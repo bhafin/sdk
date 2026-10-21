@@ -10,7 +10,7 @@
       "get": {
         "operationId": "retrieve_account",
         "summary": "Retrieve an account",
-        "description": "Resolve the account boundary and its primary investor before navigating family records.",
+        "description": "Read the account your credentials authorize, including its display name and primary investor when one is set. Start here to confirm your integration is using the intended account before selecting family records.",
         "x-required-scope": "accounts:read",
         "x-auth-mode-rules": "Direct key only OR delegated application key + same-client active user grant; reject mixtures and invalid supplied credentials. See reviewed-contract.md.",
         "security": [
@@ -208,6 +208,23 @@
               }
             }
           },
+          "422": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "429": {
             "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
             "headers": {
@@ -300,7 +317,7 @@
       "get": {
         "operationId": "list_clients",
         "summary": "List clients",
-        "description": "Browse clients within the authorized account. Use the final returned ID to request the next page.",
+        "description": "List the investor groups in your account, such as a family. These domain Clients are different from OAuth applications. Use each returned Client ID to select a group; use the last returned ID to request the next page.",
         "x-required-scope": "clients:read",
         "x-auth-mode-rules": "Direct key only OR delegated application key + same-client active user grant; reject mixtures and invalid supplied credentials. See reviewed-contract.md.",
         "security": [
@@ -526,6 +543,23 @@
               }
             }
           },
+          "422": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "429": {
             "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
             "headers": {
@@ -618,7 +652,7 @@
       "get": {
         "operationId": "retrieve_client",
         "summary": "Retrieve a client",
-        "description": "Retrieve one client by its opaque ID. Missing and foreign-account IDs return the same 404.",
+        "description": "Read one investor group, such as a family, using the Client ID returned by a list or investor record. This operation retrieves the group’s metadata; it does not select an OAuth application or grant access to its members.",
         "x-required-scope": "clients:read",
         "x-auth-mode-rules": "Direct key only OR delegated application key + same-client active user grant; reject mixtures and invalid supplied credentials. See reviewed-contract.md.",
         "security": [
@@ -825,6 +859,23 @@
               }
             }
           },
+          "422": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "429": {
             "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
             "headers": {
@@ -917,7 +968,7 @@
       "get": {
         "operationId": "list_investors",
         "summary": "List investors",
-        "description": "Browse investors within the authorized account. Use the final returned ID to request the next page.",
+        "description": "Find the people represented in the account so a user can select whose portfolio to work with. Each record has a stable investor ID and a Client association. Use the last returned ID to continue to the next page.",
         "x-required-scope": "investors:read",
         "x-auth-mode-rules": "Direct key only OR delegated application key + same-client active user grant; reject mixtures and invalid supplied credentials. See reviewed-contract.md.",
         "security": [
@@ -1155,6 +1206,23 @@
               }
             }
           },
+          "422": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "429": {
             "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
             "headers": {
@@ -1245,7 +1313,7 @@
       "post": {
         "operationId": "create_investor",
         "summary": "Create an investor",
-        "description": "Add a family member so their portfolios remain distinct. A profile does not create a login or grant that person access.",
+        "description": "Create a profile for a person in an existing Client group so their portfolios remain separate from other family members’ portfolios. This records a person; it does not invite them, create a login or authorize access to the account.",
         "x-required-scope": "investors:write",
         "x-auth-mode-rules": "Direct key only OR delegated application key + same-client active user grant; reject mixtures and invalid supplied credentials. See reviewed-contract.md.",
         "security": [
@@ -1469,6 +1537,23 @@
               }
             }
           },
+          "422": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "429": {
             "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
             "headers": {
@@ -1561,7 +1646,7 @@
       "get": {
         "operationId": "retrieve_investor",
         "summary": "Retrieve an investor",
-        "description": "Retrieve one investor by its opaque ID. Missing and foreign-account IDs return the same 404.",
+        "description": "Read a person’s investor profile, including their display name, relationship to the account owner and Client association. Use the profile’s ID for subsequent requests because names are not unique identifiers.",
         "x-required-scope": "investors:read",
         "x-auth-mode-rules": "Direct key only OR delegated application key + same-client active user grant; reject mixtures and invalid supplied credentials. See reviewed-contract.md.",
         "security": [
@@ -1770,6 +1855,23 @@
               }
             }
           },
+          "422": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "429": {
             "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
             "headers": {
@@ -1860,7 +1962,7 @@
       "post": {
         "operationId": "update_investor",
         "summary": "Update an investor",
-        "description": "Correct the investor display name or relationship without moving their Client or portfolios.",
+        "description": "Update an investor’s display name or relationship to the account owner. Supply only the fields you intend to change. This operation does not move the investor to a different Client or transfer their portfolios.",
         "x-required-scope": "investors:write",
         "x-auth-mode-rules": "Direct key only OR delegated application key + same-client active user grant; reject mixtures and invalid supplied credentials. See reviewed-contract.md.",
         "security": [
@@ -2092,6 +2194,23 @@
               }
             }
           },
+          "422": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "429": {
             "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
             "headers": {
@@ -2184,7 +2303,7 @@
       "get": {
         "operationId": "list_portfolios",
         "summary": "List portfolios",
-        "description": "Browse portfolios within the authorized account. Use the final returned ID to request the next page.",
+        "description": "Find portfolios in the authorized account and use their investor association to display them under the correct person. This list returns portfolio metadata; retrieve a current snapshot separately when you need positions and totals.",
         "x-required-scope": "portfolios:read",
         "x-auth-mode-rules": "Direct key only OR delegated application key + same-client active user grant; reject mixtures and invalid supplied credentials. See reviewed-contract.md.",
         "security": [
@@ -2422,6 +2541,23 @@
               }
             }
           },
+          "422": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "429": {
             "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
             "headers": {
@@ -2512,7 +2648,7 @@
       "post": {
         "operationId": "create_portfolio",
         "summary": "Create a portfolio",
-        "description": "Create a named portfolio, a manual investment account and its initial immutable snapshot in one operation.",
+        "description": "Save a portfolio for an existing investor, together with a manual investment account and the first dated snapshot of entered positions. The operation returns those records together so you can display the saved holdings and retain the snapshot ID for editing.",
         "x-required-scope": "portfolios:write",
         "x-auth-mode-rules": "Direct key only OR delegated application key + same-client active user grant; reject mixtures and invalid supplied credentials. See reviewed-contract.md.",
         "security": [
@@ -2829,6 +2965,23 @@
               }
             }
           },
+          "422": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "429": {
             "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
             "headers": {
@@ -2921,7 +3074,7 @@
       "get": {
         "operationId": "retrieve_portfolio",
         "summary": "Retrieve a portfolio",
-        "description": "Retrieve portfolio metadata. Fetch current_snapshot separately for holdings and totals.",
+        "description": "Read a saved portfolio’s owner, name and reporting currency. This metadata does not include its holdings. Follow with current_snapshot for current positions and totals, or use the holding-history operations for supported dated positions.",
         "x-required-scope": "portfolios:read",
         "x-auth-mode-rules": "Direct key only OR delegated application key + same-client active user grant; reject mixtures and invalid supplied credentials. See reviewed-contract.md.",
         "security": [
@@ -3130,6 +3283,23 @@
               }
             }
           },
+          "422": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "429": {
             "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
             "headers": {
@@ -3222,7 +3392,7 @@
       "get": {
         "operationId": "search_funds",
         "summary": "Search mutual funds",
-        "description": "Power instrument autocomplete with scheme, plan and option distinctions. Store the selected instrument ID, never resolve identity from a display name.",
+        "description": "Find fund instruments for a user to choose from. Display the scheme, plan and option together so similarly named investments remain distinct. Use the selected instrument ID in portfolio positions rather than resolving identity from a display name.",
         "x-required-scope": "portfolios:read",
         "x-auth-mode-rules": "Direct key only OR delegated application key + same-client active user grant; reject mixtures and invalid supplied credentials. See reviewed-contract.md.",
         "security": [
@@ -3486,6 +3656,23 @@
               }
             }
           },
+          "422": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "429": {
             "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
             "headers": {
@@ -3578,7 +3765,7 @@
       "get": {
         "operationId": "fund_references",
         "summary": "Resolve fund references",
-        "description": "Refresh reference information for exact saved instrument IDs without changing stored holdings.",
+        "description": "Retrieve current reference information for an exact set of saved instrument IDs. Use this to display labels and dated NAVs alongside existing positions. It does not change the stored holdings or their entered values.",
         "x-required-scope": "portfolios:read",
         "x-auth-mode-rules": "Direct key only OR delegated application key + same-client active user grant; reject mixtures and invalid supplied credentials. See reviewed-contract.md.",
         "security": [
@@ -3831,6 +4018,23 @@
               }
             }
           },
+          "422": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "429": {
             "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
             "headers": {
@@ -3923,7 +4127,7 @@
       "get": {
         "operationId": "current_snapshot",
         "summary": "Retrieve current holdings",
-        "description": "Read a pinned snapshot with positions, instrument metadata and the sum of entered INR values. Use this response to populate a holdings editor.",
+        "description": "Read the currently selected snapshot, its positions, the instrument metadata saved with it, and the total entered INR value. Use this response to populate a holdings editor, retaining snapshot.id to protect the next save from concurrent edits.",
         "x-required-scope": "portfolios:read",
         "x-auth-mode-rules": "Direct key only OR delegated application key + same-client active user grant; reject mixtures and invalid supplied credentials. See reviewed-contract.md.",
         "security": [
@@ -4219,6 +4423,23 @@
               }
             }
           },
+          "422": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "429": {
             "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
             "headers": {
@@ -4311,7 +4532,7 @@
       "post": {
         "operationId": "replace_snapshot",
         "summary": "Replace holdings",
-        "description": "Publish the complete replacement position set. Omitted funds are removed; an empty array clears holdings. The earlier snapshot remains immutable.",
+        "description": "Save a complete new set of positions for an existing portfolio. Send every position you want to keep: omitted instruments are removed, and an empty list clears current holdings. The previous snapshot remains unchanged. Include expected_snapshot to detect a newer save.",
         "x-required-scope": "portfolios:write",
         "x-auth-mode-rules": "Direct key only OR delegated application key + same-client active user grant; reject mixtures and invalid supplied credentials. See reviewed-contract.md.",
         "security": [
@@ -4637,6 +4858,23 @@
               }
             }
           },
+          "422": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "429": {
             "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
             "headers": {
@@ -4729,7 +4967,7 @@
       "post": {
         "operationId": "asset_mix",
         "summary": "Calculate asset mix",
-        "description": "Calculate signed net asset allocation; negative and above-100 percentages are valid. Supports saved and in-memory India INR mutual-fund portfolios. Locally implemented and tested; not a deployment claim.",
+        "description": "Calculate how an India INR mutual-fund portfolio is allocated across asset categories. Results use signed net exposure, so negative percentages or values above 100 can be valid. You can calculate from saved positions or supplied values without saving them. This API feature is locally implemented and tested, not publicly deployed.",
         "x-required-scope": "portfolios:read",
         "x-read-only": true,
         "x-auth-mode-rules": "Direct key only OR delegated application key + same-client active user grant; reject mixtures and invalid supplied credentials. See reviewed-contract.md.",
@@ -5128,7 +5366,7 @@
       "post": {
         "operationId": "sector_mix",
         "summary": "Calculate sector mix",
-        "description": "Calculate recursively normalized equity-only sector contributions, not whole-portfolio coverage. Supports saved and in-memory India INR mutual-fund portfolios. Locally implemented and tested; not a deployment claim.",
+        "description": "Calculate the sector distribution of the equity exposure in an India INR mutual-fund portfolio. Contributions are normalized within the equity calculation at each level, so these percentages do not describe the whole portfolio. This API feature supports saved or supplied positions and is locally implemented, not publicly deployed.",
         "x-required-scope": "portfolios:read",
         "x-read-only": true,
         "x-auth-mode-rules": "Direct key only OR delegated application key + same-client active user grant; reject mixtures and invalid supplied credentials. See reviewed-contract.md.",
@@ -5513,7 +5751,7 @@
       "post": {
         "operationId": "issuer_mix",
         "summary": "Calculate issuer mix",
-        "description": "Calculate recursively normalized equity-only issuer contributions, not whole-portfolio coverage. Supports saved and in-memory India INR mutual-fund portfolios. Locally implemented and tested; not a deployment claim.",
+        "description": "Calculate which issuers contribute to the equity exposure in an India INR mutual-fund portfolio. Contributions are normalized within the equity calculation at each level, so these percentages do not describe the whole portfolio. This API feature supports saved or supplied positions and is locally implemented, not publicly deployed.",
         "x-required-scope": "portfolios:read",
         "x-read-only": true,
         "x-auth-mode-rules": "Direct key only OR delegated application key + same-client active user grant; reject mixtures and invalid supplied credentials. See reviewed-contract.md.",
@@ -5651,6 +5889,2080 @@
                       }
                     ]
                   }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/accounts/{account}/portfolios/{portfolio}/history/imports": {
+      "post": {
+        "operationId": "import_history",
+        "summary": "Import holding history",
+        "description": "Add opening quantities, buy/sell transactions and declared complete ranges to an existing portfolio. Use this when you have source history to record, rather than trying to infer past purchases from today’s value. Holding history is locally implemented; the API feature is not publicly deployed.",
+        "x-required-scope": "portfolios:write",
+        "x-auth-mode-rules": "Direct key only OR delegated application key + same-client active user grant; reject mixtures and invalid supplied credentials. See reviewed-contract.md.",
+        "security": [
+          {
+            "DirectAccountKey": []
+          },
+          {
+            "DelegatedApplicationKey": [],
+            "DelegatedUserToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "account",
+            "in": "path",
+            "required": true,
+            "description": "Authorized account or me.",
+            "schema": {
+              "anyOf": [
+                {
+                  "const": "me"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^acct_[a-f0-9]{32}$"
+                }
+              ]
+            }
+          },
+          {
+            "name": "portfolio",
+            "in": "path",
+            "required": true,
+            "description": "Saved portfolio ID.",
+            "schema": {
+              "type": "string",
+              "pattern": "^ptf_[a-f0-9]{32}$"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[!-~]{1,255}$"
+            },
+            "description": "Successful responses retained for 24 hours from server recording time; response record and mutation commit atomically. Retries do not extend retention; current authorization always required before replay."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HistoryImport"
+              },
+              "example": {
+                "source": {
+                  "kind": "user",
+                  "reference": "synthetic-statement"
+                },
+                "holdings": [
+                  {
+                    "external_id": "example-holding",
+                    "investment_account": "iac_0123456789abcdef0123456789abcdef",
+                    "instrument": "ins_markets_scheme_101",
+                    "opening": {
+                      "date": "2026-01-01",
+                      "quantity": "10"
+                    },
+                    "complete_range": {
+                      "from": "2026-01-01",
+                      "through": "2026-01-31"
+                    },
+                    "transactions": [
+                      {
+                        "external_id": "buy-1",
+                        "date": "2026-01-03",
+                        "sequence": 1,
+                        "kind": "buy",
+                        "quantity": "3"
+                      }
+                    ]
+                  }
+                ],
+                "complete_range": {
+                  "from": "2026-01-01",
+                  "through": "2026-01-31"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistoryImportResult"
+                },
+                "example": {
+                  "object": "history_import",
+                  "account": "acct_0123456789abcdef0123456789abcdef",
+                  "portfolio": "ptf_0123456789abcdef0123456789abcdef",
+                  "holdings": [
+                    {
+                      "id": "hld_0123456789abcdef0123456789abcdef"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/accounts/{account}/portfolios/{portfolio}/history": {
+      "get": {
+        "operationId": "retrieve_history",
+        "summary": "Read declared holding history",
+        "description": "Read the history already recorded for a portfolio, including its source, declared range and holding-level evidence. Use this to inspect what an import stored before deciding whether a historical date is supported. Holding history is locally implemented; the API feature is not publicly deployed.",
+        "x-required-scope": "portfolios:read",
+        "x-auth-mode-rules": "Direct key only OR delegated application key + same-client active user grant; reject mixtures and invalid supplied credentials. See reviewed-contract.md.",
+        "security": [
+          {
+            "DirectAccountKey": []
+          },
+          {
+            "DelegatedApplicationKey": [],
+            "DelegatedUserToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "account",
+            "in": "path",
+            "required": true,
+            "description": "Authorized account or me.",
+            "schema": {
+              "anyOf": [
+                {
+                  "const": "me"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^acct_[a-f0-9]{32}$"
+                }
+              ]
+            }
+          },
+          {
+            "name": "portfolio",
+            "in": "path",
+            "required": true,
+            "description": "Saved portfolio ID.",
+            "schema": {
+              "type": "string",
+              "pattern": "^ptf_[a-f0-9]{32}$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistoryView"
+                },
+                "example": {
+                  "object": "portfolio_history",
+                  "account": "acct_0123456789abcdef0123456789abcdef",
+                  "portfolio": "ptf_0123456789abcdef0123456789abcdef",
+                  "source": {
+                    "kind": "user",
+                    "reference": "synthetic-statement"
+                  },
+                  "complete_range": {
+                    "from": "2026-01-01",
+                    "through": "2026-01-31"
+                  },
+                  "holdings": [
+                    {
+                      "id": "hld_0123456789abcdef0123456789abcdef",
+                      "object": "holding",
+                      "account": "acct_0123456789abcdef0123456789abcdef",
+                      "portfolio": "ptf_0123456789abcdef0123456789abcdef",
+                      "investment_account": "iac_0123456789abcdef0123456789abcdef",
+                      "instrument": "ins_markets_scheme_101",
+                      "position_backing": "ledger",
+                      "external_id": "example-holding",
+                      "opening": {
+                        "date": "2026-01-01",
+                        "quantity": "10",
+                        "source": {
+                          "kind": "user",
+                          "reference": "synthetic-statement"
+                        }
+                      },
+                      "complete_range": {
+                        "from": "2026-01-01",
+                        "through": "2026-01-31"
+                      },
+                      "transactions": [
+                        {
+                          "external_id": "buy-1",
+                          "date": "2026-01-03",
+                          "sequence": 1,
+                          "kind": "buy",
+                          "quantity": "3",
+                          "source": {
+                            "kind": "user",
+                            "reference": "synthetic-statement"
+                          }
+                        }
+                      ],
+                      "complete_range_source": {
+                        "kind": "user",
+                        "reference": "synthetic-statement"
+                      },
+                      "observed_position": null
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/accounts/{account}/portfolios/{portfolio}/history/capabilities": {
+      "get": {
+        "operationId": "history_capabilities",
+        "summary": "Check historical reconstruction",
+        "description": "Check whether the recorded history supports reconstructing a portfolio on a date. Inspect can_reconstruct and reasons before offering a dated view; completeness is a source declaration, not independent certification. Holding history is locally implemented; the API feature is not publicly deployed.",
+        "x-required-scope": "portfolios:read",
+        "x-auth-mode-rules": "Direct key only OR delegated application key + same-client active user grant; reject mixtures and invalid supplied credentials. See reviewed-contract.md.",
+        "security": [
+          {
+            "DirectAccountKey": []
+          },
+          {
+            "DelegatedApplicationKey": [],
+            "DelegatedUserToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "account",
+            "in": "path",
+            "required": true,
+            "description": "Authorized account or me.",
+            "schema": {
+              "anyOf": [
+                {
+                  "const": "me"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^acct_[a-f0-9]{32}$"
+                }
+              ]
+            }
+          },
+          {
+            "name": "portfolio",
+            "in": "path",
+            "required": true,
+            "description": "Saved portfolio ID.",
+            "schema": {
+              "type": "string",
+              "pattern": "^ptf_[a-f0-9]{32}$"
+            }
+          },
+          {
+            "name": "date",
+            "in": "query",
+            "required": true,
+            "description": "Investor position date; daily close in the investment account timezone.",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "Real calendar date, 1900-01-01 through today Asia/Kolkata; replacement cannot move backwards."
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistoryCapability"
+                },
+                "example": {
+                  "object": "history_capability",
+                  "date": "2026-01-10",
+                  "basis": "declared",
+                  "can_reconstruct": true,
+                  "history_complete": true,
+                  "position_backing": "ledger",
+                  "reasons": []
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/accounts/{account}/portfolios/{portfolio}/holdings": {
+      "get": {
+        "operationId": "list_holdings",
+        "summary": "List scoped holdings",
+        "description": "Find the holdings recorded under a portfolio. A holding keeps a stable identity for an asset within an investment account or folio, including when it is closed. Use the returned holding IDs for detail and position requests. Holding history is locally implemented; the API feature is not publicly deployed.",
+        "x-required-scope": "portfolios:read",
+        "x-auth-mode-rules": "Direct key only OR delegated application key + same-client active user grant; reject mixtures and invalid supplied credentials. See reviewed-contract.md.",
+        "security": [
+          {
+            "DirectAccountKey": []
+          },
+          {
+            "DelegatedApplicationKey": [],
+            "DelegatedUserToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "account",
+            "in": "path",
+            "required": true,
+            "description": "Authorized account or me.",
+            "schema": {
+              "anyOf": [
+                {
+                  "const": "me"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^acct_[a-f0-9]{32}$"
+                }
+              ]
+            }
+          },
+          {
+            "name": "portfolio",
+            "in": "path",
+            "required": true,
+            "description": "Saved portfolio ID.",
+            "schema": {
+              "type": "string",
+              "pattern": "^ptf_[a-f0-9]{32}$"
+            }
+          },
+          {
+            "name": "date",
+            "in": "query",
+            "required": false,
+            "description": "Optional historical date; closed holdings remain available.",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "Real calendar date, 1900-01-01 through today Asia/Kolkata; replacement cannot move backwards."
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HoldingsList"
+                },
+                "example": {
+                  "object": "list",
+                  "data": [
+                    {
+                      "id": "hld_0123456789abcdef0123456789abcdef",
+                      "object": "holding",
+                      "account": "acct_0123456789abcdef0123456789abcdef",
+                      "portfolio": "ptf_0123456789abcdef0123456789abcdef",
+                      "investment_account": "iac_0123456789abcdef0123456789abcdef",
+                      "instrument": "ins_markets_scheme_101",
+                      "position_backing": "ledger"
+                    }
+                  ],
+                  "has_more": false,
+                  "url": "/v1/accounts/acct_0123456789abcdef0123456789abcdef/portfolios/ptf_0123456789abcdef0123456789abcdef/holdings"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/accounts/{account}/portfolios/{portfolio}/holdings/{holding}": {
+      "get": {
+        "operationId": "retrieve_holding",
+        "summary": "Retrieve a holding",
+        "description": "Read the identity and evidence type of one holding in a portfolio. This describes which investment account and instrument it belongs to; use the dated-position operation to ask how much was held on a date. Holding history is locally implemented; the API feature is not publicly deployed.",
+        "x-required-scope": "portfolios:read",
+        "x-auth-mode-rules": "Direct key only OR delegated application key + same-client active user grant; reject mixtures and invalid supplied credentials. See reviewed-contract.md.",
+        "security": [
+          {
+            "DirectAccountKey": []
+          },
+          {
+            "DelegatedApplicationKey": [],
+            "DelegatedUserToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "account",
+            "in": "path",
+            "required": true,
+            "description": "Authorized account or me.",
+            "schema": {
+              "anyOf": [
+                {
+                  "const": "me"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^acct_[a-f0-9]{32}$"
+                }
+              ]
+            }
+          },
+          {
+            "name": "portfolio",
+            "in": "path",
+            "required": true,
+            "description": "Saved portfolio ID.",
+            "schema": {
+              "type": "string",
+              "pattern": "^ptf_[a-f0-9]{32}$"
+            }
+          },
+          {
+            "name": "holding",
+            "in": "path",
+            "required": true,
+            "description": "Holding scoped to this portfolio.",
+            "schema": {
+              "type": "string",
+              "pattern": "^hld_[a-f0-9]{32}$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Holding"
+                },
+                "example": {
+                  "id": "hld_0123456789abcdef0123456789abcdef",
+                  "object": "holding",
+                  "account": "acct_0123456789abcdef0123456789abcdef",
+                  "portfolio": "ptf_0123456789abcdef0123456789abcdef",
+                  "investment_account": "iac_0123456789abcdef0123456789abcdef",
+                  "instrument": "ins_markets_scheme_101",
+                  "position_backing": "ledger"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/accounts/{account}/portfolios/{portfolio}/holdings/{holding}/position": {
+      "get": {
+        "operationId": "holding_position",
+        "summary": "Resolve a dated holding position",
+        "description": "Resolve one holding’s position on a date, using an exact observation or supported transaction history. An observed value can have an unknown quantity; the API does not fill missing dates by carrying today’s balance backward. Holding history is locally implemented; the API feature is not publicly deployed.",
+        "x-required-scope": "portfolios:read",
+        "x-auth-mode-rules": "Direct key only OR delegated application key + same-client active user grant; reject mixtures and invalid supplied credentials. See reviewed-contract.md.",
+        "security": [
+          {
+            "DirectAccountKey": []
+          },
+          {
+            "DelegatedApplicationKey": [],
+            "DelegatedUserToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "account",
+            "in": "path",
+            "required": true,
+            "description": "Authorized account or me.",
+            "schema": {
+              "anyOf": [
+                {
+                  "const": "me"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^acct_[a-f0-9]{32}$"
+                }
+              ]
+            }
+          },
+          {
+            "name": "portfolio",
+            "in": "path",
+            "required": true,
+            "description": "Saved portfolio ID.",
+            "schema": {
+              "type": "string",
+              "pattern": "^ptf_[a-f0-9]{32}$"
+            }
+          },
+          {
+            "name": "holding",
+            "in": "path",
+            "required": true,
+            "description": "Holding scoped to this portfolio.",
+            "schema": {
+              "type": "string",
+              "pattern": "^hld_[a-f0-9]{32}$"
+            }
+          },
+          {
+            "name": "date",
+            "in": "query",
+            "required": true,
+            "description": "Investor position date.",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "Real calendar date, 1900-01-01 through today Asia/Kolkata; replacement cannot move backwards."
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HoldingPosition"
+                },
+                "example": {
+                  "object": "holding_position",
+                  "account": "acct_0123456789abcdef0123456789abcdef",
+                  "portfolio": "ptf_0123456789abcdef0123456789abcdef",
+                  "holding": "hld_0123456789abcdef0123456789abcdef",
+                  "position_date": "2026-01-10",
+                  "quantity": "13",
+                  "valuation": null,
+                  "position_backing": "ledger",
+                  "history_complete": true
                 }
               }
             }
@@ -7006,6 +9318,18 @@
             "format": "date",
             "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
             "description": "Real calendar date, 1900-01-01 through today Asia/Kolkata; replacement cannot move backwards."
+          },
+          "position_date": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "description": "Real calendar date, 1900-01-01 through today Asia/Kolkata; replacement cannot move backwards."
+          },
+          "valuation_date": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "description": "Real calendar date, 1900-01-01 through today Asia/Kolkata; replacement cannot move backwards."
           }
         },
         "required": ["portfolio"],
@@ -7210,6 +9534,12 @@
               "items"
             ],
             "additionalProperties": false
+          },
+          "position_date": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "description": "Real calendar date, 1900-01-01 through today Asia/Kolkata; replacement cannot move backwards."
           }
         },
         "required": [
@@ -7465,6 +9795,12 @@
               "items"
             ],
             "additionalProperties": false
+          },
+          "position_date": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "description": "Real calendar date, 1900-01-01 through today Asia/Kolkata; replacement cannot move backwards."
           }
         },
         "required": [
@@ -7693,6 +10029,12 @@
               "items"
             ],
             "additionalProperties": false
+          },
+          "position_date": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "description": "Real calendar date, 1900-01-01 through today Asia/Kolkata; replacement cannot move backwards."
           }
         },
         "required": [
@@ -7708,6 +10050,620 @@
           "source_roots",
           "warnings",
           "mix"
+        ],
+        "additionalProperties": true
+      },
+      "HistorySource": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": ["user", "statement"]
+          },
+          "reference": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          }
+        },
+        "required": ["kind", "reference"],
+        "additionalProperties": false
+      },
+      "HistoryRange": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "description": "Real calendar date, 1900-01-01 through today Asia/Kolkata; replacement cannot move backwards."
+          },
+          "through": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "description": "Real calendar date, 1900-01-01 through today Asia/Kolkata; replacement cannot move backwards."
+          }
+        },
+        "required": ["from", "through"],
+        "additionalProperties": false
+      },
+      "HistoryOpening": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "description": "Real calendar date, 1900-01-01 through today Asia/Kolkata; replacement cannot move backwards."
+          },
+          "quantity": {
+            "type": "string",
+            "pattern": "^(0|[1-9][0-9]{0,19})(\\.[0-9]{1,18})?$"
+          }
+        },
+        "required": ["date", "quantity"],
+        "additionalProperties": false
+      },
+      "HistoryTransaction": {
+        "type": "object",
+        "properties": {
+          "external_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "date": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "description": "Real calendar date, 1900-01-01 through today Asia/Kolkata; replacement cannot move backwards."
+          },
+          "sequence": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "kind": {
+            "type": "string",
+            "enum": ["buy", "sell"]
+          },
+          "quantity": {
+            "type": "string",
+            "pattern": "^(0|[1-9][0-9]{0,19})(\\.[0-9]{1,18})?$"
+          }
+        },
+        "required": ["external_id", "date", "sequence", "kind", "quantity"],
+        "additionalProperties": false
+      },
+      "HistoryObservation": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "description": "Real calendar date, 1900-01-01 through today Asia/Kolkata; replacement cannot move backwards."
+          },
+          "quantity": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(0|[1-9][0-9]{0,19})(\\.[0-9]{1,18})?$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "current_value": {
+            "$ref": "#/components/schemas/Money"
+          }
+        },
+        "required": ["date"],
+        "additionalProperties": false
+      },
+      "HistoryHoldingInput": {
+        "type": "object",
+        "properties": {
+          "external_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "investment_account": {
+            "type": "string",
+            "pattern": "^iac_[a-f0-9]{32}$"
+          },
+          "instrument": {
+            "type": "string",
+            "pattern": "^ins_[A-Za-z0-9_-]{1,150}$"
+          },
+          "opening": {
+            "$ref": "#/components/schemas/HistoryOpening"
+          },
+          "complete_range": {
+            "$ref": "#/components/schemas/HistoryRange"
+          },
+          "transactions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HistoryTransaction"
+            },
+            "maxItems": 5000
+          },
+          "observed_position": {
+            "$ref": "#/components/schemas/HistoryObservation"
+          }
+        },
+        "required": ["external_id", "investment_account", "instrument"],
+        "additionalProperties": false
+      },
+      "HistoryImport": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "$ref": "#/components/schemas/HistorySource"
+          },
+          "holdings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HistoryHoldingInput"
+            },
+            "minItems": 1,
+            "maxItems": 100
+          },
+          "complete_range": {
+            "$ref": "#/components/schemas/HistoryRange"
+          }
+        },
+        "required": ["source", "holdings"],
+        "additionalProperties": false
+      },
+      "Holding": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^hld_[a-f0-9]{32}$"
+          },
+          "object": {
+            "const": "holding"
+          },
+          "account": {
+            "type": "string",
+            "pattern": "^acct_[a-f0-9]{32}$"
+          },
+          "portfolio": {
+            "type": "string",
+            "pattern": "^ptf_[a-f0-9]{32}$"
+          },
+          "investment_account": {
+            "type": "string",
+            "pattern": "^iac_[a-f0-9]{32}$"
+          },
+          "instrument": {
+            "type": "string",
+            "pattern": "^ins_[A-Za-z0-9_-]{1,150}$"
+          },
+          "position_backing": {
+            "type": "string",
+            "x-known-values": ["snapshot", "ledger", "mixed"],
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "object",
+          "account",
+          "portfolio",
+          "investment_account",
+          "instrument",
+          "position_backing"
+        ],
+        "additionalProperties": true
+      },
+      "HoldingPosition": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "const": "holding_position"
+          },
+          "account": {
+            "type": "string",
+            "pattern": "^acct_[a-f0-9]{32}$"
+          },
+          "portfolio": {
+            "type": "string",
+            "pattern": "^ptf_[a-f0-9]{32}$"
+          },
+          "holding": {
+            "type": "string",
+            "pattern": "^hld_[a-f0-9]{32}$"
+          },
+          "position_date": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "description": "Real calendar date, 1900-01-01 through today Asia/Kolkata; replacement cannot move backwards."
+          },
+          "quantity": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(0|[1-9][0-9]{0,19})(\\.[0-9]{1,18})?$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "valuation": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "market_value": {
+                    "$ref": "#/components/schemas/Money"
+                  },
+                  "as_of": {
+                    "$ref": "#/components/schemas/FinancialDate"
+                  }
+                },
+                "required": ["market_value", "as_of"],
+                "additionalProperties": true
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "position_backing": {
+            "type": "string",
+            "x-known-values": ["snapshot", "ledger", "mixed"],
+            "minLength": 1
+          },
+          "history_complete": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "object",
+          "account",
+          "portfolio",
+          "holding",
+          "position_date",
+          "quantity",
+          "valuation",
+          "position_backing",
+          "history_complete"
+        ],
+        "additionalProperties": true
+      },
+      "HistoryCapability": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "const": "history_capability"
+          },
+          "date": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "description": "Real calendar date, 1900-01-01 through today Asia/Kolkata; replacement cannot move backwards."
+          },
+          "basis": {
+            "const": "declared"
+          },
+          "can_reconstruct": {
+            "type": "boolean"
+          },
+          "history_complete": {
+            "type": "boolean"
+          },
+          "position_backing": {
+            "type": "string",
+            "x-known-values": ["snapshot", "ledger", "mixed"],
+            "minLength": 1
+          },
+          "reasons": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "object",
+          "date",
+          "basis",
+          "can_reconstruct",
+          "history_complete",
+          "position_backing",
+          "reasons"
+        ],
+        "additionalProperties": true
+      },
+      "HoldingsList": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "const": "list"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Holding"
+            }
+          },
+          "has_more": {
+            "type": "boolean"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": ["object", "data", "has_more", "url"],
+        "additionalProperties": true
+      },
+      "HistoryImportResult": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "const": "history_import"
+          },
+          "account": {
+            "type": "string",
+            "pattern": "^acct_[a-f0-9]{32}$"
+          },
+          "portfolio": {
+            "type": "string",
+            "pattern": "^ptf_[a-f0-9]{32}$"
+          },
+          "holdings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^hld_[a-f0-9]{32}$"
+                }
+              },
+              "required": ["id"],
+              "additionalProperties": true
+            }
+          }
+        },
+        "required": ["object", "account", "portfolio", "holdings"],
+        "additionalProperties": true
+      },
+      "HistoryView": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "const": "portfolio_history"
+          },
+          "account": {
+            "type": "string",
+            "pattern": "^acct_[a-f0-9]{32}$"
+          },
+          "portfolio": {
+            "type": "string",
+            "pattern": "^ptf_[a-f0-9]{32}$"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/HistorySource"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "complete_range": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/HistoryRange"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "holdings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^hld_[a-f0-9]{32}$"
+                },
+                "object": {
+                  "const": "holding"
+                },
+                "account": {
+                  "type": "string",
+                  "pattern": "^acct_[a-f0-9]{32}$"
+                },
+                "portfolio": {
+                  "type": "string",
+                  "pattern": "^ptf_[a-f0-9]{32}$"
+                },
+                "investment_account": {
+                  "type": "string",
+                  "pattern": "^iac_[a-f0-9]{32}$"
+                },
+                "instrument": {
+                  "type": "string",
+                  "pattern": "^ins_[A-Za-z0-9_-]{1,150}$"
+                },
+                "position_backing": {
+                  "type": "string",
+                  "x-known-values": ["snapshot", "ledger", "mixed"],
+                  "minLength": 1
+                },
+                "external_id": {
+                  "type": "string"
+                },
+                "opening": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "date": {
+                          "type": "string",
+                          "format": "date",
+                          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                          "description": "Real calendar date, 1900-01-01 through today Asia/Kolkata; replacement cannot move backwards."
+                        },
+                        "quantity": {
+                          "type": "string",
+                          "pattern": "^(0|[1-9][0-9]{0,19})(\\.[0-9]{1,18})?$"
+                        },
+                        "source": {
+                          "$ref": "#/components/schemas/HistorySource"
+                        }
+                      },
+                      "required": ["date", "quantity", "source"],
+                      "additionalProperties": true
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "complete_range": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/HistoryRange"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "complete_range_source": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/HistorySource"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "transactions": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "external_id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 255
+                      },
+                      "date": {
+                        "type": "string",
+                        "format": "date",
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                        "description": "Real calendar date, 1900-01-01 through today Asia/Kolkata; replacement cannot move backwards."
+                      },
+                      "sequence": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      },
+                      "kind": {
+                        "type": "string",
+                        "x-known-values": ["buy", "sell"],
+                        "minLength": 1
+                      },
+                      "quantity": {
+                        "type": "string",
+                        "pattern": "^(0|[1-9][0-9]{0,19})(\\.[0-9]{1,18})?$"
+                      },
+                      "source": {
+                        "$ref": "#/components/schemas/HistorySource"
+                      }
+                    },
+                    "required": [
+                      "external_id",
+                      "date",
+                      "sequence",
+                      "kind",
+                      "quantity",
+                      "source"
+                    ],
+                    "additionalProperties": true
+                  }
+                },
+                "observed_position": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "date": {
+                          "type": "string",
+                          "format": "date",
+                          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                          "description": "Real calendar date, 1900-01-01 through today Asia/Kolkata; replacement cannot move backwards."
+                        },
+                        "quantity": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "pattern": "^(0|[1-9][0-9]{0,19})(\\.[0-9]{1,18})?$"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "current_value": {
+                          "$ref": "#/components/schemas/Money"
+                        },
+                        "source": {
+                          "$ref": "#/components/schemas/HistorySource"
+                        }
+                      },
+                      "required": ["date", "quantity", "source"],
+                      "additionalProperties": true
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "object",
+                "account",
+                "portfolio",
+                "investment_account",
+                "instrument",
+                "position_backing",
+                "external_id",
+                "opening",
+                "complete_range",
+                "complete_range_source",
+                "transactions",
+                "observed_position"
+              ],
+              "additionalProperties": true
+            }
+          }
+        },
+        "required": [
+          "object",
+          "account",
+          "portfolio",
+          "source",
+          "complete_range",
+          "holdings"
         ],
         "additionalProperties": true
       }

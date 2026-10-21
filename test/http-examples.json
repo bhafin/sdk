@@ -885,5 +885,196 @@
         ]
       }
     }
+  },
+  {
+    "operation_id": "import_history",
+    "method": "POST",
+    "path": "/v1/accounts/{account}/portfolios/{portfolio}/history/imports",
+    "query": "",
+    "status": 201,
+    "request": {
+      "source": {
+        "kind": "user",
+        "reference": "synthetic-statement"
+      },
+      "holdings": [
+        {
+          "external_id": "example-holding",
+          "investment_account": "iac_0123456789abcdef0123456789abcdef",
+          "instrument": "ins_markets_scheme_101",
+          "opening": {
+            "date": "2026-01-01",
+            "quantity": "10"
+          },
+          "complete_range": {
+            "from": "2026-01-01",
+            "through": "2026-01-31"
+          },
+          "transactions": [
+            {
+              "external_id": "buy-1",
+              "date": "2026-01-03",
+              "sequence": 1,
+              "kind": "buy",
+              "quantity": "3"
+            }
+          ]
+        }
+      ],
+      "complete_range": {
+        "from": "2026-01-01",
+        "through": "2026-01-31"
+      }
+    },
+    "response": {
+      "object": "history_import",
+      "account": "acct_0123456789abcdef0123456789abcdef",
+      "portfolio": "ptf_0123456789abcdef0123456789abcdef",
+      "holdings": [
+        {
+          "id": "hld_0123456789abcdef0123456789abcdef"
+        }
+      ]
+    }
+  },
+  {
+    "operation_id": "retrieve_history",
+    "method": "GET",
+    "path": "/v1/accounts/{account}/portfolios/{portfolio}/history",
+    "query": "",
+    "status": 200,
+    "request": null,
+    "response": {
+      "object": "portfolio_history",
+      "account": "acct_0123456789abcdef0123456789abcdef",
+      "portfolio": "ptf_0123456789abcdef0123456789abcdef",
+      "source": {
+        "kind": "user",
+        "reference": "synthetic-statement"
+      },
+      "complete_range": {
+        "from": "2026-01-01",
+        "through": "2026-01-31"
+      },
+      "holdings": [
+        {
+          "id": "hld_0123456789abcdef0123456789abcdef",
+          "object": "holding",
+          "account": "acct_0123456789abcdef0123456789abcdef",
+          "portfolio": "ptf_0123456789abcdef0123456789abcdef",
+          "investment_account": "iac_0123456789abcdef0123456789abcdef",
+          "instrument": "ins_markets_scheme_101",
+          "position_backing": "ledger",
+          "external_id": "example-holding",
+          "opening": {
+            "date": "2026-01-01",
+            "quantity": "10",
+            "source": {
+              "kind": "user",
+              "reference": "synthetic-statement"
+            }
+          },
+          "complete_range": {
+            "from": "2026-01-01",
+            "through": "2026-01-31"
+          },
+          "transactions": [
+            {
+              "external_id": "buy-1",
+              "date": "2026-01-03",
+              "sequence": 1,
+              "kind": "buy",
+              "quantity": "3",
+              "source": {
+                "kind": "user",
+                "reference": "synthetic-statement"
+              }
+            }
+          ],
+          "complete_range_source": {
+            "kind": "user",
+            "reference": "synthetic-statement"
+          },
+          "observed_position": null
+        }
+      ]
+    }
+  },
+  {
+    "operation_id": "history_capabilities",
+    "method": "GET",
+    "path": "/v1/accounts/{account}/portfolios/{portfolio}/history/capabilities",
+    "query": "date=2026-01-10",
+    "status": 200,
+    "request": null,
+    "response": {
+      "object": "history_capability",
+      "date": "2026-01-10",
+      "basis": "declared",
+      "can_reconstruct": true,
+      "history_complete": true,
+      "position_backing": "ledger",
+      "reasons": []
+    }
+  },
+  {
+    "operation_id": "list_holdings",
+    "method": "GET",
+    "path": "/v1/accounts/{account}/portfolios/{portfolio}/holdings",
+    "query": "",
+    "status": 200,
+    "request": null,
+    "response": {
+      "object": "list",
+      "data": [
+        {
+          "id": "hld_0123456789abcdef0123456789abcdef",
+          "object": "holding",
+          "account": "acct_0123456789abcdef0123456789abcdef",
+          "portfolio": "ptf_0123456789abcdef0123456789abcdef",
+          "investment_account": "iac_0123456789abcdef0123456789abcdef",
+          "instrument": "ins_markets_scheme_101",
+          "position_backing": "ledger"
+        }
+      ],
+      "has_more": false,
+      "url": "/v1/accounts/acct_0123456789abcdef0123456789abcdef/portfolios/ptf_0123456789abcdef0123456789abcdef/holdings"
+    }
+  },
+  {
+    "operation_id": "retrieve_holding",
+    "method": "GET",
+    "path": "/v1/accounts/{account}/portfolios/{portfolio}/holdings/{holding}",
+    "query": "",
+    "status": 200,
+    "request": null,
+    "response": {
+      "id": "hld_0123456789abcdef0123456789abcdef",
+      "object": "holding",
+      "account": "acct_0123456789abcdef0123456789abcdef",
+      "portfolio": "ptf_0123456789abcdef0123456789abcdef",
+      "investment_account": "iac_0123456789abcdef0123456789abcdef",
+      "instrument": "ins_markets_scheme_101",
+      "position_backing": "ledger"
+    }
+  },
+  {
+    "operation_id": "holding_position",
+    "method": "GET",
+    "path": "/v1/accounts/{account}/portfolios/{portfolio}/holdings/{holding}/position",
+    "query": "date=2026-01-10",
+    "status": 200,
+    "request": null,
+    "response": {
+      "object": "holding_position",
+      "account": "acct_0123456789abcdef0123456789abcdef",
+      "portfolio": "ptf_0123456789abcdef0123456789abcdef",
+      "holding": "hld_0123456789abcdef0123456789abcdef",
+      "position_date": "2026-01-10",
+      "quantity": "13",
+      "valuation": null,
+      "position_backing": "ledger",
+      "history_complete": true
+    }
   }
 ]
