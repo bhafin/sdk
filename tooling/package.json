@@ -1,0 +1,9 @@
+{
+  "name": "bharosa-sdk-development-tools",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Pinned contributor tools; not part of the SDK artifact",
+  "devDependencies": {
+    "typescript": "5.5.4"
+  }
+}
