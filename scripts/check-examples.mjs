@@ -47,6 +47,26 @@ for (const e of endpoints)
           ...config,
           fetch: async (url, init) => {
             calls++;
+            const prerequisite = endpoints.find(
+              (x) =>
+                x.method === init.method &&
+                new RegExp(
+                  "^" + x.path.replace(/\{[^}]+\}/g, "[^/]+") + "$",
+                ).test(new URL(url).pathname),
+            );
+            if (
+              e.group === "Holding history" &&
+              prerequisite &&
+              prerequisite.slug !== e.slug
+            )
+              return new Response(JSON.stringify(prerequisite.response), {
+                status: 200,
+                headers: {
+                  "Content-Type": "application/json",
+                  "Request-Id": "req_prerequisite",
+                },
+              });
+
             assert.equal(
               init.headers["Bharosa-User-Authorization"],
               delegated ? "Bearer synthetic-token" : undefined,
@@ -77,7 +97,10 @@ for (const e of endpoints)
       { env },
       { randomUUID: () => "synthetic-example-key" },
     );
-    assert.equal(calls, 1);
+    assert.equal(
+      calls,
+      e.slug === "holding-position" ? 3 : e.group === "Holding history" ? 2 : 1,
+    );
     count++;
     fs.writeFileSync(
       path.join(consumer, `website-${e.slug}-${delegated}.ts`),
@@ -93,7 +116,13 @@ if (process.env.BHAROSA_TSC) {
   ).href;
   const guideSource = fs
     .readFileSync(path.join(marketing, "src/content/guides.ts"), "utf8")
-    .replace('"./product"', JSON.stringify(productUrl));
+    .replace('"./product"', JSON.stringify(productUrl))
+    .replace(
+      '"./examples"',
+      JSON.stringify(
+        pathToFileURL(path.join(marketing, "src/content/examples.ts")).href,
+      ),
+    );
   const guideJs = ts.transpileModule(guideSource, {
     compilerOptions: {
       module: ts.ModuleKind.ESNext,
@@ -108,6 +137,8 @@ if (process.env.BHAROSA_TSC) {
   for (const guide of guides)
     for (const section of guide.sections) {
       if (!section.code || !/bharosa|Bharosa/.test(section.code)) continue;
+      // Shell examples are checked by the website tooling, not the TS executor.
+      if (/^\s*curl\b/.test(section.code)) continue;
       const source =
         (section.code.includes("import { Bharosa }")
           ? ""

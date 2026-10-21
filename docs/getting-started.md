@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-Use Node.js 22.12 or later in a supported LTS release. The SDK supports ESM and CommonJS. Browsers, Bun, and Deno are unsupported; keep credentials in your backend or BFF.
+Use Node.js 22.12 or later in a supported LTS release. The SDK supports ESM and CommonJS. Key-based authentication is server-only; keep credentials in your backend or BFF. Browser applications can supply a generic transport whose private host implementation manages sessions, origin restrictions and CSRF. Bun and Deno are unsupported.
 
 Obtain an authorized API origin, account ID, and account key through your deployment's provisioning process. There is no default public origin. The SDK neither provisions accounts nor runs an OAuth consent flow.
 
@@ -60,3 +60,29 @@ Lists take `{ limit, startingAfter }`. Investor and portfolio lists also accept 
 Money is represented by decimal strings. Keep it as strings or use an appropriate decimal library in your application; converting to JavaScript Number can lose precision. Dates are financial dates in Asia/Kolkata, not local browser dates.
 
 To try the interface without an API or credentials, use the [synthetic examples](../examples/README.md).
+
+
+## Caller-owned transport and first-party market data
+
+`BharosaTransport.send(url: string, request: RequestInit): Promise<Response>`
+can replace credential configuration. Construct with `baseUrl`, `account` and
+`transport`; do not also pass `auth` or `fetch`. The host application owns its
+private session adapter, URL/origin restrictions, per-write CSRF, cookie policy
+and cancellation on account changes. SDK requests default to omitted credentials,
+redirect errors and no-store caching. This interface confers no API privileges.
+
+`client.marketData` exposes fund owners, investible schemes, AMCs, managers,
+categories, dated portfolios, NAVs and expense observations. The new operations
+currently require server-validated first-party sessions. Key/delegated clients
+receive authorization errors; method availability does not grant access.
+`schemes.valuation(id, {units, asOf, positionDate})` returns either an available
+exact decimal value with actual NAV date/freshness or an explicit unavailable
+reason. Latest means on/before the cutoff, not necessarily today's price. Stored
+normalized expense values are returned unchanged, including null missingness.
+Lists use limit/startingAfter; history lists use inclusive from/to and report
+observations only, not complete coverage. Fund IDs identify portfolio owners;
+scheme IDs identify investible products; neither identifies the AMC.
+
+The first-party schema has a separate FIRST-PARTY-CONTRACT-SHA256 digest.
+No database loaders, analytics implementations, market samples or session logic
+are packaged in the SDK.

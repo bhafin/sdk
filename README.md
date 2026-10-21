@@ -1,6 +1,6 @@
-# Bharosa SDK for Node.js
+# Bharosa SDK
 
-A typed, server-side client for Bharosa accounts, investors, portfolios, and mutual funds. Use one resource interface from TypeScript, ESM, or CommonJS, with no runtime dependencies.
+A typed client for Bharosa accounts, investors, portfolios, and mutual funds. Use one resource interface from TypeScript, ESM, or CommonJS, with no runtime dependencies.
 
 **Local development package.** This SDK is not published to npm. API access and credentials must come from your authorized deployment; no public API origin is assumed.
 
@@ -77,7 +77,7 @@ The SDK also supports account reads, client lists, investor creation/updates, sn
 
 ## Reliability and security
 
-Keep credentials in a backend or BFF. Browser imports and browser-like runtimes are rejected; Bun and Deno are unsupported. Clients are immutable and account-scoped. The SDK does not provision access, start consent, or refresh tokens.
+Keep credentials in a backend or BFF. Account-key and delegated authentication are server-only. Browser applications can use a caller-owned transport; the host application owns session handling, same-origin enforcement and CSRF. Bun and Deno are unsupported. Clients are immutable and account-scoped. The SDK does not provision access, start consent, or refresh tokens.
 
 Requests have a total 30-second timeout by default and zero retries unless requested. Creates require an idempotency key. A failed mutation can have an `unknown` outcome even if the server committed it. Use the [reliability guide](docs/reliability.md) to handle retries, cancellation, and reconciliation correctly.
 
@@ -92,3 +92,5 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for reproducible tooling, synthetic tests
 [MIT](LICENSE) — Copyright (c) 2026 Bharosa Technoserve Private Limited.
 
 The license covers this SDK. The Bharosa API service, analytics implementation, ingestion adapters, and provider datasets are separate and are not included or licensed by this repository.
+
+Saved portfolios also expose scoped `holdings` and declared `history`. Use `holding.positionOn(date)` for dated evidence and `portfolio.on(date).assetMix({ valuationDate, asOf })` for strict server-side historical calculation. See [dated positions and declared history](docs/portfolios.md#dated-positions-and-declared-history) for completeness, exact-date valuation and supported-event limits. These methods do not move calculation code into the SDK.
