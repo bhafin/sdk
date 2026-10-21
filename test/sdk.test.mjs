@@ -64,8 +64,37 @@ const mapping = {
   current_snapshot: ["portfolios", "snapshots", "retrieveCurrent"],
   replace_snapshot: ["portfolios", "snapshots", "create"],
 };
-function invoke(client, f, opts = {}) {
+async function invoke(client, f, opts = {}) {
   const id = f.operation_id;
+  if (
+    [
+      "import_history",
+      "retrieve_history",
+      "history_capabilities",
+      "list_holdings",
+      "retrieve_holding",
+      "holding_position",
+    ].includes(id)
+  ) {
+    const p = await client.portfolios.retrieve(
+      "ptf_0123456789abcdef0123456789abcdef",
+    );
+    if (id === "import_history")
+      return p.history.import(f.request, {
+        idempotencyKey: "fixture-key",
+        ...opts,
+      });
+    if (id === "retrieve_history") return p.history.retrieve(opts);
+    if (id === "history_capabilities")
+      return p.history.canReconstruct("2026-01-10", opts);
+    if (id === "list_holdings") return p.holdings.list({}, opts);
+    const h = await p.holdings.retrieve(
+      "hld_0123456789abcdef0123456789abcdef",
+      opts,
+    );
+    return id === "retrieve_holding" ? h : h.positionOn("2026-01-10", opts);
+  }
+
   if (["asset_mix", "sector_mix", "issuer_mix"].includes(id)) {
     const p = f.request.portfolio;
     return client.portfolios
@@ -113,6 +142,27 @@ for (const f of fixtures)
       ...config,
       fetch: async (url, init) => {
         called++;
+        if (
+          f.operation_id.includes("history") ||
+          ["list_holdings", "retrieve_holding", "holding_position"].includes(
+            f.operation_id,
+          )
+        ) {
+          if (url.endsWith("/portfolios/ptf_0123456789abcdef0123456789abcdef"))
+            return res(
+              fixtures.find((x) => x.operation_id === "retrieve_portfolio")
+                .response,
+            );
+          if (
+            f.operation_id === "holding_position" &&
+            url.endsWith("/holdings/hld_0123456789abcdef0123456789abcdef")
+          )
+            return res(
+              fixtures.find((x) => x.operation_id === "retrieve_holding")
+                .response,
+            );
+        }
+
         assert.ok(url.startsWith(config.baseUrl + "/v1/accounts/" + account));
         assert.equal(init.method, f.method);
         assert.equal(init.redirect, "error");
@@ -127,7 +177,20 @@ for (const f of fixtures)
       },
     });
     assert.deepEqual(await invoke(c, f), f.response);
-    assert.equal(called, 1);
+    assert.equal(
+      called,
+      f.operation_id === "holding_position"
+        ? 3
+        : [
+              "import_history",
+              "retrieve_history",
+              "history_capabilities",
+              "list_holdings",
+              "retrieve_holding",
+            ].includes(f.operation_id)
+          ? 2
+          : 1,
+    );
   });
 for (const c of futures.cases)
   test(c.name, () =>
@@ -483,16 +546,12 @@ test("snapshot links and exact decimal totals", async () => {
     v.total_current_value.amount,
   );
 });
-test("browser runtime and old Node guard before loading credentials", () => {
-  const code = fs.readFileSync(
-    new URL("../dist/index.cjs", import.meta.url),
-    "utf8",
-  );
-  for (const context of [
-    { window: {} },
-    { process: { versions: { node: "20.0.0" } } },
-  ])
-    assert.throws(() => vm.runInNewContext(code, context), /requires/);
+test("server key modes remain guarded in browser and old Node", () => {
+  const code = fs.readFileSync(new URL("../dist/index.cjs", import.meta.url),"utf8");
+  assert.throws(() => vm.runInNewContext(code,{process:{versions:{node:"20.0.0"}}}),/requires/);
+  globalThis.window = {location:{origin:"https://api.example"}};
+  try { assert.throws(() => new Bharosa(config), /requires server-side/); }
+  finally { delete globalThis.window; }
 });
 test("reference results must exactly partition requested identifiers", async () => {
   const f = fixtures.find((f) => f.operation_id === "fund_references");

@@ -11,8 +11,12 @@ function assertServer() {
   if (major < 22 || (major === 22 && minor < 12))
     throw new Error("Bharosa requires Node.js >=22.12.");
 }
-assertServer();
-const { schemas, operations } = require("./contract.cjs");
+if (typeof window === "undefined") assertServer();
+const { schemas, operations: resourceOperations } = require("./contract.cjs");
+const operations = {
+  ...resourceOperations,
+  ...require("./market-data.cjs").operations,
+};
 const { valid, consistent } = require("./validate.cjs");
 class BharosaError extends Error {
   constructor(
@@ -192,7 +196,8 @@ async function read(response, max, signal) {
 }
 class Bharosa {
   constructor(config) {
-    assertServer();
+    const customTransport = config?.transport !== undefined;
+    if (!customTransport) assertServer();
     keys(config, [
       "baseUrl",
       "account",
@@ -200,6 +205,7 @@ class Bharosa {
       "allowLocalhostHttp",
       "maxResponseBytes",
       "fetch",
+      "transport",
     ]);
     check(
       config.allowLocalhostHttp === undefined ||
@@ -210,21 +216,30 @@ class Bharosa {
       valid(operations.retrieve_account.parameters[0].schema, config.account),
     );
     const account = config.account;
-    keys(config.auth, ["type", "apiKey", "userAccessToken"]);
     const a = config.auth;
-    check(token(a.apiKey));
-    check(
-      (a.type === "account_key" && !Object.hasOwn(a, "userAccessToken")) ||
-        (a.type === "delegated_application" && token(a.userAccessToken)),
-    );
-    const headers = Object.freeze({
-      Authorization: "Bearer " + a.apiKey,
-      ...(a.type === "delegated_application"
-        ? { "Bharosa-User-Authorization": "Bearer " + a.userAccessToken }
-        : {}),
-      Accept: "application/json",
-    });
-    const secrets = [a.apiKey, a.userAccessToken].filter(Boolean);
+    let headers, secrets;
+    if (customTransport) {
+      check(config.auth === undefined && config.fetch === undefined);
+      keys(config.transport, ["send"]);
+      check(typeof config.transport.send === "function");
+      headers = Object.freeze({ Accept: "application/json" });
+      secrets = [];
+    } else {
+      keys(a, ["type", "apiKey", "userAccessToken"]);
+      check(token(a.apiKey));
+      check(
+        (a.type === "account_key" && !Object.hasOwn(a, "userAccessToken")) ||
+          (a.type === "delegated_application" && token(a.userAccessToken)),
+      );
+      headers = Object.freeze({
+        Authorization: "Bearer " + a.apiKey,
+        ...(a.type === "delegated_application"
+          ? { "Bharosa-User-Authorization": "Bearer " + a.userAccessToken }
+          : {}),
+        Accept: "application/json",
+      });
+      secrets = [a.apiKey, a.userAccessToken].filter(Boolean);
+    }
     const safe = (v) =>
       typeof v === "string" &&
       !secrets.some((s) => v.includes(s)) &&
@@ -232,7 +247,9 @@ class Bharosa {
       !/[\r\n]/.test(v)
         ? v
         : undefined;
-    const transport = config.fetch ?? globalThis.fetch;
+    const transport = customTransport
+      ? config.transport.send.bind(config.transport)
+      : (config.fetch ?? globalThis.fetch);
     check(typeof transport === "function");
     const max = config.maxResponseBytes ?? 16777216;
     check(Number.isInteger(max) && max >= 1 && max <= 16777216);
@@ -377,10 +394,69 @@ class Bharosa {
                 throw interrupted();
               }
               if (!error && response.status === op.status) {
+                const badMarket =
+                  op.marketData &&
+                  ((id.endsWith("_get") && data?.id !== params.id) ||
+                    ([
+                      "md_navs",
+                      "md_expenses",
+                      "md_portfolios",
+                      "md_holdings",
+                    ].includes(id) &&
+                      data?.data?.some(
+                        (row) =>
+                          row[
+                            id === "md_portfolios"
+                              ? "fund_id"
+                              : id === "md_holdings"
+                                ? "portfolio_id"
+                                : "scheme_id"
+                          ] !== params.id,
+                      )) ||
+                    (id === "md_valuation" &&
+                      ((body.position_date !== undefined &&
+                        data?.position_date !== body.position_date) ||
+                        data?.nav?.date > data?.as_of)) ||
+                    (id === "current_holdings" &&
+                      (data?.holdings?.length !== body.holdings.length ||
+                        data?.holdings?.some((row, i) => {
+                          const input = body.holdings[i].observed_position,
+                            d = row.derivation;
+                          const canonicalDecimal = (v) =>
+                            typeof v === "string"
+                              ? v
+                                  .replace(/(\.\d*?)0+$/, "$1")
+                                  .replace(/\.$/, "")
+                              : v;
+                          return d?.kind === "amount_divided_by_nav"
+                            ? d.position_date !== input.date ||
+                                canonicalDecimal(d.original_amount) !==
+                                  canonicalDecimal(
+                                    input.current_value?.amount,
+                                  ) ||
+                                d.nav?.date > input.date ||
+                                d.nav?.amount === "0"
+                            : d?.kind !== "supplied" || input.quantity == null;
+                        }))));
+                if (badMarket)
+                  throw new InvalidResponseError(
+                    meta({ status: response.status, requestId }),
+                  );
+                if (
+                  id === "md_valuation" &&
+                  (data.scheme_id !== body.scheme_id ||
+                    (body.as_of !== undefined && data.as_of !== body.as_of) ||
+                    (data.status === "unavailable" && data.value !== undefined))
+                )
+                  throw new InvalidResponseError(
+                    meta({ status: response.status, requestId }),
+                  );
+
                 if (
                   !valid(op.response, data) ||
                   !consistent(data, account) ||
                   (op.readOnly &&
+                    !op.marketData &&
                     (data.mix_type !== id.replace("_mix", "") ||
                       data.portfolio !==
                         (body.portfolio.type === "saved"
@@ -394,8 +470,32 @@ class Bharosa {
                       op.parameters.some(
                         (p) => p.in === "path" && p.name === k,
                       ) &&
-                      (data.portfolio?.id ?? data.id) !== v,
+                      !["history_capabilities", "list_holdings"].includes(id) &&
+                      (typeof data.portfolio === "string"
+                        ? data.portfolio
+                        : (data.portfolio?.id ?? data.id)) !== v,
                   )
+                )
+                  throw new InvalidResponseError(
+                    meta({ status: response.status, requestId }),
+                  );
+                if (
+                  (id === "retrieve_holding" && data.id !== params.holding) ||
+                  (id === "holding_position" &&
+                    (data.holding !== params.holding ||
+                      data.position_date !== params.date)) ||
+                  (id === "history_capabilities" &&
+                    data.date !== params.date) ||
+                  (id === "list_holdings" &&
+                    data.data.some((h) => h.portfolio !== params.portfolio)) ||
+                  (op.readOnly &&
+                    !op.marketData &&
+                    body.position_date !== undefined &&
+                    data.position_date !== body.position_date) ||
+                  (op.readOnly &&
+                    !op.marketData &&
+                    body.valuation_date !== undefined &&
+                    data.valuation_date !== body.valuation_date)
                 )
                   throw new InvalidResponseError(
                     meta({ status: response.status, requestId }),
@@ -517,7 +617,29 @@ class Bharosa {
       create: (b, o) => call("create_investor", {}, b, o),
       update: (investor, b, o) => call("update_investor", { investor }, b, o),
     });
-    const portfolioObject = (target, data = {}) => {
+    const checkedDate = (value) => {
+      check(
+        valid(
+          { type: "string", format: "date", pattern: "^\\d{4}-\\d{2}-\\d{2}$" },
+          value,
+        ),
+      );
+      return value;
+    };
+    const holdingObject = (data) => {
+      const scope = { portfolio: data.portfolio, holding: data.id };
+      Object.defineProperty(data, "positionOn", {
+        value: (date, options) =>
+          call(
+            "holding_position",
+            { ...scope, date: checkedDate(date) },
+            undefined,
+            options,
+          ),
+      });
+      return data;
+    };
+    const portfolioObject = (target, data = {}, positionDate) => {
       const freeze = (value) => {
         if (value && typeof value === "object") {
           for (const child of Object.values(value)) freeze(child);
@@ -527,7 +649,7 @@ class Bharosa {
       };
       const frozenTarget = freeze(JSON.parse(JSON.stringify(target)));
       const invoke = (kind, params = {}, o) => {
-        keys(params, ["asOf"]);
+        keys(params, positionDate ? ["asOf", "valuationDate"] : ["asOf"]);
         if (params.asOf !== undefined)
           check(
             valid(
@@ -545,6 +667,12 @@ class Bharosa {
           {
             portfolio: frozenTarget,
             ...(params.asOf === undefined ? {} : { as_of: params.asOf }),
+            ...(positionDate === undefined
+              ? {}
+              : { position_date: positionDate }),
+            ...(params.valuationDate === undefined
+              ? {}
+              : { valuation_date: checkedDate(params.valuationDate) }),
           },
           o,
         );
@@ -558,6 +686,58 @@ class Bharosa {
           value: (options) =>
             this.portfolios.snapshots.retrieveCurrent(frozenTarget.id, options),
         });
+      if (["saved", "in_memory"].includes(frozenTarget.type))
+        Object.defineProperty(data, "on", {
+          value: (date) =>
+            Object.freeze(portfolioObject(frozenTarget, {}, checkedDate(date))),
+        });
+      if (frozenTarget.type === "saved") {
+        const scope = { portfolio: frozenTarget.id };
+        Object.defineProperties(data, {
+          history: {
+            value: Object.freeze({
+              retrieve: (options) =>
+                call("retrieve_history", scope, undefined, options),
+              import: (body, options) =>
+                call("import_history", scope, body, options),
+              canReconstruct: (date, options) =>
+                call(
+                  "history_capabilities",
+                  { ...scope, date: checkedDate(date) },
+                  undefined,
+                  options,
+                ),
+            }),
+          },
+          holdings: {
+            value: Object.freeze({
+              setCurrent: (body, options) =>
+                call("current_holdings", scope, body, options),
+              list: (params = {}, options) => {
+                keys(params, ["date"]);
+                return call(
+                  "list_holdings",
+                  {
+                    ...scope,
+                    ...(params.date === undefined
+                      ? {}
+                      : { date: checkedDate(params.date) }),
+                  },
+                  undefined,
+                  options,
+                );
+              },
+              retrieve: (holding, options) =>
+                call(
+                  "retrieve_holding",
+                  { ...scope, holding },
+                  undefined,
+                  options,
+                ),
+            }),
+          },
+        });
+      }
       Object.defineProperties(data, {
         assetMix: { value: (p, o) => invoke("asset", p, o) },
         sectorMix: { value: (p, o) => invoke("sector", p, o) },
@@ -576,6 +756,8 @@ class Bharosa {
       return data;
     };
     const decorate = (id, data) => {
+      if (id === "retrieve_holding") return holdingObject(data);
+      if (id === "list_holdings") data.data = data.data.map(holdingObject);
       if (id === "retrieve_portfolio")
         return portfolioObject({ type: "saved", id: data.id }, data);
       if (id === "list_portfolios")
@@ -622,6 +804,92 @@ class Bharosa {
           call("current_snapshot", { portfolio }, undefined, o),
         create: (portfolio, b, o) =>
           call("replace_snapshot", { portfolio }, b, o),
+      }),
+    });
+    const listQuery = (query = {}) => {
+      keys(query, [
+        "limit",
+        "startingAfter",
+        "query",
+        "amc",
+        "category",
+        "manager",
+        "fund",
+        "from",
+        "to",
+      ]);
+      const { startingAfter, ...rest } = query;
+      return {
+        ...rest,
+        ...(startingAfter === undefined
+          ? {}
+          : { starting_after: startingAfter }),
+      };
+    };
+    const marketCollection = (name) =>
+      Object.freeze({
+        list: (query, opts) =>
+          call("md_" + name, listQuery(query), undefined, opts),
+        ...(name === "categories"
+          ? {}
+          : {
+              retrieve: (id, opts) =>
+                call("md_" + name + "_get", { id }, undefined, opts),
+            }),
+        ...(name === "funds"
+          ? {
+              portfolios: (id, query, opts) =>
+                call(
+                  "md_portfolios",
+                  { id, ...listQuery(query) },
+                  undefined,
+                  opts,
+                ),
+            }
+          : {}),
+        ...(name === "schemes"
+          ? {
+              navs: (id, query, opts) =>
+                call("md_navs", { id, ...listQuery(query) }, undefined, opts),
+              expenseRatios: (id, query, opts) =>
+                call(
+                  "md_expenses",
+                  { id, ...listQuery(query) },
+                  undefined,
+                  opts,
+                ),
+              valuation: (id, input = {}, opts) => {
+                keys(input, ["units", "asOf", "positionDate", "observedValue"]);
+                const { units, asOf, positionDate, observedValue } = input;
+                return call(
+                  "md_valuation",
+                  {},
+                  {
+                    scheme_id: id,
+                    ...(units === undefined ? {} : { units }),
+                    ...(asOf === undefined ? {} : { as_of: asOf }),
+                    ...(positionDate === undefined
+                      ? {}
+                      : { position_date: positionDate }),
+                    ...(observedValue === undefined
+                      ? {}
+                      : { observed_value: observedValue }),
+                  },
+                  opts,
+                );
+              },
+            }
+          : {}),
+      });
+    this.marketData = Object.freeze({
+      funds: marketCollection("funds"),
+      schemes: marketCollection("schemes"),
+      amcs: marketCollection("amcs"),
+      managers: marketCollection("managers"),
+      categories: marketCollection("categories"),
+      portfolios: Object.freeze({
+        holdings: (id, query, opts) =>
+          call("md_holdings", { id, ...listQuery(query) }, undefined, opts),
       }),
     });
     this.mutualFunds = Object.freeze({

@@ -86,6 +86,10 @@ function consistent(v, account) {
       "investor",
       "portfolio",
       "portfolio_mix",
+      "holding",
+      "holding_position",
+      "history_import",
+      "portfolio_history",
       "investment_account",
       "position_snapshot",
       "position",
@@ -139,6 +143,7 @@ function consistent(v, account) {
   return (
     v.object === "list"
       ? v.data
+      : v.object === "portfolio_history" ? v.holdings
       : v.snapshot && v.positions
         ? [v.portfolio, v.investment_account, v.snapshot, ...v.positions]
         : []

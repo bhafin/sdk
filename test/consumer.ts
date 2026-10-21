@@ -108,3 +108,63 @@ c.accounts = { retrieve: async () => ({}) };
 void types;
 void invalid;
 void APIError;
+
+const transported = new Bharosa({
+  baseUrl: "https://synthetic.invalid",
+  account: "me",
+  transport: { send: async (url, request) => fetch(url, request) },
+});
+async function marketTypes() {
+  const funds = await transported.marketData.funds.list({
+    category: "Equity",
+    limit: 10,
+  });
+  funds.data[0].manager_ids[0].toUpperCase();
+  await transported.marketData.schemes.expenseRatios("11", {
+    from: "2026-01-01",
+    to: "2026-01-11",
+  });
+  const value = await transported.marketData.schemes.valuation("11", {
+    units: "1.25",
+    asOf: "2026-01-11",
+    positionDate: "2026-01-09",
+  });
+  if (value.status === "available") value.nav.date.toUpperCase();
+  else value.reason.toUpperCase();
+  const portfolio = await transported.portfolios.retrieve("ptf_id");
+  const result = await portfolio.holdings.setCurrent(
+    {
+      source: { kind: "user", reference: "entry" },
+      holdings: [
+        {
+          external_id: "position",
+          investment_account: "iac_id",
+          instrument: "ins_example",
+          observed_position: {
+            date: "2026-01-11",
+            current_value: { amount: "10.02", currency: "INR" },
+          },
+        },
+      ],
+    },
+    { idempotencyKey: "entry" },
+  );
+  const derivation = result.holdings[0].derivation;
+  if (derivation.kind === "amount_divided_by_nav")
+    derivation.nav.amount.toUpperCase();
+  // @ts-expect-error current writes require idempotency
+  portfolio.holdings.setCurrent({
+    source: { kind: "user", reference: "entry" },
+    holdings: [],
+  });
+  // @ts-expect-error money/units are decimal strings
+  transported.marketData.schemes.valuation("11", { units: 1.25 });
+}
+// @ts-expect-error custom transport cannot also carry SDK credentials
+new Bharosa({
+  baseUrl: "https://synthetic.invalid",
+  account: "me",
+  transport: { send: fetch },
+  auth: { type: "account_key", apiKey: "synthetic" },
+});
+void marketTypes;

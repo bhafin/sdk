@@ -2,7 +2,7 @@
   "name": "bharosa",
   "version": "0.0.0-development",
   "private": true,
-  "description": "Typed server-side Bharosa resource SDK for Node.js. Local development package; not published.",
+  "description": "Typed Bharosa resource SDK with server credentials or caller-owned transport. Local development package; not published.",
   "license": "MIT",
   "type": "module",
   "engines": {
@@ -37,7 +37,8 @@
     "examples/",
     "CONTRIBUTING.md",
     "SECURITY.md",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "FIRST-PARTY-CONTRACT-SHA256"
   ],
   "scripts": {
     "build": "node scripts/build.mjs",
@@ -46,6 +47,8 @@
     "prepublishOnly": "node -e \"throw new Error('Publication disabled pending owner release approval')\"",
     "test:pack": "node scripts/pack-smoke.mjs",
     "test:examples": "node scripts/check-examples.mjs",
-    "generate": "node scripts/generate.mjs"
+    "generate": "node scripts/generate.mjs",
+    "generate:first-party": "node scripts/generate-first-party.mjs",
+    "check:first-party": "node scripts/generate-first-party.mjs --check"
   }
 }

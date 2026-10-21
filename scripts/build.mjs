@@ -9,7 +9,7 @@ for (const name of fs.readdirSync(new URL("../src", import.meta.url)))
     new URL("../src/" + name, import.meta.url),
     new URL("../dist/" + name, import.meta.url),
   );
-for (const name of ["index", "models"])
+for (const name of ["index", "models", "market-data"])
   fs.writeFileSync(
     new URL("../dist/" + name + ".d.cts", import.meta.url),
     fs
@@ -17,5 +17,7 @@ for (const name of ["index", "models"])
         new URL("../src/" + name + ".d.ts", import.meta.url),
         "utf8",
       )
-      .replaceAll("./models.js", "./models.cjs"),
+      .replaceAll("./models.js", "./models.cjs")
+      .replaceAll("./market-data.js", "./market-data.cjs")
+      .replaceAll("./index.js", "./index.cjs"),
   );

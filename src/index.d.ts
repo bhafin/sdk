@@ -1,4 +1,17 @@
 import type {
+  MarketDataClient,
+  CurrentHoldingsInput,
+  CurrentHoldingsResult,
+} from "./market-data.js";
+export type * from "./market-data.js";
+import type {
+  Holding,
+  HoldingPosition,
+  HistoryCapability,
+  HistoryView,
+  HistoryImport,
+  HistoryImportResult,
+  HoldingsList,
   AssetMix,
   SectorMix,
   IssuerMix,
@@ -30,14 +43,29 @@ export type Auth =
       readonly apiKey: string;
       readonly userAccessToken: string;
     };
-export interface BharosaConfig {
+/** Trusted caller-owned transport. Authentication, session handling and origin policy belong to the host application. */
+export interface BharosaTransport {
+  send(url: string, request: RequestInit): Promise<Response>;
+}
+interface BharosaBaseConfig {
   readonly baseUrl: string;
   readonly account: string;
-  readonly auth: Auth;
   readonly allowLocalhostHttp?: boolean;
   readonly maxResponseBytes?: number;
-  /** Trusted transport injection for synthetic tests. Receives credentials; never use an untrusted implementation. */ readonly fetch?: typeof globalThis.fetch;
 }
+export type BharosaConfig = BharosaBaseConfig &
+  (
+    | {
+        readonly auth: Auth;
+        readonly fetch?: typeof globalThis.fetch;
+        readonly transport?: never;
+      }
+    | {
+        readonly transport: BharosaTransport;
+        readonly auth?: never;
+        readonly fetch?: never;
+      }
+  );
 export interface RequestOptions {
   idempotencyKey?: string;
   signal?: AbortSignal;
@@ -90,12 +118,57 @@ export interface InMemoryPortfolioInput {
   currency?: "INR";
   positions: ReadonlyArray<Readonly<PositionInput>>;
 }
+export interface DatedPortfolioMethods {
+  assetMix(
+    params?: MixOptions & { valuationDate?: string },
+    options?: RequestOptions,
+  ): Promise<AssetMix>;
+  sectorMix(
+    params?: MixOptions & { valuationDate?: string },
+    options?: RequestOptions,
+  ): Promise<SectorMix>;
+  issuerMix(
+    params?: MixOptions & { valuationDate?: string },
+    options?: RequestOptions,
+  ): Promise<IssuerMix>;
+  on(date: string): DatedPortfolioMethods;
+}
+export type HoldingObject = Holding & {
+  positionOn(date: string, options?: RequestOptions): Promise<HoldingPosition>;
+};
 export interface InMemoryPortfolio extends PortfolioMethods {
+  on(date: string): DatedPortfolioMethods;
   readonly positions: ReadonlyArray<Readonly<PositionInput>>;
 }
 export type PortfolioObject = Portfolio &
   PortfolioMethods & {
     currentSnapshot(options?: RequestOptions): Promise<SnapshotPortfolioView>;
+    on(date: string): DatedPortfolioMethods;
+    readonly history: {
+      retrieve(options?: RequestOptions): Promise<HistoryView>;
+      import(
+        body: HistoryImport,
+        options: IdempotentOptions,
+      ): Promise<HistoryImportResult>;
+      canReconstruct(
+        date: string,
+        options?: RequestOptions,
+      ): Promise<HistoryCapability>;
+    };
+    readonly holdings: {
+      setCurrent(
+        body: CurrentHoldingsInput,
+        options: IdempotentOptions,
+      ): Promise<CurrentHoldingsResult>;
+      retrieve(
+        holding: string,
+        options?: RequestOptions,
+      ): Promise<HoldingObject>;
+      list(
+        params?: { date?: string },
+        options?: RequestOptions,
+      ): Promise<Omit<HoldingsList, "data"> & { data: HoldingObject[] }>;
+    };
   };
 type Fields<T> = { [K in keyof T as string extends K ? never : K]: T[K] };
 export type SnapshotPortfolioView = Omit<Fields<SnapshotView>, "portfolio"> & {
@@ -125,6 +198,7 @@ export type FundObjectReferences = Omit<Fields<FundReferences>, "data"> & {
   >;
 };
 export class Bharosa {
+  readonly marketData: MarketDataClient;
   constructor(config: BharosaConfig);
   readonly accounts: {
     readonly retrieve: (options?: RequestOptions) => Promise<Account>;
