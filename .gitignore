@@ -1,0 +1,18 @@
+node_modules/
+dist/
+*.tgz
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+.DS_Store
+coverage/
+*.log
+# Local coordination records; not public project documentation.
+/AGENTS.md
+/HANDOFF.md
+/MARKETING-HANDOFF.md
+/SHARED-CONTRACT-HASHES.txt
+/RELEASE-CHECKLIST.md

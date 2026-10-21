@@ -1,0 +1,67 @@
+{
+  "cases": [
+    {
+      "name": "future-investor-response-enum",
+      "schema": "Investor",
+      "value": {
+        "id": "inv_0123456789abcdef0123456789abcdef",
+        "object": "investor",
+        "created": 1792281600,
+        "account": "acct_0123456789abcdef0123456789abcdef",
+        "client": "clt_0123456789abcdef0123456789abcdef",
+        "name": "Meera Rao",
+        "relationship_to_owner": "future_relationship"
+      },
+      "valid": true
+    },
+    {
+      "name": "future-distribution-response-enum",
+      "schema": "Instrument",
+      "value": {
+        "id": "ins_markets_scheme_101",
+        "object": "instrument",
+        "created": 1792281600,
+        "name": "Example Equity Fund \u2014 Direct Growth",
+        "identifiers": [],
+        "domicile_country": "IN",
+        "type": "mutual_fund",
+        "mutual_fund": {
+          "fund_name": "Example Equity Fund",
+          "share_class": "Direct Growth",
+          "class_currency": "INR",
+          "distribution_policy": "future_distribution"
+        }
+      },
+      "valid": true
+    },
+    {
+      "name": "unknown-request-relationship-rejected",
+      "schema": "InvestorCreate",
+      "value": {
+        "name": "Synthetic Member",
+        "relationship_to_owner": "future_relationship"
+      },
+      "valid": false
+    },
+    {
+      "name": "strict-instrument-discriminator",
+      "schema": "Instrument",
+      "value": {
+        "id": "ins_markets_scheme_101",
+        "object": "instrument",
+        "created": 1792281600,
+        "name": "Example Equity Fund \u2014 Direct Growth",
+        "identifiers": [],
+        "domicile_country": "IN",
+        "type": "stock",
+        "mutual_fund": {
+          "fund_name": "Example Equity Fund",
+          "share_class": "Direct Growth",
+          "class_currency": "INR",
+          "distribution_policy": "future_distribution"
+        }
+      },
+      "valid": false
+    }
+  ]
+}

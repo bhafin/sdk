@@ -1,0 +1,51 @@
+{
+  "name": "bharosa",
+  "version": "0.0.0-development",
+  "private": true,
+  "description": "Typed server-side Bharosa resource SDK for Node.js. Local development package; not published.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "browser": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/browser.cjs"
+      },
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      },
+      "default": "./dist/browser.cjs"
+    }
+  },
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE",
+    "CONTRACT-SHA256",
+    "docs/",
+    "examples/",
+    "CONTRIBUTING.md",
+    "SECURITY.md",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test test/*.test.mjs",
+    "prepack": "npm run build",
+    "prepublishOnly": "node -e \"throw new Error('Publication disabled pending owner release approval')\"",
+    "test:pack": "node scripts/pack-smoke.mjs",
+    "test:examples": "node scripts/check-examples.mjs",
+    "generate": "node scripts/generate.mjs"
+  }
+}
