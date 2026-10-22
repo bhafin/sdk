@@ -1,6 +1,6 @@
 # Errors and request reliability
 
-Every SDK error extends `BharosaError`. Subclasses distinguish local validation, API rejection, transport failure, timeout, cancellation, and invalid responses. Inspect `kind`, `outcome`, and available `status`, `code`, `type`, `param`, and `requestId`. Do not parse message strings. Remote message bodies and transport causes are deliberately omitted.
+Every SDK error extends `BharosaError`. Subclasses distinguish local validation, API rejection, transport failure, timeout, cancellation, and invalid responses. Inspect `kind`, `outcome`, and available `status`, `code`, `type`, `param`, and `requestId`. Do not parse message strings. Messages explain next steps without copying potentially sensitive server or network details.
 
 | Outcome          | Meaning                                                       |
 | ---------------- | ------------------------------------------------------------- |
@@ -27,4 +27,4 @@ See [create-investor.ts](../examples/create-investor.ts) for a typed request tha
 
 ## Transport boundaries
 
-Requests refuse redirects and omit cookies. The SDK does not accept arbitrary credential/account/origin header overrides. Response bodies are capped at 16 MiB; `maxResponseBytes` can lower the limit. A custom `fetch` implementation receives credentials, so inject only trusted test or server code. The synthetic examples use a mock transport and never call a live service.
+Requests refuse redirects and omit cookies by default. A caller-owned browser transport may attach session cookies and CSRF headers only within the host application’s approved origin policy. The SDK does not accept arbitrary credential/account/origin header overrides. Response bodies are capped at 16 MiB; `maxResponseBytes` can lower the limit. A custom `fetch` implementation receives credentials, so inject only trusted test or server code. The synthetic examples use a mock transport and never call a live service.

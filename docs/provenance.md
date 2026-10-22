@@ -1,6 +1,6 @@
 # Source and fixture provenance
 
-The SDK source and public contract snapshots are Bharosa project material. The public mix schemas and examples were confirmed by the implementation owner as project-authored and synthetic during the October 2026 handoff. Test account and investor names, resource IDs, fund IDs, amounts, and dates are fixture values, not production records. They must not be used to identify real customers or provider holdings.
+The SDK source and public contract snapshots are Bharosa project material. Included schemas and examples are project-authored; test fixtures contain invented data. Test account and investor names, resource IDs, fund IDs, amounts, and dates are fixture values, not production records. They must not be used to identify real customers or provider holdings.
 
 Generated runtime schemas and TypeScript models originate from `test/openapi.json`. `CONTRACT-SHA256` records the exact input digest; the canonical path in that file identifies provenance rather than a required sibling checkout. Generation and ordinary SDK tests run from this repository alone. The optional marketing example check requires a separate marketing checkout.
 

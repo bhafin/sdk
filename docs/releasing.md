@@ -17,7 +17,7 @@ Source preparation does not authorize a push, a visibility change, npm publicati
 
 - Confirm package-name ownership and intended registry, version, release notes, compatibility matrix, and source repository metadata.
 - Confirm usable API access/provisioning instructions without claiming unverified deployment availability.
-- Build and verify a fresh tarball; inspect its exact files, license, types, browser rejection, and ESM/CommonJS behavior. Do not reuse an older local archive.
+- Build and verify a fresh tarball; inspect its exact files, license, types, browser transport and server-only credential enforcement, and ESM/CommonJS behavior. Do not reuse an older local archive.
 - Run tests, local examples, packed-consumer checks, and relevant website example checks. Record exact Node/TypeScript versions and artifact digest.
 - Review dependency licenses and security findings, including development dependencies and CI changes.
 - Obtain explicit publication authorization before changing `private` or `prepublishOnly`, tagging/pushing a release, or publishing. Document precisely what was released.

@@ -547,11 +547,21 @@ test("snapshot links and exact decimal totals", async () => {
   );
 });
 test("server key modes remain guarded in browser and old Node", () => {
-  const code = fs.readFileSync(new URL("../dist/index.cjs", import.meta.url),"utf8");
-  assert.throws(() => vm.runInNewContext(code,{process:{versions:{node:"20.0.0"}}}),/requires/);
-  globalThis.window = {location:{origin:"https://api.example"}};
-  try { assert.throws(() => new Bharosa(config), /requires server-side/); }
-  finally { delete globalThis.window; }
+  const code = fs.readFileSync(
+    new URL("../dist/index.cjs", import.meta.url),
+    "utf8",
+  );
+  assert.throws(
+    () =>
+      vm.runInNewContext(code, { process: { versions: { node: "20.0.0" } } }),
+    /requires/,
+  );
+  globalThis.window = { location: { origin: "https://api.example" } };
+  try {
+    assert.throws(() => new Bharosa(config), /requires server-side/);
+  } finally {
+    delete globalThis.window;
+  }
 });
 test("reference results must exactly partition requested identifiers", async () => {
   const f = fixtures.find((f) => f.operation_id === "fund_references");
@@ -1091,4 +1101,28 @@ test("currentSnapshot preserves delegated auth, original resource identity and c
     AbortError,
   );
   assert.equal(calls.length, 2);
+});
+
+test("human error messages give next steps without changing structured metadata", () => {
+  const meta = {
+    code: "synthetic_code",
+    requestId: "req_example",
+    outcome: "unknown",
+    status: 503,
+  };
+  for (const Type of [
+    APIError,
+    TransportError,
+    TimeoutError,
+    AbortError,
+    InvalidResponseError,
+  ]) {
+    const error = new Type(meta);
+    assert.equal(error.code, meta.code);
+    assert.equal(error.requestId, meta.requestId);
+    assert.equal(error.outcome, "unknown");
+    assert.match(error.message, /check|Check|Contact|contact/);
+    assert.ok(!error.message.includes(meta.code));
+  }
+  assert.match(new ValidationError().message, /not sent/);
 });

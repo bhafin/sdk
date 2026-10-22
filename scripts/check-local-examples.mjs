@@ -104,7 +104,7 @@ try {
         (item) => item.operation_id === operation.id,
       );
       assert.ok(fixture);
-      const response = structuredClone(fixture.response);
+      const response = structuredClone(expected.response ?? fixture.response);
       if (operation.id.endsWith("_mix")) {
         response.portfolio =
           body.portfolio.type === "saved" ? body.portfolio.id : null;
@@ -177,7 +177,7 @@ try {
         },
       },
     ],
-    () => mixes.inMemoryMix(client),
+    () => mixes.inMemoryMix(client, "ins_example_india_equity_direct_growth"),
   );
   const fund = {
     type: "fund_instrument",
@@ -188,7 +188,7 @@ try {
       id: `${kind}_mix`,
       body: { portfolio: fund },
     })),
-    () => mixes.fundMixes(client),
+    () => mixes.fundMixes(client, "ins_example_india_equity_direct_growth"),
   );
   const mutation = await import(
     pathToFileURL(path.join(temp, "build/create-investor.js"))
@@ -217,7 +217,10 @@ try {
   );
   const readmeSource = `declare const process: { env: Record<string, string | undefined> };\n${snippets[0]}\n${snippets
     .slice(1)
-    .map((s) => `{\n${s}\n}`)
+    .map(
+      (s, i) =>
+        `{\n${s}\n${i === 0 ? `await savedPortfolioMix(${JSON.stringify(portfolioId)});` : ""}\n}`,
+    )
     .join("\n")}`;
   fs.writeFileSync(path.join(temp, "readme.ts"), readmeSource);
   const readmeCompile = spawnSync(
@@ -260,28 +263,10 @@ try {
   await run(
     [
       { id: "retrieve_account" },
-      { id: "list_portfolios" },
-      ...["asset", "sector", "issuer"].map((kind) => ({
-        id: `${kind}_mix`,
-        body: { portfolio: saved },
-      })),
-      {
-        id: "asset_mix",
-        body: {
-          portfolio: {
-            type: "in_memory",
-            valuation_date: "2026-10-17",
-            currency: "INR",
-            positions: [
-              {
-                instrument: "ins_example_india_equity_direct_growth",
-                current_value: "100",
-              },
-            ],
-          },
-          as_of: "2026-10-18",
-        },
-      },
+      { id: "retrieve_portfolio" },
+      { id: "current_snapshot" },
+      { id: "asset_mix", body: { portfolio: saved } },
+      { id: "search_funds" },
     ],
     () =>
       new AsyncFunction("Bharosa", "process", readmeJs)(
@@ -307,7 +292,45 @@ try {
       },
     ),
   );
-  assert.equal(calls, 19);
+  await run(
+    [
+      {
+        id: "list_clients",
+        response: {
+          ...fixtures.find((f) => f.operation_id === "list_clients").response,
+          data: [
+            {
+              ...fixtures.find((f) => f.operation_id === "list_clients")
+                .response.data[0],
+              id: "clt_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            },
+          ],
+          has_more: true,
+        },
+      },
+      {
+        id: "list_clients",
+        query: "?limit=100&starting_after=clt_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      },
+      { id: "list_investors" },
+      { id: "list_portfolios" },
+      { id: "current_snapshot" },
+      { id: "asset_mix", body: { portfolio: saved } },
+    ],
+    () =>
+      mixes.selectedSavedMix(client, async (_kind, choices) => {
+        assert.ok(choices.length);
+        return choices.at(-1).id;
+      }),
+  );
+  await assert.rejects(
+    () =>
+      run([{ id: "list_clients" }], () =>
+        mixes.selectedSavedMix(client, async () => "not-a-returned-id"),
+      ),
+    /Choose a family/,
+  );
+  assert.equal(calls, 25);
   console.log(
     `Compiled ${examples.length} example files and ${snippets.length} README snippets; verified ${calls} synthetic requests including setup; no live API used.`,
   );

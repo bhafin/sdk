@@ -1,6 +1,6 @@
 # Bharosa SDK guides
 
-Build a Node.js integration with the Bharosa resource API. This SDK is currently a private, unpublished local package. An SDK checkout does not supply API access or credentials.
+Build a Node.js integration with the Bharosa resource API. This SDK is not yet published on npm; install it from a local archive. Ask your service operator for API access separately.
 
 1. [Install locally and make your first request](getting-started.md).
 2. [Work with portfolios and mixes](portfolios.md).

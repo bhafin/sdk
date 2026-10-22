@@ -2,7 +2,7 @@
 
 A typed client for Bharosa accounts, investors, portfolios, and mutual funds. Use one resource interface from TypeScript, ESM, or CommonJS, with no runtime dependencies.
 
-**Local development package.** This SDK is not published to npm. API access and credentials must come from your authorized deployment; no public API origin is assumed.
+**Installation:** this package is not yet available on npm. Install the local archive below. You also need an API URL and credentials from the operator of your Bharosa service; installing the SDK does not create an account or grant access.
 
 ## Start here
 
@@ -34,38 +34,51 @@ const account = await bharosa.accounts.retrieve();
 
 Validate required environment variables at application startup; the non-null assertions above are TypeScript annotations, not runtime checks. See the [complete setup guide](docs/getting-started.md) for explicit checks and delegated authentication. CommonJS uses `const { Bharosa } = require("bharosa")`.
 
-## Work with portfolio objects
+## Calculate a saved portfolio's mix
 
-Retrieved portfolios expose read-only mix methods:
+A client is a person or family group, such as the Rao family. An investor is one
+member of that group. Each investor can have several saved portfolios; there is
+no automatic "current portfolio" selection.
+
+List families with `bharosa.clients.list()`, then list their members with
+`bharosa.investors.list({ client: family.id })`. List portfolios with
+`bharosa.portfolios.list({ client: family.id })` and keep those whose `investor`
+field matches the selected member's ID. Let the user choose a portfolio, and
+pass its returned ID to this function:
 
 ```ts
-const portfolios = await bharosa.portfolios.list({ limit: 10 });
-const portfolio = portfolios.data[0];
-if (portfolio) {
+async function savedPortfolioMix(portfolioId: string) {
+  const portfolio = await bharosa.portfolios.retrieve(portfolioId);
+  const snapshot = await portfolio.currentSnapshot();
   const asset = await portfolio.assetMix();
-  const sector = await portfolio.sectorMix();
-  const issuer = await portfolio.issuerMix();
+  return { snapshot, asset };
 }
 ```
 
-You can also create a local portfolio handle without saving it:
+Follow `has_more` and `startingAfter` when listing resources. Do not select the
+first result or match only by a family name: names need not be unique. See the
+[complete selection example](examples/portfolio-mixes.ts).
+
+The saved mix uses the values and date in the portfolio's current saved snapshot.
+It does not automatically reprice later holding-unit observations using today's
+NAV. `asOf` changes the date used to look up the funds' underlying holdings; it
+does not change the investor's positions or their valuation date.
+
+For a fund, search first and let the user select the matching share class:
 
 ```ts
-const portfolio = bharosa.portfolios.build({
-  valuationDate: "2026-10-17",
-  positions: [
-    {
-      instrument: "ins_example_india_equity_direct_growth",
-      current_value: "100",
-    },
-  ],
-});
-const asset = await portfolio.assetMix({ asOf: "2026-10-18" });
+const matches = await bharosa.mutualFunds.search({ query: "equity" });
+// Display matches.data and let the user choose the intended fund/plan.
+// The returned instrument exposes assetMix(), sectorMix() and issuerMix().
 ```
 
-The instrument above is fictional. The API calculates the mix; the SDK sends the request. MutualFund handles expose the same methods through `fund.portfolio` and directly on the fund. Saved calculations use the current snapshot; `asOf` selects the underlying holdings cutoff, not saved portfolio history. Asset percentages can be negative or above 100; sector and issuer mixes are equity-only. Preserve returned dates, warnings, availability, and precision metadata.
+Use returned IDs rather than inventing them. The API calculates each mix; the SDK
+makes the request. Asset percentages can be negative or above 100. Sector and
+issuer mixes cover equities only. Keep the response's dates, warnings and
+availability status alongside the numbers.
 
-Read the [portfolio guide](docs/portfolios.md), or run the [synthetic examples](examples/README.md) without live credentials.
+Read the [portfolio guide](docs/portfolios.md), or run the
+[examples with simulated responses](examples/README.md) without live credentials.
 
 ## Read and build resources
 
@@ -75,9 +88,11 @@ A saved portfolio has `currentSnapshot()` to retrieve its current snapshot using
 
 The SDK also supports account reads, client lists, investor creation/updates, snapshot replacement, and mutual-fund discovery. Body and response fields use snake_case. Monetary values remain decimal strings. Lists use `limit` and `startingAfter`; investor/portfolio lists can filter by `client`. Root exports include TypeScript models and typed error classes.
 
+Saved portfolios also expose scoped `holdings` and declared `history`. Use `holding.positionOn(date)` for dated evidence and `portfolio.on(date).assetMix({ valuationDate, asOf })` for strict server-side historical calculation. See [dated positions and declared history](docs/portfolios.md#dated-positions-and-declared-history) for completeness, exact-date valuation and supported-event limits. These methods do not move calculation code into the SDK.
+
 ## Reliability and security
 
-Keep credentials in a backend or BFF. Account-key and delegated authentication are server-only. Browser applications can use a caller-owned transport; the host application owns session handling, same-origin enforcement and CSRF. Bun and Deno are unsupported. Clients are immutable and account-scoped. The SDK does not provision access, start consent, or refresh tokens.
+Keep credentials in a backend or a server that handles browser sessions. Account-key and delegated authentication are server-only. Browser applications can use a caller-owned transport; the host application owns session handling, same-origin enforcement and CSRF. Bun and Deno are unsupported. Clients are immutable and account-scoped. The SDK does not provision access, start consent, or refresh tokens.
 
 Requests have a total 30-second timeout by default and zero retries unless requested. Creates require an idempotency key. A failed mutation can have an `unknown` outcome even if the server committed it. Use the [reliability guide](docs/reliability.md) to handle retries, cancellation, and reconciliation correctly.
 
@@ -85,12 +100,10 @@ Report vulnerabilities privately using [SECURITY.md](SECURITY.md).
 
 ## Develop and contribute
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for reproducible tooling, synthetic tests, and packed-consumer verification. The [release checklist](docs/releasing.md) separates source publication from npm publication. Both require separate external-release authorization; publication guards remain enabled.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for reproducible tooling, synthetic tests, and packed-consumer verification. The [release checklist](docs/releasing.md) separates source publication from npm publication. The package is configured to prevent accidental npm publication.
 
 ## License and scope
 
 [MIT](LICENSE) — Copyright (c) 2026 Bharosa Technoserve Private Limited.
 
 The license covers this SDK. The Bharosa API service, analytics implementation, ingestion adapters, and provider datasets are separate and are not included or licensed by this repository.
-
-Saved portfolios also expose scoped `holdings` and declared `history`. Use `holding.positionOn(date)` for dated evidence and `portfolio.on(date).assetMix({ valuationDate, asOf })` for strict server-side historical calculation. See [dated positions and declared history](docs/portfolios.md#dated-positions-and-declared-history) for completeness, exact-date valuation and supported-event limits. These methods do not move calculation code into the SDK.

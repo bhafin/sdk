@@ -37,38 +37,53 @@ class BharosaError extends Error {
 }
 class ValidationError extends BharosaError {
   constructor() {
-    super("validation", "Invalid SDK configuration or request.");
+    super(
+      "validation",
+      "Check the SDK configuration and request fields against the method documentation. The request was not sent.",
+    );
   }
 }
 class APIError extends BharosaError {
   constructor(meta) {
-    super("api", "Bharosa API rejected the request.", meta);
+    super(
+      "api",
+      "Bharosa rejected the request. Check code and param for the reason, and include requestId when contacting support.",
+      meta,
+    );
   }
 }
 class TransportError extends BharosaError {
   constructor(meta) {
     super(
       "transport",
-      "Bharosa transport failed; no remote details retained.",
+      "Could not reach Bharosa or read its response. Check your connection. For a write, inspect outcome before retrying with the original idempotency key.",
       meta,
     );
   }
 }
 class TimeoutError extends BharosaError {
   constructor(meta) {
-    super("timeout", "Bharosa request exceeded its total timeout.", meta);
+    super(
+      "timeout",
+      "The request timed out. For a write, check outcome before retrying; the server may already have saved it.",
+      meta,
+    );
   }
 }
 class AbortError extends BharosaError {
   constructor(meta) {
-    super("abort", "Bharosa request was cancelled.", meta);
+    super(
+      "abort",
+      "The request was cancelled. Cancellation does not undo a write already saved by the server; check outcome before retrying.",
+      meta,
+    );
   }
 }
 class InvalidResponseError extends BharosaError {
   constructor(meta) {
     super(
       "invalid_response",
-      "Bharosa returned an invalid or unsupported response.",
+      "The response did not match the expected format. Contact support with requestId. For a write, check outcome before retrying.",
       meta,
     );
   }

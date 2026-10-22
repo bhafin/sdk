@@ -6,13 +6,13 @@ A Portfolio object exposes `assetMix()`, `sectorMix()`, and `issuerMix()`. Each 
 
 Retrieve a portfolio with `bharosa.portfolios.retrieve(id)`, then call its mix methods. Portfolios returned by list, create, and current/replacement snapshot operations expose the same methods. Methods do not add fields to serialized portfolio JSON.
 
-Saved calculations use the current snapshot. An optional `{ asOf: "2026-10-18" }` selects the underlying holdings cutoff; it does not select an older saved snapshot. Use valid IDs from your deployment, not the fictional IDs in examples.
+Saved calculations use the current snapshot. An optional `{ asOf: "2026-10-18" }` selects the underlying holdings cutoff; it does not select an older saved snapshot. Get portfolio IDs from `portfolios.list()`. Filter the returned portfolios by the selected investor ID; there is no unique current-portfolio property. Follow pagination before offering a complete list.
 
-Saved portfolio objects also expose `currentSnapshot(requestOptions?)`, which delegates to the existing current-snapshot read. It returns the snapshot view, including a Portfolio object. This does not add an endpoint or bypass account authorization.
+Saved portfolio objects also expose `currentSnapshot(requestOptions?)`, which delegates to the existing current-snapshot read. It returns the snapshot view, including a Portfolio object. The response includes the snapshot date and recorded amounts. It does not automatically revalue current holdings at the latest NAV.
 
 ## In-memory portfolios
 
-`bharosa.portfolios.build({ valuationDate, positions, currency: "INR" })` creates a local handle. Each position has an `instrument` ID and a decimal-string `current_value`. Calling a mix method sends the target to the API without saving a portfolio. Only supported India INR mutual-fund portfolios are accepted.
+`bharosa.portfolios.build({ valuationDate, positions, currency: "INR" })` creates a local handle. First call `mutualFunds.search({ query })` and let the user select the intended fund and plan; use the selected result’s `instrument.id`. Each position has an `instrument` ID and a decimal-string `current_value`. Calling a mix method sends the target to the API without saving a portfolio. Only supported India INR mutual-fund portfolios are accepted.
 
 The handle exposes the supplied `positions` as a defensively copied, frozen collection with frozen entries. It is not a mutable persistence collection: create a new handle to change the supplied positions. `fromPositions(...)` remains an equivalent alias. Use `portfolios.create(...)` for persistence. Convenience properties and methods do not change serialized JSON fields.
 
@@ -32,14 +32,15 @@ The method signatures are `(params?, requestOptions?)`. Pass `{}` for params whe
 
 ## Dated positions and declared history
 
+See [selectedSavedMix](../examples/portfolio-mixes.ts) for a paginated family → investor → saved portfolio selection flow. Selection callbacks are your application UI, not SDK methods.
+
 For a saved portfolio, `portfolio.holdings.list()` and `.retrieve(id)` return scoped holdings. `holding.positionOn("2026-01-10")` resolves exact observed evidence or opening quantity plus buy/sell transactions within a declared complete range. Value-only observations retain `quantity: null`. A later opening does not hide an earlier exact observation, and missing dates never inherit current quantities.
 
 Use `portfolio.history.import(body, { idempotencyKey })` to import source-tagged history, `.retrieve()` to inspect it, and `.canReconstruct(date)` to check strict availability. Completeness is a source/user assertion, not independent verification or an inference from matching ending balances. Every stored holding, including closed holdings and separate folios, must be supported for a complete dated portfolio.
 
 `portfolio.on(positionDate).assetMix({ valuationDate, asOf })` uses server-side reconstruction and calculation. The dated view also supports `sectorMix` and `issuerMix`. Position date, valuation date (defaulting to position date), and underlying composition cutoff (`asOf`) are independent. Exact-date provider NAV is required; missing prices fail explicitly. Existing `asOf` calls remain unchanged. Fund handles do not expose investor dated views; in-memory value-only positions cannot reconstruct earlier dates.
 
-Opening quantities apply at start of day; transactions through daily close use explicit sequence order. The investment account owns the timezone (initial default Asia/Kolkata). Decimal strings support up to 20 whole digits and 18 fractional places. Imports are idempotent by scoped source/event identity; conflicting payloads fail. A declared range can extend forward with the same start, and transaction-only imports preserve its source. No acquisition history is invented from an opening balance. Unsupported transfers, splits, corrections, reversals, price imports, tax lots and performance calculations fail explicitly. These capabilities are local implementation, not a published service.
-
+Opening quantities apply at start of day; transactions through daily close use explicit sequence order. The account or folio containing the holding determines its timezone (initial default Asia/Kolkata). Decimal strings support up to 20 whole digits and 18 fractional places. Imports are idempotent by scoped source/event identity; conflicting payloads fail. A declared range can extend forward with the same start, and transaction-only imports preserve its source. No acquisition history is invented from an opening balance. Unsupported transfers, splits, corrections, reversals, price imports, tax lots and performance calculations fail explicitly. Check your service operator’s available features before relying on these operations.
 
 ## Current holding entry
 

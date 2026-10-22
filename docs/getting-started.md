@@ -2,9 +2,9 @@
 
 ## Prerequisites
 
-Use Node.js 22.12 or later in a supported LTS release. The SDK supports ESM and CommonJS. Key-based authentication is server-only; keep credentials in your backend or BFF. Browser applications can supply a generic transport whose private host implementation manages sessions, origin restrictions and CSRF. Bun and Deno are unsupported.
+Use Node.js 22.12 or later in a supported LTS release. The SDK supports ESM and CommonJS. Key-based authentication is server-only; keep credentials in your backend or server that handles browser sessions. Browser applications can supply a generic transport whose private host implementation manages sessions, origin restrictions and CSRF. Bun and Deno are unsupported.
 
-Obtain an authorized API origin, account ID, and account key through your deployment's provisioning process. There is no default public origin. The SDK neither provisions accounts nor runs an OAuth consent flow.
+Obtain an authorized API origin, account ID, and account key from your Bharosa service operator. There is no default public origin. The SDK neither provisions accounts nor runs an OAuth consent flow.
 
 ## Install a local build
 
@@ -21,7 +21,7 @@ Then, from your application directory:
 npm install /absolute/path/to/artifacts/bharosa-0.0.0-development.tgz
 ```
 
-Use the filename produced by `npm pack` if the development version changes. This installs your local artifact; `npm install bharosa` is not a verified public installation path. The package remains private and publication is disabled.
+Use the filename produced by `npm pack` if the development version changes. This installs your local artifact; `npm install bharosa` is not currently supported. Use the archive until an npm release is available.
 
 ## Read your account
 
@@ -51,16 +51,15 @@ CommonJS applications use `const { Bharosa } = require("bharosa")` inside an asy
 
 ## Delegated access
 
-Use `auth: { type: "delegated_application", apiKey: applicationKey, userAccessToken }` with the account selected by the authoritative server grant. Both credentials are required. A direct account key cannot carry a user access token. The SDK does not obtain or refresh tokens. Create a new client when credentials or account change; each client is immutable.
+Use `auth: { type: "delegated_application", apiKey: applicationKey, userAccessToken }` with the account selected by the server-issued authorization for that user and account. Both credentials are required. A direct account key cannot carry a user access token. The SDK does not obtain or refresh tokens. Create a new client when credentials or account change; each client is immutable.
 
 ## Lists and fields
 
-Lists take `{ limit, startingAfter }`. Investor and portfolio lists also accept `client`. Body/response fields use snake_case; the SDK maps `startingAfter` to the HTTP `starting_after` query parameter. To continue a list, use its `has_more` indicator and the last returned resource ID as the next cursor. Do not assume every list fits in one response.
+A client represents a person or family group; an investor represents one member. Their IDs come from API responses, not names you invent. Lists take `{ limit, startingAfter }`. Investor and portfolio lists also accept `client`. Body/response fields use snake_case; the SDK maps `startingAfter` to the HTTP `starting_after` query parameter. To continue a list, use its `has_more` indicator and the last returned resource ID as the next cursor. Do not assume every list fits in one response.
 
 Money is represented by decimal strings. Keep it as strings or use an appropriate decimal library in your application; converting to JavaScript Number can lose precision. Dates are financial dates in Asia/Kolkata, not local browser dates.
 
 To try the interface without an API or credentials, use the [synthetic examples](../examples/README.md).
-
 
 ## Caller-owned transport and first-party market data
 
@@ -72,8 +71,8 @@ and cancellation on account changes. SDK requests default to omitted credentials
 redirect errors and no-store caching. This interface confers no API privileges.
 
 `client.marketData` exposes fund owners, investible schemes, AMCs, managers,
-categories, dated portfolios, NAVs and expense observations. The new operations
-currently require server-validated first-party sessions. Key/delegated clients
+categories, dated portfolios, NAVs and expense observations. These operations
+currently require a signed-in session in an authorized Bharosa application. Key/delegated clients
 receive authorization errors; method availability does not grant access.
 `schemes.valuation(id, {units, asOf, positionDate})` returns either an available
 exact decimal value with actual NAV date/freshness or an explicit unavailable
