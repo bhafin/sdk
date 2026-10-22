@@ -1,6 +1,6 @@
 # Portfolios and mixes
 
-A Portfolio object exposes `assetMix()`, `sectorMix()`, and `issuerMix()`. Each performs a separate read-only API request. The SDK does not calculate mixes locally.
+A `Portfolio` object exposes `assetMix()`, `sectorMix()`, and `issuerMix()`. Each performs a separate read-only API request. The SDK does not calculate mixes locally.
 
 ## Saved portfolios
 
@@ -8,7 +8,7 @@ Retrieve a portfolio with `bharosa.portfolios.retrieve(id)`, then call its mix m
 
 Saved calculations use the current snapshot. An optional `{ asOf: "2026-10-18" }` selects the underlying holdings cutoff; it does not select an older saved snapshot. Get portfolio IDs from `portfolios.list()`. Filter the returned portfolios by the selected investor ID; there is no unique current-portfolio property. Follow pagination before offering a complete list.
 
-Saved portfolio objects also expose `currentSnapshot(requestOptions?)`, which delegates to the existing current-snapshot read. It returns the snapshot view, including a Portfolio object. The response includes the snapshot date and recorded amounts. It does not automatically revalue current holdings at the latest NAV.
+Saved portfolio objects also expose `currentSnapshot(requestOptions?)`, which delegates to the existing current-snapshot read. It returns the snapshot view, including a `Portfolio` object. The response includes the snapshot date and recorded amounts. It does not automatically revalue current holdings at the latest NAV.
 
 ## In-memory portfolios
 
@@ -45,21 +45,36 @@ Opening quantities apply at start of day; transactions through daily close use e
 ## Current holding entry
 
 Saved portfolios expose `holdings.setCurrent(input, {idempotencyKey})` for the
-first-party current-entry workflow. Input contains source (kind user/statement
-and reference), and holdings with external_id, investment_account, instrument
-and observed_position. The observation contains date and quantity and/or INR
-current_value. Decimal values are strings.
+first-party current-entry workflow. Input contains `source` (`kind`: `user` or `statement`,
+and `reference`), and `holdings` with `external_id`, `investment_account`, `instrument`
+and `observed_position`. The observation contains `date` and `quantity` and/or INR
+`current_value`. Decimal values are strings.
 
-Omitting quantity converts the supplied dated amount into units on the server
+Omitting `quantity` converts the supplied dated amount into units on the server
 using NAV on/before that date. The result preserves original amount, position
 date, actual NAV, and half-even rounding to 18 decimal places. Missing NAV fails
 the write. Explicit units retain supplied provenance. This creates no purchases
 or transaction-history completeness. Historical snapshot writes are unchanged.
 
-Each returned holding has revision. To correct the latest observation on its
-same date, include expected_revision matching that revision and use a new
+Each returned holding has `revision`. To correct the latest observation on its
+same date, include `expected_revision` matching that revision and use a new
 idempotency key. A stale revision conflicts; prior evidence remains in audit
 history. A genuinely later observation starts revision 1. Retry an unchanged
 operation with its original key to receive its original receipt. Do not change
 dates to bypass a conflict. Distinct folios remain separate; an incomplete set
 of valuations must not be presented as a complete total.
+
+## Current portfolios valued with NAV
+
+For a signed-in first-party application, `portfolio.current()` creates a read-only view of the saved portfolio's dated unit observations:
+
+```ts
+const portfolio = await bharosa.portfolios.retrieve(selectedPortfolioId);
+const result = await portfolio.current().assetMix();
+```
+
+`selectedPortfolioId` comes from the portfolio selection described above. The view also exposes `sectorMix()` and `issuerMix()`. Each request values the stored units with the latest NAV on or before today in Asia/Kolkata, then uses the existing server calculation. This view takes no historical date parameter. Account keys and delegated third-party credentials cannot access it yet; a caller-owned transport alone does not grant access.
+
+Read `result.current_valuation.holdings` for every folio's observation date, actual NAV date, freshness, revision and unit provenance. Older observed units are user-supplied ownership, not proof of today's ownership. Zero-unit holdings remain in the evidence. A missing quantity or NAV fails the entire calculation; no partial portfolio is silently normalized. A holding without a unit observation, or with transactions after its latest observation, requires an updated observation before this view can calculate.
+
+Existing `portfolio.assetMix()` continues to use saved snapshot values. `portfolio.on(date)` continues to reconstruct supported historical positions. Neither behavior changes when using the current view.

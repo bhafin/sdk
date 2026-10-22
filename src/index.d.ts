@@ -140,8 +140,53 @@ export interface InMemoryPortfolio extends PortfolioMethods {
   on(date: string): DatedPortfolioMethods;
   readonly positions: ReadonlyArray<Readonly<PositionInput>>;
 }
+export interface CurrentPortfolioMethods {
+  assetMix(
+    params?: Record<string, never>,
+    options?: RequestOptions,
+  ): Promise<AssetMix & CurrentMixEvidence>;
+  sectorMix(
+    params?: Record<string, never>,
+    options?: RequestOptions,
+  ): Promise<SectorMix & CurrentMixEvidence>;
+  issuerMix(
+    params?: Record<string, never>,
+    options?: RequestOptions,
+  ): Promise<IssuerMix & CurrentMixEvidence>;
+}
+export interface CurrentMixEvidence {
+  current_valuation: {
+    valuation_date: string;
+    holdings: Array<{
+      holding: string;
+      investment_account: string;
+      instrument: string;
+      scheme_id: string;
+      status: "available";
+      units: string;
+      as_of: string;
+      position_date: string;
+      value: { amount: string; currency: "INR" };
+      nav: { amount: string; currency: "INR"; date: string };
+      freshness: {
+        status: "recent" | "stale";
+        age_days: number;
+        recent_within_days: 3;
+        time_zone: "Asia/Kolkata";
+      };
+      ownership_status: "user_supplied_not_verified";
+      valuation_basis: "units_times_latest_nav";
+      revision: number | null;
+      source: { kind: "user" | "statement"; reference: string };
+      derivation:
+        | import("./market-data.js").CurrentHoldingsResult["holdings"][number]["derivation"]
+        | null;
+    }>;
+  };
+}
 export type PortfolioObject = Portfolio &
   PortfolioMethods & {
+    current(): CurrentPortfolioMethods;
     currentSnapshot(options?: RequestOptions): Promise<SnapshotPortfolioView>;
     on(date: string): DatedPortfolioMethods;
     readonly history: {

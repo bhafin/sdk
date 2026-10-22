@@ -193,7 +193,9 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["error"],
+                  "required": [
+                    "error"
+                  ],
                   "properties": {
                     "error": {
                       "type": "object"
@@ -308,7 +310,9 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["error"],
+                  "required": [
+                    "error"
+                  ],
                   "properties": {
                     "error": {
                       "type": "object"
@@ -535,7 +539,9 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["error"],
+                  "required": [
+                    "error"
+                  ],
                   "properties": {
                     "error": {
                       "type": "object"
@@ -668,7 +674,9 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["error"],
+                  "required": [
+                    "error"
+                  ],
                   "properties": {
                     "error": {
                       "type": "object"
@@ -746,7 +754,10 @@
                       "type": "array",
                       "items": {
                         "type": "object",
-                        "required": ["id", "name"],
+                        "required": [
+                          "id",
+                          "name"
+                        ],
                         "properties": {
                           "id": {
                             "type": "string",
@@ -795,7 +806,9 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["error"],
+                  "required": [
+                    "error"
+                  ],
                   "properties": {
                     "error": {
                       "type": "object"
@@ -837,7 +850,10 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["id", "name"],
+                  "required": [
+                    "id",
+                    "name"
+                  ],
                   "properties": {
                     "id": {
                       "type": "string",
@@ -865,7 +881,9 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["error"],
+                  "required": [
+                    "error"
+                  ],
                   "properties": {
                     "error": {
                       "type": "object"
@@ -943,7 +961,10 @@
                       "type": "array",
                       "items": {
                         "type": "object",
-                        "required": ["id", "name"],
+                        "required": [
+                          "id",
+                          "name"
+                        ],
                         "properties": {
                           "id": {
                             "type": "string",
@@ -992,7 +1013,9 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["error"],
+                  "required": [
+                    "error"
+                  ],
                   "properties": {
                     "error": {
                       "type": "object"
@@ -1034,7 +1057,10 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["id", "name"],
+                  "required": [
+                    "id",
+                    "name"
+                  ],
                   "properties": {
                     "id": {
                       "type": "string",
@@ -1062,7 +1088,9 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["error"],
+                  "required": [
+                    "error"
+                  ],
                   "properties": {
                     "error": {
                       "type": "object"
@@ -1130,7 +1158,10 @@
                       "type": "array",
                       "items": {
                         "type": "object",
-                        "required": ["id", "name"],
+                        "required": [
+                          "id",
+                          "name"
+                        ],
                         "properties": {
                           "id": {
                             "type": "string"
@@ -1171,7 +1202,9 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["error"],
+                  "required": [
+                    "error"
+                  ],
                   "properties": {
                     "error": {
                       "type": "object"
@@ -1271,7 +1304,11 @@
                       "type": "array",
                       "items": {
                         "type": "object",
-                        "required": ["id", "fund_id", "date"],
+                        "required": [
+                          "id",
+                          "fund_id",
+                          "date"
+                        ],
                         "properties": {
                           "id": {
                             "type": "string",
@@ -1329,7 +1366,9 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["error"],
+                  "required": [
+                    "error"
+                  ],
                   "properties": {
                     "error": {
                       "type": "object"
@@ -1499,7 +1538,9 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["error"],
+                  "required": [
+                    "error"
+                  ],
                   "properties": {
                     "error": {
                       "type": "object"
@@ -1599,7 +1640,12 @@
                       "type": "array",
                       "items": {
                         "type": "object",
-                        "required": ["id", "scheme_id", "date", "value"],
+                        "required": [
+                          "id",
+                          "scheme_id",
+                          "date",
+                          "value"
+                        ],
                         "properties": {
                           "id": {
                             "type": "string",
@@ -1667,7 +1713,9 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["error"],
+                  "required": [
+                    "error"
+                  ],
                   "properties": {
                     "error": {
                       "type": "object"
@@ -1785,7 +1833,10 @@
                           },
                           "value": {
                             "type": "object",
-                            "required": ["amount", "currency"],
+                            "required": [
+                              "amount",
+                              "currency"
+                            ],
                             "properties": {
                               "amount": {
                                 "type": "string"
@@ -1829,7 +1880,9 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["error"],
+                  "required": [
+                    "error"
+                  ],
                   "properties": {
                     "error": {
                       "type": "object"
@@ -1870,7 +1923,9 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["scheme_id"],
+                "required": [
+                  "scheme_id"
+                ],
                 "properties": {
                   "scheme_id": {
                     "type": "string",
@@ -1948,7 +2003,10 @@
                         },
                         "value": {
                           "type": "object",
-                          "required": ["amount", "currency"],
+                          "required": [
+                            "amount",
+                            "currency"
+                          ],
                           "properties": {
                             "amount": {
                               "type": "string",
@@ -1962,7 +2020,11 @@
                         },
                         "nav": {
                           "type": "object",
-                          "required": ["amount", "currency", "date"],
+                          "required": [
+                            "amount",
+                            "currency",
+                            "date"
+                          ],
                           "properties": {
                             "amount": {
                               "type": "string",
@@ -1990,7 +2052,10 @@
                           ],
                           "properties": {
                             "status": {
-                              "enum": ["recent", "stale"]
+                              "enum": [
+                                "recent",
+                                "stale"
+                              ]
                             },
                             "age_days": {
                               "type": "integer",
@@ -2064,7 +2129,10 @@
                           "anyOf": [
                             {
                               "type": "object",
-                              "required": ["amount", "currency"],
+                              "required": [
+                                "amount",
+                                "currency"
+                              ],
                               "properties": {
                                 "amount": {
                                   "type": "string",
@@ -2135,7 +2203,10 @@
                           "anyOf": [
                             {
                               "type": "object",
-                              "required": ["amount", "currency"],
+                              "required": [
+                                "amount",
+                                "currency"
+                              ],
                               "properties": {
                                 "amount": {
                                   "type": "string",
@@ -2189,7 +2260,9 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["error"],
+                  "required": [
+                    "error"
+                  ],
                   "properties": {
                     "error": {
                       "type": "object"
@@ -2273,7 +2346,10 @@
                     "properties": {
                       "kind": {
                         "type": "string",
-                        "enum": ["user", "statement"]
+                        "enum": [
+                          "user",
+                          "statement"
+                        ]
                       },
                       "reference": {
                         "type": "string",
@@ -2281,7 +2357,10 @@
                         "maxLength": 255
                       }
                     },
-                    "required": ["kind", "reference"],
+                    "required": [
+                      "kind",
+                      "reference"
+                    ],
                     "additionalProperties": false
                   },
                   "holdings": {
@@ -2333,11 +2412,16 @@
                                   "const": "INR"
                                 }
                               },
-                              "required": ["amount", "currency"],
+                              "required": [
+                                "amount",
+                                "currency"
+                              ],
                               "additionalProperties": true
                             }
                           },
-                          "required": ["date"],
+                          "required": [
+                            "date"
+                          ],
                           "additionalProperties": false
                         },
                         "expected_revision": {
@@ -2358,7 +2442,10 @@
                     "maxItems": 100
                   }
                 },
-                "required": ["source", "holdings"],
+                "required": [
+                  "source",
+                  "holdings"
+                ],
                 "additionalProperties": false
               }
             }
@@ -2371,7 +2458,12 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["object", "account", "portfolio", "holdings"],
+                  "required": [
+                    "object",
+                    "account",
+                    "portfolio",
+                    "holdings"
+                  ],
                   "properties": {
                     "object": {
                       "const": "history_import"
@@ -2405,7 +2497,9 @@
                             "anyOf": [
                               {
                                 "type": "object",
-                                "required": ["kind"],
+                                "required": [
+                                  "kind"
+                                ],
                                 "properties": {
                                   "kind": {
                                     "const": "supplied"
@@ -2439,7 +2533,11 @@
                                   },
                                   "nav": {
                                     "type": "object",
-                                    "required": ["amount", "currency", "date"],
+                                    "required": [
+                                      "amount",
+                                      "currency",
+                                      "date"
+                                    ],
                                     "properties": {
                                       "amount": {
                                         "type": "string",
@@ -2489,12 +2587,1837 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["error"],
+                  "required": [
+                    "error"
+                  ],
                   "properties": {
                     "error": {
                       "type": "object"
                     }
                   }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/app-api/accounts/{account}/portfolios/current_asset_mix": {
+      "post": {
+        "operationId": "current_asset_mix",
+        "x-availability": "first_party_session",
+        "x-read-only": true,
+        "x-sdk-method": "portfolio.current().assetMix",
+        "description": "Value every stored current holding with latest NAV on or before today in Asia/Kolkata, then calculate the mix. Fails if a holding cannot be valued. Separate from snapshot and historical calculations.",
+        "parameters": [
+          {
+            "name": "account",
+            "in": "path",
+            "required": true,
+            "description": "Authorized account or me.",
+            "schema": {
+              "anyOf": [
+                {
+                  "const": "me"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^acct_[a-f0-9]{32}$"
+                }
+              ]
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "security": [
+          {
+            "browserSession": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "portfolio"
+                ],
+                "properties": {
+                  "portfolio": {
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "id"
+                    ],
+                    "properties": {
+                      "type": {
+                        "const": "saved"
+                      },
+                      "id": {
+                        "type": "string",
+                        "pattern": "^ptf_[a-f0-9]{32}$"
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Current mix and complete valuation provenance.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "const": "portfolio_mix"
+                    },
+                    "account": {
+                      "type": "string",
+                      "pattern": "^acct_[a-f0-9]{32}$"
+                    },
+                    "portfolio": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "pattern": "^ptf_[a-f0-9]{32}$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "mix_type": {
+                      "const": "asset"
+                    },
+                    "engine_version": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "as_of_date": {
+                      "type": "string",
+                      "format": "date",
+                      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                      "description": "Real calendar date, 1900-01-01 through today Asia/Kolkata; replacement cannot move backwards."
+                    },
+                    "valuation_date": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date",
+                          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                          "description": "Real calendar date, 1900-01-01 through today Asia/Kolkata; replacement cannot move backwards."
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "input_total": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "amount": {
+                              "type": "string",
+                              "pattern": "^(0|[1-9][0-9]{0,99})(\\.[0-9]{1,100})?$"
+                            },
+                            "currency": {
+                              "const": "INR"
+                            }
+                          },
+                          "required": [
+                            "amount",
+                            "currency"
+                          ],
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "calculation_precision": {
+                      "const": "float64"
+                    },
+                    "source_roots": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "mutual_fund_id": {
+                            "type": "string",
+                            "pattern": "^[1-9][0-9]{0,18}$"
+                          },
+                          "portfolio_id": {
+                            "type": "string",
+                            "pattern": "^[1-9][0-9]{0,18}$"
+                          },
+                          "date": {
+                            "type": "string",
+                            "format": "date",
+                            "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+                          }
+                        },
+                        "required": [
+                          "mutual_fund_id",
+                          "portfolio_id",
+                          "date"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "minItems": 1,
+                      "maxItems": 100
+                    },
+                    "warnings": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "code": {
+                            "type": "string",
+                            "x-known-values": [
+                              "float64_precision",
+                              "threshold_contribution_skipped",
+                              "nested_holdings_unavailable",
+                              "missing_issuer_identity",
+                              "cycle_detected",
+                              "classifications_not_historical"
+                            ],
+                            "minLength": 1
+                          },
+                          "message": {
+                            "type": "string"
+                          },
+                          "mutual_fund_id": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "pattern": "^[1-9][0-9]{0,17}$"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "path": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "required": [
+                          "code",
+                          "message",
+                          "mutual_fund_id",
+                          "path"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "mix": {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "x-known-values": [
+                            "available",
+                            "unavailable"
+                          ],
+                          "minLength": 1
+                        },
+                        "denominator": {
+                          "const": "total_supplied_value_or_root_value"
+                        },
+                        "unavailable_reason": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "x-known-values": [
+                                "no_eligible_contributions"
+                              ],
+                              "minLength": 1
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "items": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "code": {
+                                "type": "string",
+                                "x-known-values": [
+                                  "cash",
+                                  "debt",
+                                  "equity",
+                                  "gold",
+                                  "other",
+                                  "unknown"
+                                ],
+                                "minLength": 1
+                              },
+                              "percentage": {
+                                "type": "string",
+                                "pattern": "^-?(1000000000000(\\.0{1,10})?|[0-9]{1,12}(\\.[0-9]{1,10})?)$"
+                              }
+                            },
+                            "required": [
+                              "code",
+                              "percentage"
+                            ],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": [
+                        "status",
+                        "denominator",
+                        "unavailable_reason",
+                        "items"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "position_date": {
+                      "type": "string",
+                      "format": "date",
+                      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                      "description": "Real calendar date, 1900-01-01 through today Asia/Kolkata; replacement cannot move backwards."
+                    },
+                    "current_valuation": {
+                      "type": "object",
+                      "required": [
+                        "valuation_date",
+                        "holdings"
+                      ],
+                      "properties": {
+                        "valuation_date": {
+                          "type": "string",
+                          "format": "date"
+                        },
+                        "holdings": {
+                          "type": "array",
+                          "minItems": 1,
+                          "maxItems": 100,
+                          "items": {
+                            "type": "object",
+                            "required": [
+                              "status",
+                              "scheme_id",
+                              "units",
+                              "as_of",
+                              "value",
+                              "nav",
+                              "freshness",
+                              "ownership_status",
+                              "position_date",
+                              "valuation_basis",
+                              "holding",
+                              "investment_account",
+                              "instrument",
+                              "revision",
+                              "source",
+                              "derivation"
+                            ],
+                            "properties": {
+                              "status": {
+                                "const": "available"
+                              },
+                              "scheme_id": {
+                                "type": "string",
+                                "pattern": "^[1-9][0-9]{0,18}$"
+                              },
+                              "units": {
+                                "type": "string",
+                                "pattern": "^(0|[1-9][0-9]{0,19})(\\.[0-9]{1,18})?$"
+                              },
+                              "as_of": {
+                                "type": "string",
+                                "format": "date",
+                                "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                                "description": "NAV cutoff date. Defaults to today in Asia/Kolkata; separate from investor position date and actual NAV date."
+                              },
+                              "value": {
+                                "type": "object",
+                                "required": [
+                                  "amount",
+                                  "currency"
+                                ],
+                                "properties": {
+                                  "amount": {
+                                    "type": "string",
+                                    "pattern": "^[0-9]+(\\.[0-9]+)?$"
+                                  },
+                                  "currency": {
+                                    "const": "INR"
+                                  }
+                                },
+                                "additionalProperties": true
+                              },
+                              "nav": {
+                                "type": "object",
+                                "required": [
+                                  "amount",
+                                  "currency",
+                                  "date"
+                                ],
+                                "properties": {
+                                  "amount": {
+                                    "type": "string",
+                                    "pattern": "^[0-9]+(\\.[0-9]+)?$"
+                                  },
+                                  "currency": {
+                                    "const": "INR"
+                                  },
+                                  "date": {
+                                    "type": "string",
+                                    "format": "date",
+                                    "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                                    "description": "Actual NAV observation date, on or before as_of; never relabelled as the requested cutoff."
+                                  }
+                                },
+                                "additionalProperties": true
+                              },
+                              "freshness": {
+                                "type": "object",
+                                "required": [
+                                  "status",
+                                  "age_days",
+                                  "recent_within_days",
+                                  "time_zone"
+                                ],
+                                "properties": {
+                                  "status": {
+                                    "enum": [
+                                      "recent",
+                                      "stale"
+                                    ]
+                                  },
+                                  "age_days": {
+                                    "type": "integer",
+                                    "minimum": 0
+                                  },
+                                  "recent_within_days": {
+                                    "const": 3,
+                                    "description": "Calendar-day freshness threshold, inclusive."
+                                  },
+                                  "time_zone": {
+                                    "const": "Asia/Kolkata",
+                                    "description": "Financial-date timezone used for the default cutoff."
+                                  }
+                                },
+                                "additionalProperties": true,
+                                "description": "Age is measured against the requested NAV cutoff, not the position date. recent means age_days <= 3; stale means greater than 3."
+                              },
+                              "position_date": {
+                                "type": "string",
+                                "format": "date",
+                                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                              },
+                              "ownership_status": {
+                                "const": "user_supplied_not_verified",
+                                "description": "Supplied quantities and dates are not independent verification of current ownership."
+                              },
+                              "valuation_basis": {
+                                "const": "units_times_latest_nav",
+                                "description": "Exact decimal units multiplied by latest positive INR NAV on or before as_of."
+                              },
+                              "holding": {
+                                "type": "string"
+                              },
+                              "investment_account": {
+                                "type": "string"
+                              },
+                              "instrument": {
+                                "type": "string"
+                              },
+                              "revision": {
+                                "anyOf": [
+                                  {
+                                    "type": "integer",
+                                    "minimum": 1
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "source": {
+                                "type": "object",
+                                "required": [
+                                  "kind",
+                                  "reference"
+                                ],
+                                "properties": {
+                                  "kind": {
+                                    "enum": [
+                                      "user",
+                                      "statement"
+                                    ]
+                                  },
+                                  "reference": {
+                                    "type": "string"
+                                  }
+                                },
+                                "additionalProperties": false
+                              },
+                              "derivation": {
+                                "anyOf": [
+                                  {
+                                    "anyOf": [
+                                      {
+                                        "type": "object",
+                                        "required": [
+                                          "kind"
+                                        ],
+                                        "properties": {
+                                          "kind": {
+                                            "const": "supplied"
+                                          }
+                                        },
+                                        "additionalProperties": true
+                                      },
+                                      {
+                                        "type": "object",
+                                        "required": [
+                                          "kind",
+                                          "original_amount",
+                                          "position_date",
+                                          "nav",
+                                          "rounding",
+                                          "rounded"
+                                        ],
+                                        "properties": {
+                                          "kind": {
+                                            "const": "amount_divided_by_nav"
+                                          },
+                                          "original_amount": {
+                                            "type": "string",
+                                            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+                                            "maxLength": 80
+                                          },
+                                          "position_date": {
+                                            "type": "string",
+                                            "format": "date",
+                                            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                                          },
+                                          "nav": {
+                                            "type": "object",
+                                            "required": [
+                                              "amount",
+                                              "currency",
+                                              "date"
+                                            ],
+                                            "properties": {
+                                              "amount": {
+                                                "type": "string",
+                                                "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+                                                "maxLength": 80
+                                              },
+                                              "currency": {
+                                                "const": "INR"
+                                              },
+                                              "date": {
+                                                "type": "string",
+                                                "format": "date",
+                                                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                                              }
+                                            },
+                                            "additionalProperties": true
+                                          },
+                                          "rounding": {
+                                            "const": "half_even_18_decimal_places"
+                                          },
+                                          "rounded": {
+                                            "type": "boolean"
+                                          }
+                                        },
+                                        "additionalProperties": true
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            "additionalProperties": true
+                          }
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "object",
+                    "account",
+                    "portfolio",
+                    "mix_type",
+                    "engine_version",
+                    "as_of_date",
+                    "valuation_date",
+                    "input_total",
+                    "calculation_precision",
+                    "source_roots",
+                    "warnings",
+                    "mix",
+                    "current_valuation"
+                  ],
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/app-api/accounts/{account}/portfolios/current_sector_mix": {
+      "post": {
+        "operationId": "current_sector_mix",
+        "x-availability": "first_party_session",
+        "x-read-only": true,
+        "x-sdk-method": "portfolio.current().sectorMix",
+        "description": "Value every stored current holding with latest NAV on or before today in Asia/Kolkata, then calculate the mix. Fails if a holding cannot be valued. Separate from snapshot and historical calculations.",
+        "parameters": [
+          {
+            "name": "account",
+            "in": "path",
+            "required": true,
+            "description": "Authorized account or me.",
+            "schema": {
+              "anyOf": [
+                {
+                  "const": "me"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^acct_[a-f0-9]{32}$"
+                }
+              ]
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "security": [
+          {
+            "browserSession": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "portfolio"
+                ],
+                "properties": {
+                  "portfolio": {
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "id"
+                    ],
+                    "properties": {
+                      "type": {
+                        "const": "saved"
+                      },
+                      "id": {
+                        "type": "string",
+                        "pattern": "^ptf_[a-f0-9]{32}$"
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Current mix and complete valuation provenance.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "const": "portfolio_mix"
+                    },
+                    "account": {
+                      "type": "string",
+                      "pattern": "^acct_[a-f0-9]{32}$"
+                    },
+                    "portfolio": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "pattern": "^ptf_[a-f0-9]{32}$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "mix_type": {
+                      "const": "sector"
+                    },
+                    "engine_version": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "as_of_date": {
+                      "type": "string",
+                      "format": "date",
+                      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                      "description": "Real calendar date, 1900-01-01 through today Asia/Kolkata; replacement cannot move backwards."
+                    },
+                    "valuation_date": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date",
+                          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                          "description": "Real calendar date, 1900-01-01 through today Asia/Kolkata; replacement cannot move backwards."
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "input_total": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "amount": {
+                              "type": "string",
+                              "pattern": "^(0|[1-9][0-9]{0,99})(\\.[0-9]{1,100})?$"
+                            },
+                            "currency": {
+                              "const": "INR"
+                            }
+                          },
+                          "required": [
+                            "amount",
+                            "currency"
+                          ],
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "calculation_precision": {
+                      "const": "float64"
+                    },
+                    "source_roots": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "mutual_fund_id": {
+                            "type": "string",
+                            "pattern": "^[1-9][0-9]{0,18}$"
+                          },
+                          "portfolio_id": {
+                            "type": "string",
+                            "pattern": "^[1-9][0-9]{0,18}$"
+                          },
+                          "date": {
+                            "type": "string",
+                            "format": "date",
+                            "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+                          }
+                        },
+                        "required": [
+                          "mutual_fund_id",
+                          "portfolio_id",
+                          "date"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "minItems": 1,
+                      "maxItems": 100
+                    },
+                    "warnings": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "code": {
+                            "type": "string",
+                            "x-known-values": [
+                              "float64_precision",
+                              "threshold_contribution_skipped",
+                              "nested_holdings_unavailable",
+                              "missing_issuer_identity",
+                              "cycle_detected",
+                              "classifications_not_historical"
+                            ],
+                            "minLength": 1
+                          },
+                          "message": {
+                            "type": "string"
+                          },
+                          "mutual_fund_id": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "pattern": "^[1-9][0-9]{0,17}$"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "path": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "required": [
+                          "code",
+                          "message",
+                          "mutual_fund_id",
+                          "path"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "mix": {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "x-known-values": [
+                            "available",
+                            "unavailable"
+                          ],
+                          "minLength": 1
+                        },
+                        "denominator": {
+                          "const": "recursively_normalized_eligible_equity_sector_contributions"
+                        },
+                        "unavailable_reason": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "x-known-values": [
+                                "no_eligible_contributions"
+                              ],
+                              "minLength": 1
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "items": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "code": {
+                                "type": "string",
+                                "x-known-values": [
+                                  "not_set",
+                                  "agriculture",
+                                  "auto",
+                                  "cash_equivalents",
+                                  "chemicals",
+                                  "construction",
+                                  "consumer_discretionary",
+                                  "consumer_staples",
+                                  "defence",
+                                  "diversified",
+                                  "education",
+                                  "electronics",
+                                  "etf",
+                                  "energy_production",
+                                  "finance",
+                                  "furniture",
+                                  "government",
+                                  "healthcare",
+                                  "industrial_equipment",
+                                  "infrastructure",
+                                  "it_technology",
+                                  "logistics",
+                                  "media",
+                                  "outsourcing",
+                                  "packaging",
+                                  "paper_products",
+                                  "photographic_films",
+                                  "plastic_products",
+                                  "raw_materials",
+                                  "real_estate",
+                                  "restaurants",
+                                  "retail",
+                                  "shipping",
+                                  "telecom",
+                                  "textile",
+                                  "tobacco",
+                                  "trading",
+                                  "travel_lodging",
+                                  "utilities",
+                                  "other",
+                                  "not_applicable"
+                                ],
+                                "minLength": 1
+                              },
+                              "label": {
+                                "type": "string"
+                              },
+                              "percentage": {
+                                "type": "string",
+                                "pattern": "^(100(\\.0{1,10})?|[0-9]{1,2}(\\.[0-9]{1,10})?)$"
+                              }
+                            },
+                            "required": [
+                              "code",
+                              "label",
+                              "percentage"
+                            ],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": [
+                        "status",
+                        "denominator",
+                        "unavailable_reason",
+                        "items"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "position_date": {
+                      "type": "string",
+                      "format": "date",
+                      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                      "description": "Real calendar date, 1900-01-01 through today Asia/Kolkata; replacement cannot move backwards."
+                    },
+                    "current_valuation": {
+                      "type": "object",
+                      "required": [
+                        "valuation_date",
+                        "holdings"
+                      ],
+                      "properties": {
+                        "valuation_date": {
+                          "type": "string",
+                          "format": "date"
+                        },
+                        "holdings": {
+                          "type": "array",
+                          "minItems": 1,
+                          "maxItems": 100,
+                          "items": {
+                            "type": "object",
+                            "required": [
+                              "status",
+                              "scheme_id",
+                              "units",
+                              "as_of",
+                              "value",
+                              "nav",
+                              "freshness",
+                              "ownership_status",
+                              "position_date",
+                              "valuation_basis",
+                              "holding",
+                              "investment_account",
+                              "instrument",
+                              "revision",
+                              "source",
+                              "derivation"
+                            ],
+                            "properties": {
+                              "status": {
+                                "const": "available"
+                              },
+                              "scheme_id": {
+                                "type": "string",
+                                "pattern": "^[1-9][0-9]{0,18}$"
+                              },
+                              "units": {
+                                "type": "string",
+                                "pattern": "^(0|[1-9][0-9]{0,19})(\\.[0-9]{1,18})?$"
+                              },
+                              "as_of": {
+                                "type": "string",
+                                "format": "date",
+                                "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                                "description": "NAV cutoff date. Defaults to today in Asia/Kolkata; separate from investor position date and actual NAV date."
+                              },
+                              "value": {
+                                "type": "object",
+                                "required": [
+                                  "amount",
+                                  "currency"
+                                ],
+                                "properties": {
+                                  "amount": {
+                                    "type": "string",
+                                    "pattern": "^[0-9]+(\\.[0-9]+)?$"
+                                  },
+                                  "currency": {
+                                    "const": "INR"
+                                  }
+                                },
+                                "additionalProperties": true
+                              },
+                              "nav": {
+                                "type": "object",
+                                "required": [
+                                  "amount",
+                                  "currency",
+                                  "date"
+                                ],
+                                "properties": {
+                                  "amount": {
+                                    "type": "string",
+                                    "pattern": "^[0-9]+(\\.[0-9]+)?$"
+                                  },
+                                  "currency": {
+                                    "const": "INR"
+                                  },
+                                  "date": {
+                                    "type": "string",
+                                    "format": "date",
+                                    "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                                    "description": "Actual NAV observation date, on or before as_of; never relabelled as the requested cutoff."
+                                  }
+                                },
+                                "additionalProperties": true
+                              },
+                              "freshness": {
+                                "type": "object",
+                                "required": [
+                                  "status",
+                                  "age_days",
+                                  "recent_within_days",
+                                  "time_zone"
+                                ],
+                                "properties": {
+                                  "status": {
+                                    "enum": [
+                                      "recent",
+                                      "stale"
+                                    ]
+                                  },
+                                  "age_days": {
+                                    "type": "integer",
+                                    "minimum": 0
+                                  },
+                                  "recent_within_days": {
+                                    "const": 3,
+                                    "description": "Calendar-day freshness threshold, inclusive."
+                                  },
+                                  "time_zone": {
+                                    "const": "Asia/Kolkata",
+                                    "description": "Financial-date timezone used for the default cutoff."
+                                  }
+                                },
+                                "additionalProperties": true,
+                                "description": "Age is measured against the requested NAV cutoff, not the position date. recent means age_days <= 3; stale means greater than 3."
+                              },
+                              "position_date": {
+                                "type": "string",
+                                "format": "date",
+                                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                              },
+                              "ownership_status": {
+                                "const": "user_supplied_not_verified",
+                                "description": "Supplied quantities and dates are not independent verification of current ownership."
+                              },
+                              "valuation_basis": {
+                                "const": "units_times_latest_nav",
+                                "description": "Exact decimal units multiplied by latest positive INR NAV on or before as_of."
+                              },
+                              "holding": {
+                                "type": "string"
+                              },
+                              "investment_account": {
+                                "type": "string"
+                              },
+                              "instrument": {
+                                "type": "string"
+                              },
+                              "revision": {
+                                "anyOf": [
+                                  {
+                                    "type": "integer",
+                                    "minimum": 1
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "source": {
+                                "type": "object",
+                                "required": [
+                                  "kind",
+                                  "reference"
+                                ],
+                                "properties": {
+                                  "kind": {
+                                    "enum": [
+                                      "user",
+                                      "statement"
+                                    ]
+                                  },
+                                  "reference": {
+                                    "type": "string"
+                                  }
+                                },
+                                "additionalProperties": false
+                              },
+                              "derivation": {
+                                "anyOf": [
+                                  {
+                                    "anyOf": [
+                                      {
+                                        "type": "object",
+                                        "required": [
+                                          "kind"
+                                        ],
+                                        "properties": {
+                                          "kind": {
+                                            "const": "supplied"
+                                          }
+                                        },
+                                        "additionalProperties": true
+                                      },
+                                      {
+                                        "type": "object",
+                                        "required": [
+                                          "kind",
+                                          "original_amount",
+                                          "position_date",
+                                          "nav",
+                                          "rounding",
+                                          "rounded"
+                                        ],
+                                        "properties": {
+                                          "kind": {
+                                            "const": "amount_divided_by_nav"
+                                          },
+                                          "original_amount": {
+                                            "type": "string",
+                                            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+                                            "maxLength": 80
+                                          },
+                                          "position_date": {
+                                            "type": "string",
+                                            "format": "date",
+                                            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                                          },
+                                          "nav": {
+                                            "type": "object",
+                                            "required": [
+                                              "amount",
+                                              "currency",
+                                              "date"
+                                            ],
+                                            "properties": {
+                                              "amount": {
+                                                "type": "string",
+                                                "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+                                                "maxLength": 80
+                                              },
+                                              "currency": {
+                                                "const": "INR"
+                                              },
+                                              "date": {
+                                                "type": "string",
+                                                "format": "date",
+                                                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                                              }
+                                            },
+                                            "additionalProperties": true
+                                          },
+                                          "rounding": {
+                                            "const": "half_even_18_decimal_places"
+                                          },
+                                          "rounded": {
+                                            "type": "boolean"
+                                          }
+                                        },
+                                        "additionalProperties": true
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            "additionalProperties": true
+                          }
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "object",
+                    "account",
+                    "portfolio",
+                    "mix_type",
+                    "engine_version",
+                    "as_of_date",
+                    "valuation_date",
+                    "input_total",
+                    "calculation_precision",
+                    "source_roots",
+                    "warnings",
+                    "mix",
+                    "current_valuation"
+                  ],
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/app-api/accounts/{account}/portfolios/current_issuer_mix": {
+      "post": {
+        "operationId": "current_issuer_mix",
+        "x-availability": "first_party_session",
+        "x-read-only": true,
+        "x-sdk-method": "portfolio.current().issuerMix",
+        "description": "Value every stored current holding with latest NAV on or before today in Asia/Kolkata, then calculate the mix. Fails if a holding cannot be valued. Separate from snapshot and historical calculations.",
+        "parameters": [
+          {
+            "name": "account",
+            "in": "path",
+            "required": true,
+            "description": "Authorized account or me.",
+            "schema": {
+              "anyOf": [
+                {
+                  "const": "me"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^acct_[a-f0-9]{32}$"
+                }
+              ]
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "security": [
+          {
+            "browserSession": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "portfolio"
+                ],
+                "properties": {
+                  "portfolio": {
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "id"
+                    ],
+                    "properties": {
+                      "type": {
+                        "const": "saved"
+                      },
+                      "id": {
+                        "type": "string",
+                        "pattern": "^ptf_[a-f0-9]{32}$"
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Current mix and complete valuation provenance.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "const": "portfolio_mix"
+                    },
+                    "account": {
+                      "type": "string",
+                      "pattern": "^acct_[a-f0-9]{32}$"
+                    },
+                    "portfolio": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "pattern": "^ptf_[a-f0-9]{32}$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "mix_type": {
+                      "const": "issuer"
+                    },
+                    "engine_version": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "as_of_date": {
+                      "type": "string",
+                      "format": "date",
+                      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                      "description": "Real calendar date, 1900-01-01 through today Asia/Kolkata; replacement cannot move backwards."
+                    },
+                    "valuation_date": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date",
+                          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                          "description": "Real calendar date, 1900-01-01 through today Asia/Kolkata; replacement cannot move backwards."
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "input_total": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "amount": {
+                              "type": "string",
+                              "pattern": "^(0|[1-9][0-9]{0,99})(\\.[0-9]{1,100})?$"
+                            },
+                            "currency": {
+                              "const": "INR"
+                            }
+                          },
+                          "required": [
+                            "amount",
+                            "currency"
+                          ],
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "calculation_precision": {
+                      "const": "float64"
+                    },
+                    "source_roots": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "mutual_fund_id": {
+                            "type": "string",
+                            "pattern": "^[1-9][0-9]{0,18}$"
+                          },
+                          "portfolio_id": {
+                            "type": "string",
+                            "pattern": "^[1-9][0-9]{0,18}$"
+                          },
+                          "date": {
+                            "type": "string",
+                            "format": "date",
+                            "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+                          }
+                        },
+                        "required": [
+                          "mutual_fund_id",
+                          "portfolio_id",
+                          "date"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "minItems": 1,
+                      "maxItems": 100
+                    },
+                    "warnings": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "code": {
+                            "type": "string",
+                            "x-known-values": [
+                              "float64_precision",
+                              "threshold_contribution_skipped",
+                              "nested_holdings_unavailable",
+                              "missing_issuer_identity",
+                              "cycle_detected",
+                              "classifications_not_historical"
+                            ],
+                            "minLength": 1
+                          },
+                          "message": {
+                            "type": "string"
+                          },
+                          "mutual_fund_id": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "pattern": "^[1-9][0-9]{0,17}$"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "path": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "required": [
+                          "code",
+                          "message",
+                          "mutual_fund_id",
+                          "path"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "mix": {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "x-known-values": [
+                            "available",
+                            "unavailable"
+                          ],
+                          "minLength": 1
+                        },
+                        "denominator": {
+                          "const": "recursively_normalized_eligible_equity_issuer_contributions"
+                        },
+                        "unavailable_reason": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "x-known-values": [
+                                "no_eligible_contributions"
+                              ],
+                              "minLength": 1
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "items": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "issuer_type": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "issuer_id": {
+                                "type": "string",
+                                "pattern": "^[1-9][0-9]{0,18}$"
+                              },
+                              "name": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "percentage": {
+                                "type": "string",
+                                "pattern": "^(100(\\.0{1,10})?|[0-9]{1,2}(\\.[0-9]{1,10})?)$"
+                              }
+                            },
+                            "required": [
+                              "issuer_type",
+                              "issuer_id",
+                              "name",
+                              "percentage"
+                            ],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": [
+                        "status",
+                        "denominator",
+                        "unavailable_reason",
+                        "items"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "position_date": {
+                      "type": "string",
+                      "format": "date",
+                      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                      "description": "Real calendar date, 1900-01-01 through today Asia/Kolkata; replacement cannot move backwards."
+                    },
+                    "current_valuation": {
+                      "type": "object",
+                      "required": [
+                        "valuation_date",
+                        "holdings"
+                      ],
+                      "properties": {
+                        "valuation_date": {
+                          "type": "string",
+                          "format": "date"
+                        },
+                        "holdings": {
+                          "type": "array",
+                          "minItems": 1,
+                          "maxItems": 100,
+                          "items": {
+                            "type": "object",
+                            "required": [
+                              "status",
+                              "scheme_id",
+                              "units",
+                              "as_of",
+                              "value",
+                              "nav",
+                              "freshness",
+                              "ownership_status",
+                              "position_date",
+                              "valuation_basis",
+                              "holding",
+                              "investment_account",
+                              "instrument",
+                              "revision",
+                              "source",
+                              "derivation"
+                            ],
+                            "properties": {
+                              "status": {
+                                "const": "available"
+                              },
+                              "scheme_id": {
+                                "type": "string",
+                                "pattern": "^[1-9][0-9]{0,18}$"
+                              },
+                              "units": {
+                                "type": "string",
+                                "pattern": "^(0|[1-9][0-9]{0,19})(\\.[0-9]{1,18})?$"
+                              },
+                              "as_of": {
+                                "type": "string",
+                                "format": "date",
+                                "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                                "description": "NAV cutoff date. Defaults to today in Asia/Kolkata; separate from investor position date and actual NAV date."
+                              },
+                              "value": {
+                                "type": "object",
+                                "required": [
+                                  "amount",
+                                  "currency"
+                                ],
+                                "properties": {
+                                  "amount": {
+                                    "type": "string",
+                                    "pattern": "^[0-9]+(\\.[0-9]+)?$"
+                                  },
+                                  "currency": {
+                                    "const": "INR"
+                                  }
+                                },
+                                "additionalProperties": true
+                              },
+                              "nav": {
+                                "type": "object",
+                                "required": [
+                                  "amount",
+                                  "currency",
+                                  "date"
+                                ],
+                                "properties": {
+                                  "amount": {
+                                    "type": "string",
+                                    "pattern": "^[0-9]+(\\.[0-9]+)?$"
+                                  },
+                                  "currency": {
+                                    "const": "INR"
+                                  },
+                                  "date": {
+                                    "type": "string",
+                                    "format": "date",
+                                    "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                                    "description": "Actual NAV observation date, on or before as_of; never relabelled as the requested cutoff."
+                                  }
+                                },
+                                "additionalProperties": true
+                              },
+                              "freshness": {
+                                "type": "object",
+                                "required": [
+                                  "status",
+                                  "age_days",
+                                  "recent_within_days",
+                                  "time_zone"
+                                ],
+                                "properties": {
+                                  "status": {
+                                    "enum": [
+                                      "recent",
+                                      "stale"
+                                    ]
+                                  },
+                                  "age_days": {
+                                    "type": "integer",
+                                    "minimum": 0
+                                  },
+                                  "recent_within_days": {
+                                    "const": 3,
+                                    "description": "Calendar-day freshness threshold, inclusive."
+                                  },
+                                  "time_zone": {
+                                    "const": "Asia/Kolkata",
+                                    "description": "Financial-date timezone used for the default cutoff."
+                                  }
+                                },
+                                "additionalProperties": true,
+                                "description": "Age is measured against the requested NAV cutoff, not the position date. recent means age_days <= 3; stale means greater than 3."
+                              },
+                              "position_date": {
+                                "type": "string",
+                                "format": "date",
+                                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                              },
+                              "ownership_status": {
+                                "const": "user_supplied_not_verified",
+                                "description": "Supplied quantities and dates are not independent verification of current ownership."
+                              },
+                              "valuation_basis": {
+                                "const": "units_times_latest_nav",
+                                "description": "Exact decimal units multiplied by latest positive INR NAV on or before as_of."
+                              },
+                              "holding": {
+                                "type": "string"
+                              },
+                              "investment_account": {
+                                "type": "string"
+                              },
+                              "instrument": {
+                                "type": "string"
+                              },
+                              "revision": {
+                                "anyOf": [
+                                  {
+                                    "type": "integer",
+                                    "minimum": 1
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "source": {
+                                "type": "object",
+                                "required": [
+                                  "kind",
+                                  "reference"
+                                ],
+                                "properties": {
+                                  "kind": {
+                                    "enum": [
+                                      "user",
+                                      "statement"
+                                    ]
+                                  },
+                                  "reference": {
+                                    "type": "string"
+                                  }
+                                },
+                                "additionalProperties": false
+                              },
+                              "derivation": {
+                                "anyOf": [
+                                  {
+                                    "anyOf": [
+                                      {
+                                        "type": "object",
+                                        "required": [
+                                          "kind"
+                                        ],
+                                        "properties": {
+                                          "kind": {
+                                            "const": "supplied"
+                                          }
+                                        },
+                                        "additionalProperties": true
+                                      },
+                                      {
+                                        "type": "object",
+                                        "required": [
+                                          "kind",
+                                          "original_amount",
+                                          "position_date",
+                                          "nav",
+                                          "rounding",
+                                          "rounded"
+                                        ],
+                                        "properties": {
+                                          "kind": {
+                                            "const": "amount_divided_by_nav"
+                                          },
+                                          "original_amount": {
+                                            "type": "string",
+                                            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+                                            "maxLength": 80
+                                          },
+                                          "position_date": {
+                                            "type": "string",
+                                            "format": "date",
+                                            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                                          },
+                                          "nav": {
+                                            "type": "object",
+                                            "required": [
+                                              "amount",
+                                              "currency",
+                                              "date"
+                                            ],
+                                            "properties": {
+                                              "amount": {
+                                                "type": "string",
+                                                "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+                                                "maxLength": 80
+                                              },
+                                              "currency": {
+                                                "const": "INR"
+                                              },
+                                              "date": {
+                                                "type": "string",
+                                                "format": "date",
+                                                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                                              }
+                                            },
+                                            "additionalProperties": true
+                                          },
+                                          "rounding": {
+                                            "const": "half_even_18_decimal_places"
+                                          },
+                                          "rounded": {
+                                            "type": "boolean"
+                                          }
+                                        },
+                                        "additionalProperties": true
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            "additionalProperties": true
+                          }
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "object",
+                    "account",
+                    "portfolio",
+                    "mix_type",
+                    "engine_version",
+                    "as_of_date",
+                    "valuation_date",
+                    "input_total",
+                    "calculation_precision",
+                    "source_roots",
+                    "warnings",
+                    "mix",
+                    "current_valuation"
+                  ],
+                  "additionalProperties": true
                 }
               }
             }

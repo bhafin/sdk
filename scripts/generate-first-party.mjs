@@ -13,7 +13,9 @@ for (const [path, item] of Object.entries(doc.paths))
       method: method.toUpperCase(),
       status: Number(status),
       marketData: true,
-      ...(op.operationId === "md_valuation" ? { readOnly: true } : {}),
+      ...(op.operationId === "md_valuation" || op["x-read-only"] === true
+        ? { readOnly: true }
+        : {}),
       parameters: op.parameters.filter((p) => p.name !== "X-CSRF-Token"),
       ...(op.requestBody
         ? { request: op.requestBody.content["application/json"].schema }

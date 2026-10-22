@@ -409,6 +409,23 @@ class Bharosa {
                 throw interrupted();
               }
               if (!error && response.status === op.status) {
+                if (
+                  id.startsWith("current_") &&
+                  id.endsWith("_mix") &&
+                  (data?.portfolio !== body.portfolio.id ||
+                    data?.mix_type !== id.split("_")[1] ||
+                    data?.current_valuation?.valuation_date !==
+                      data?.valuation_date ||
+                    data?.current_valuation?.holdings?.some(
+                      (h) =>
+                        h.nav?.date > h.as_of ||
+                        h.position_date > h.as_of ||
+                        h.as_of !== data.valuation_date,
+                    ))
+                )
+                  throw new InvalidResponseError(
+                    meta({ status: response.status, requestId }),
+                  );
                 const badMarket =
                   op.marketData &&
                   ((id.endsWith("_get") && data?.id !== params.id) ||
@@ -709,6 +726,25 @@ class Bharosa {
       if (frozenTarget.type === "saved") {
         const scope = { portfolio: frozenTarget.id };
         Object.defineProperties(data, {
+          current: {
+            value: () =>
+              Object.freeze(
+                Object.fromEntries(
+                  ["asset", "sector", "issuer"].map((kind) => [
+                    kind + "Mix",
+                    (params = {}, options) => {
+                      keys(params, []);
+                      return call(
+                        "current_" + kind + "_mix",
+                        {},
+                        { portfolio: frozenTarget },
+                        options,
+                      );
+                    },
+                  ]),
+                ),
+              ),
+          },
           history: {
             value: Object.freeze({
               retrieve: (options) =>

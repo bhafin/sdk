@@ -1126,3 +1126,82 @@ test("human error messages give next steps without changing structured metadata"
   }
   assert.match(new ValidationError().message, /not sent/);
 });
+
+test("saved portfolio current view sends separate typed operations and validates evidence", async () => {
+  const portfolio = fixtures.find(
+    (f) => f.operation_id === "retrieve_portfolio",
+  ).response;
+  const seen = [];
+  let corrupt = false;
+  const client = new Bharosa({
+    baseUrl: "https://synthetic.invalid",
+    account,
+    transport: {
+      send: async (url, init) => {
+        seen.push(new URL(url).pathname);
+        if (init.method === "GET") return res(portfolio);
+        const kind = new URL(url).pathname.match(
+          /current_(asset|sector|issuer)_mix$/,
+        )?.[1];
+        assert.ok(kind);
+        assert.deepEqual(JSON.parse(init.body), {
+          portfolio: { type: "saved", id: portfolio.id },
+        });
+        const data = structuredClone(
+          fixtures.find((f) => f.operation_id === kind + "_mix").response,
+        );
+        data.portfolio = portfolio.id;
+        data.valuation_date = "2026-10-18";
+        data.current_valuation = {
+          valuation_date: "2026-10-18",
+          holdings: [
+            {
+              holding: "hld_synthetic",
+              investment_account: "iac_synthetic",
+              instrument: "ins_synthetic",
+              scheme_id: "101",
+              status: "available",
+              units: "1.25",
+              as_of: "2026-10-18",
+              position_date: "2026-10-16",
+              value: { amount: "154.320875", currency: "INR" },
+              nav: {
+                amount: "123.4567",
+                currency: "INR",
+                date: corrupt ? "2026-10-19" : "2026-10-16",
+              },
+              freshness: {
+                status: "recent",
+                age_days: 2,
+                recent_within_days: 3,
+                time_zone: "Asia/Kolkata",
+              },
+              ownership_status: "user_supplied_not_verified",
+              valuation_basis: "units_times_latest_nav",
+              revision: 2,
+              source: { kind: "user", reference: "synthetic" },
+              derivation: { kind: "supplied" },
+            },
+          ],
+        };
+        return res(data);
+      },
+    },
+  });
+  const saved = await client.portfolios.retrieve(portfolio.id);
+  assert.equal(typeof saved.current, "function");
+  for (const kind of ["asset", "sector", "issuer"]) {
+    const result = await saved.current()[kind + "Mix"]();
+    assert.equal(
+      result.current_valuation.holdings[0].value.amount,
+      "154.320875",
+    );
+  }
+  assert.equal(seen.length, 4);
+  assert.throws(
+    () => saved.current().assetMix({ asOf: "2026-10-18" }),
+    ValidationError,
+  );
+  corrupt = true;
+  await assert.rejects(saved.current().assetMix(), InvalidResponseError);
+});

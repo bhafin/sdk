@@ -152,8 +152,8 @@ try {
       { id: "retrieve_portfolio" },
       { id: "current_snapshot" },
       { id: "asset_mix", body: { portfolio: saved, as_of: "2026-10-18" } },
-      { id: "sector_mix", body: { portfolio: saved } },
-      { id: "issuer_mix", body: { portfolio: saved } },
+      { id: "sector_mix", body: { portfolio: saved, as_of: "2026-10-18" } },
+      { id: "issuer_mix", body: { portfolio: saved, as_of: "2026-10-18" } },
     ],
     () => mixes.savedMixes(client, portfolioId),
   );

@@ -168,3 +168,13 @@ new Bharosa({
   auth: { type: "account_key", apiKey: "synthetic" },
 });
 void marketTypes;
+async function currentViewTypes(client: Bharosa, id: string) {
+  const portfolio = await client.portfolios.retrieve(id);
+  const result = await portfolio.current().assetMix();
+  const units: string = result.current_valuation.holdings[0]!.units;
+  const date: string = result.current_valuation.holdings[0]!.nav.date;
+  // @ts-expect-error current view does not silently accept a historical cutoff
+  await portfolio.current().assetMix({ asOf: "2026-01-01" });
+  return { units, date };
+}
+void currentViewTypes;
