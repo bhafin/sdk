@@ -1,23 +1,32 @@
 import fs from "node:fs";
-fs.rmSync(new URL("../dist", import.meta.url), {
-  recursive: true,
-  force: true,
-});
-fs.mkdirSync(new URL("../dist", import.meta.url));
-for (const name of fs.readdirSync(new URL("../src", import.meta.url)))
-  fs.copyFileSync(
-    new URL("../src/" + name, import.meta.url),
-    new URL("../dist/" + name, import.meta.url),
-  );
-for (const name of ["index", "models", "market-data"])
-  fs.writeFileSync(
-    new URL("../dist/" + name + ".d.cts", import.meta.url),
-    fs
-      .readFileSync(
-        new URL("../src/" + name + ".d.ts", import.meta.url),
-        "utf8",
-      )
-      .replaceAll("./models.js", "./models.cjs")
-      .replaceAll("./market-data.js", "./market-data.cjs")
-      .replaceAll("./index.js", "./index.cjs"),
-  );
+import { spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
+const root = new URL("../", import.meta.url),
+  dist = new URL("dist/", root);
+fs.rmSync(dist, { recursive: true, force: true });
+const result = spawnSync(
+  process.execPath,
+  [
+    fileURLToPath(new URL("tooling/node_modules/typescript/bin/tsc", root)),
+    "--project",
+    fileURLToPath(new URL("tsconfig.json", root)),
+  ],
+  { stdio: "inherit" },
+);
+if (result.status !== 0) process.exit(result.status ?? 1);
+for (const name of [
+  "contract.cjs",
+  "market-data.cjs",
+  "contract.d.cts",
+  "market-data.d.cts",
+])
+  fs.copyFileSync(new URL("src/" + name, root), new URL(name, dist));
+for (const name of fs.readdirSync(dist))
+  if (name.endsWith(".d.cts"))
+    fs.writeFileSync(
+      new URL(name.replace(".d.cts", ".d.ts"), dist),
+      fs
+        .readFileSync(new URL(name, dist), "utf8")
+        .replaceAll('.cjs"', '.js"')
+        .replaceAll(".cjs'", ".js'"),
+    );

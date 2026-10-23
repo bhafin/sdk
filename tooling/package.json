@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "description": "Pinned contributor tools; not part of the SDK artifact",
   "devDependencies": {
+    "@types/node": "22.20.5",
     "typescript": "5.5.4"
   }
 }

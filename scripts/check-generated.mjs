@@ -17,7 +17,7 @@ try {
     { encoding: "utf8" },
   );
   assert.equal(result.status, 0, result.stdout + result.stderr);
-  for (const file of ["src/contract.cjs", "src/models.d.ts", "CONTRACT-SHA256"])
+  for (const file of ["src/contract.cjs", "src/models.cts", "CONTRACT-SHA256"])
     assert.equal(
       fs.readFileSync(path.join(root, file), "utf8"),
       fs.readFileSync(path.join(temp, file), "utf8"),

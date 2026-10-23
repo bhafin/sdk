@@ -1,9 +1,11 @@
+import { parseBody, object, array } from "./helpers.js";
+import type { CurrentHoldingsInput } from "../dist/index.mjs";
 import { test, afterEach } from "node:test";
 import assert from "node:assert/strict";
-import { Bharosa, APIError } from "../src/index.mjs";
+import { Bharosa, APIError } from "../dist/index.mjs";
 afterEach(() => {
-  delete globalThis.window;
-  delete globalThis.document;
+  Reflect.deleteProperty(globalThis, "window");
+  Reflect.deleteProperty(globalThis, "document");
 });
 const result = {
   status: "available",
@@ -23,8 +25,11 @@ const result = {
   valuation_basis: "units_times_latest_nav",
 };
 test("generic transport receives typed operation, cancellation and safe request defaults without auth material", async () => {
-  globalThis.window = {};
-  const calls = [];
+  Object.defineProperty(globalThis, "window", {
+    value: {},
+    configurable: true,
+  });
+  const calls: Array<{ url: string; options: RequestInit }> = [];
   const client = new Bharosa({
     baseUrl: "https://app.example",
     account: "me",
@@ -40,6 +45,8 @@ test("generic transport receives typed operation, cancellation and safe request 
     asOf: "2026-01-11",
     positionDate: "2026-01-11",
   });
+  assert.equal(value.status, "available");
+  assert.ok(value.status === "available");
   assert.equal(value.value.amount, "154.320875");
   assert.equal(
     calls[0].url,
@@ -47,42 +54,51 @@ test("generic transport receives typed operation, cancellation and safe request 
   );
   assert.equal(calls[0].options.credentials, "omit");
   assert.equal(calls[0].options.redirect, "error");
-  assert.equal(calls[0].options.headers.Authorization, undefined);
-  assert.equal(calls[0].options.headers["X-CSRF-Token"], undefined);
+  assert.equal(
+    new Headers(calls[0].options.headers).get("Authorization"),
+    null,
+  );
+  assert.equal(new Headers(calls[0].options.headers).get("X-CSRF-Token"), null);
   assert.ok(calls[0].options.signal instanceof AbortSignal);
 });
 test("custom transport cannot be combined with credential modes or a second fetch", () => {
   const transport = { send: async () => Response.json({}) };
-  assert.throws(
-    () =>
-      new Bharosa({
+  assert.throws(() =>
+    Reflect.construct(Bharosa, [
+      {
         baseUrl: "https://app.example",
         account: "me",
         auth: { type: "account_key", apiKey: "synthetic" },
         transport,
-      }),
+      },
+    ]),
   );
-  assert.throws(
-    () =>
-      new Bharosa({
+  assert.throws(() =>
+    Reflect.construct(Bharosa, [
+      {
         baseUrl: "https://app.example",
         account: "me",
         fetch: fetch,
         transport,
-      }),
+      },
+    ]),
   );
-  globalThis.window = {};
-  assert.throws(
-    () =>
-      new Bharosa({
+  Object.defineProperty(globalThis, "window", {
+    value: {},
+    configurable: true,
+  });
+  assert.throws(() =>
+    Reflect.construct(Bharosa, [
+      {
         baseUrl: "https://app.example",
         account: "me",
         auth: { type: "account_key", apiKey: "synthetic" },
-      }),
+      },
+    ]),
   );
 });
 test("typed discovery preserves query and transport choice confers no access", async () => {
-  let request;
+  let request: { url: string; options: RequestInit } | undefined;
   const client = new Bharosa({
     baseUrl: "https://app.example",
     account: "me",
@@ -113,6 +129,7 @@ test("typed discovery preserves query and transport choice confers no access", a
     }),
     APIError,
   );
+  assert.ok(request);
   assert.match(request.url, /amc=4/);
 });
 
@@ -120,7 +137,7 @@ test("current-holding write uses the scoped portfolio and preserves dated amount
   const p = "ptf_" + "1".repeat(32),
     a = "acct_" + "2".repeat(32),
     h = "hld_" + "3".repeat(32);
-  let request;
+  let request: { url: string; options: RequestInit } | undefined;
   const c = new Bharosa({
     baseUrl: "https://app.example",
     account: "me",
@@ -182,15 +199,24 @@ test("current-holding write uses the scoped portfolio and preserves dated amount
     { idempotencyKey: "entry-1" },
   );
   assert.equal(response.holdings[0].quantity, "4");
+  assert.ok(request);
   assert.equal(
     request.url,
     `https://app.example/app-api/accounts/me/portfolios/${p}/holdings/current`,
   );
-  assert.equal(request.options.headers["Idempotency-Key"], "entry-1");
   assert.equal(
-    JSON.parse(request.options.body).holdings[0].observed_position.current_value
-      .amount,
-    "10.020",
+    new Headers(request.options.headers).get("Idempotency-Key"),
+    "entry-1",
+  );
+  assert.deepEqual(
+    object(
+      object(array(object(parseBody(request.options)).holdings)[0])
+        .observed_position,
+    ),
+    {
+      date: "2026-01-10",
+      current_value: { amount: "10.020", currency: "INR" },
+    },
   );
 });
 
@@ -239,7 +265,7 @@ test("current holding receipts reject missing quantity and malformed conversion 
   const p = "ptf_" + "1".repeat(32),
     a = "acct_" + "2".repeat(32),
     h = "hld_" + "3".repeat(32);
-  const input = {
+  const input: CurrentHoldingsInput = {
     source: { kind: "user", reference: "entry" },
     holdings: [
       {

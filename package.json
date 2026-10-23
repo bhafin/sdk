@@ -42,13 +42,14 @@
   ],
   "scripts": {
     "build": "node scripts/build.mjs",
-    "test": "node --test test/*.test.mjs",
+    "test": "npm run build && npm run typecheck && node scripts/test.mjs",
     "prepack": "npm run build",
     "prepublishOnly": "node -e \"throw new Error('Publication disabled pending owner release approval')\"",
     "test:pack": "node scripts/pack-smoke.mjs",
     "test:examples": "node scripts/check-examples.mjs",
     "generate": "node scripts/generate.mjs",
     "generate:first-party": "node scripts/generate-first-party.mjs",
-    "check:first-party": "node scripts/generate-first-party.mjs --check"
+    "check:first-party": "node scripts/generate-first-party.mjs --check",
+    "typecheck": "node tooling/node_modules/typescript/bin/tsc --noEmit && node tooling/node_modules/typescript/bin/tsc -p tsconfig.test.json --noEmit && node tooling/node_modules/typescript/bin/tsc --noEmit --strict --target ES2022 --module NodeNext --moduleResolution NodeNext --typeRoots tooling/node_modules/@types test/api-compatibility.ts"
   }
 }

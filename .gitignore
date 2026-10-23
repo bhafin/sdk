@@ -16,3 +16,5 @@ coverage/
 /MARKETING-HANDOFF.md
 /SHARED-CONTRACT-HASHES.txt
 /RELEASE-CHECKLIST.md
+
+.test-build/

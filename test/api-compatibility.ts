@@ -1,0 +1,55 @@
+// Frozen pre-migration declarations are an independent compatibility oracle.
+import { Bharosa as Current } from "../dist/index.js";
+import { Bharosa as Previous } from "./legacy-types/index.js";
+declare const current: Current;
+declare const previous: Previous;
+const previousSurface: Previous = current;
+const currentSurface: Current = previous;
+void previousSurface;
+void currentSurface;
+
+import * as CurrentErrors from "../dist/index.js";
+import * as PreviousErrors from "./legacy-types/index.js";
+const legacyBharosaError: typeof PreviousErrors.BharosaError =
+  CurrentErrors.BharosaError;
+new legacyBharosaError();
+new CurrentErrors.BharosaError();
+new CurrentErrors.BharosaError("message");
+new CurrentErrors.BharosaError("message", { cause: new Error("cause") });
+const legacyValidationError: typeof PreviousErrors.ValidationError =
+  CurrentErrors.ValidationError;
+new legacyValidationError();
+new CurrentErrors.ValidationError();
+new CurrentErrors.ValidationError("message");
+new CurrentErrors.ValidationError("message", { cause: new Error("cause") });
+const legacyAPIError: typeof PreviousErrors.APIError = CurrentErrors.APIError;
+new legacyAPIError();
+new CurrentErrors.APIError();
+new CurrentErrors.APIError("message");
+new CurrentErrors.APIError("message", { cause: new Error("cause") });
+const legacyTransportError: typeof PreviousErrors.TransportError =
+  CurrentErrors.TransportError;
+new legacyTransportError();
+new CurrentErrors.TransportError();
+new CurrentErrors.TransportError("message");
+new CurrentErrors.TransportError("message", { cause: new Error("cause") });
+const legacyTimeoutError: typeof PreviousErrors.TimeoutError =
+  CurrentErrors.TimeoutError;
+new legacyTimeoutError();
+new CurrentErrors.TimeoutError();
+new CurrentErrors.TimeoutError("message");
+new CurrentErrors.TimeoutError("message", { cause: new Error("cause") });
+const legacyAbortError: typeof PreviousErrors.AbortError =
+  CurrentErrors.AbortError;
+new legacyAbortError();
+new CurrentErrors.AbortError();
+new CurrentErrors.AbortError("message");
+new CurrentErrors.AbortError("message", { cause: new Error("cause") });
+const legacyInvalidResponseError: typeof PreviousErrors.InvalidResponseError =
+  CurrentErrors.InvalidResponseError;
+new legacyInvalidResponseError();
+new CurrentErrors.InvalidResponseError();
+new CurrentErrors.InvalidResponseError("message");
+new CurrentErrors.InvalidResponseError("message", {
+  cause: new Error("cause"),
+});

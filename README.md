@@ -1,6 +1,6 @@
 # Bharosa SDK
 
-A typed client for Bharosa accounts, investors, portfolios, and mutual funds. Use one resource interface from TypeScript, ESM, or CommonJS, with no runtime dependencies.
+A TypeScript client for Bharosa accounts, investors, portfolios, and mutual funds. Use one resource interface from TypeScript, ESM, or CommonJS, with no runtime dependencies.
 
 **Installation:** this package is not yet available on npm. Install the local archive below. You also need an API URL and credentials from the operator of your Bharosa service; installing the SDK does not create an account or grant access.
 
@@ -9,6 +9,7 @@ A typed client for Bharosa accounts, investors, portfolios, and mutual funds. Us
 Use Node.js 22.12+ in a supported LTS release. Build and pack this checkout:
 
 ```sh
+npm --prefix tooling ci --ignore-scripts
 npm run build
 npm pack --pack-destination /absolute/path/to/artifacts
 ```

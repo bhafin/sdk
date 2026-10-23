@@ -56,7 +56,7 @@ function type(s) {
   throw Error("Unhandled schema");
 }
 fs.writeFileSync(
-  new URL("../src/models.d.ts", import.meta.url),
+  new URL("../src/models.cts", import.meta.url),
   "// Generated from canonical schema; decimal amounts remain strings.\n" +
     Object.entries(schemas)
       .map(

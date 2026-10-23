@@ -1,0 +1,47 @@
+import type * as M from "./models.cjs";
+import type * as D from "./market-types.cjs";
+import type { CurrentMixEvidence } from "./client-types.cjs";
+/** Each entry is the decoded response of the corresponding generated operation. */
+export interface OperationResults {
+  retrieve_account: M.Account;
+  list_clients: M.ClientsList;
+  retrieve_client: M.Client;
+  list_investors: M.InvestorsList;
+  retrieve_investor: M.Investor;
+  create_investor: M.Investor;
+  update_investor: M.Investor;
+  list_portfolios: M.PortfoliosList;
+  retrieve_portfolio: M.Portfolio;
+  create_portfolio: M.SnapshotView;
+  current_snapshot: M.SnapshotView;
+  replace_snapshot: M.SnapshotView;
+  search_funds: M.FundsList;
+  fund_references: M.FundReferences;
+  asset_mix: M.AssetMix;
+  sector_mix: M.SectorMix;
+  issuer_mix: M.IssuerMix;
+  current_asset_mix: M.AssetMix & CurrentMixEvidence;
+  current_sector_mix: M.SectorMix & CurrentMixEvidence;
+  current_issuer_mix: M.IssuerMix & CurrentMixEvidence;
+  retrieve_history: M.HistoryView;
+  import_history: M.HistoryImportResult;
+  history_capabilities: M.HistoryCapability;
+  list_holdings: M.HoldingsList;
+  retrieve_holding: M.Holding;
+  holding_position: M.HoldingPosition;
+  current_holdings: D.CurrentHoldingsResult;
+  md_funds: D.MarketList<D.FundOwner>;
+  md_funds_get: D.FundOwner;
+  md_schemes: D.MarketList<D.FundScheme>;
+  md_schemes_get: D.FundScheme;
+  md_amcs: D.MarketList<D.MarketName>;
+  md_amcs_get: D.MarketName;
+  md_managers: D.MarketList<D.MarketName>;
+  md_managers_get: D.MarketName;
+  md_categories: D.MarketList<D.MarketName>;
+  md_portfolios: D.MarketList<D.FundPortfolio>;
+  md_holdings: D.MarketList<D.FundHolding>;
+  md_navs: D.MarketList<D.NavObservation>;
+  md_expenses: D.MarketList<D.ExpenseObservation>;
+  md_valuation: D.LatestNavValuation;
+}

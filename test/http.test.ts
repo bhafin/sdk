@@ -2,16 +2,20 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import http from "node:http";
 import { Bharosa, TransportError } from "../dist/index.mjs";
-async function listen(server) {
-  await new Promise((resolve, reject) => {
+async function listen(server: http.Server) {
+  await new Promise<void>((resolve, reject) => {
     server.once("error", reject);
     server.listen(0, "127.0.0.1", resolve);
   });
-  return server.address().port;
+  const address = server.address();
+  assert.ok(address && typeof address !== "string");
+  return address.port;
 }
-async function close(server) {
+async function close(server: http.Server) {
   server.closeAllConnections();
-  await new Promise((resolve) => server.close(resolve));
+  await new Promise<void>((resolve) =>
+    server.close((error) => (error ? Promise.reject(error) : resolve())),
+  );
 }
 test("native fetch never forwards credentials to redirect destination", async () => {
   let destinationCalls = 0,

@@ -21,7 +21,7 @@ assert.ok(dry.files.some((x) => x.path === "LICENSE"));
 for (const f of dry.files)
   assert.match(
     f.path,
-    /^(dist\/[^/]+\.(?:cjs|mjs|d\.ts|d\.cts)|README\.md|CONTRIBUTING\.md|SECURITY\.md|CHANGELOG\.md|docs\/(?:index|getting-started|portfolios|reliability|releasing|provenance)\.md|examples\/(?:README\.md|(?:read-account|portfolio-mixes|create-investor)\.ts)|LICENSE|CONTRACT-SHA256|FIRST-PARTY-CONTRACT-SHA256|package\.json)$/,
+    /^(dist\/[^/]+\.(?:cjs|mjs|d\.ts|d\.cts|d\.mts)|README\.md|CONTRIBUTING\.md|SECURITY\.md|CHANGELOG\.md|docs\/(?:index|getting-started|portfolios|reliability|releasing|provenance)\.md|examples\/(?:README\.md|(?:read-account|portfolio-mixes|create-investor)\.ts)|LICENSE|CONTRACT-SHA256|FIRST-PARTY-CONTRACT-SHA256|package\.json)$/,
   );
 assert.ok(
   !dry.files.some((x) =>

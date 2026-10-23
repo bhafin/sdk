@@ -1,5 +1,4 @@
-import sdk from "./index.cjs";
-export const {
+export {
   Bharosa,
   BharosaError,
   ValidationError,
@@ -8,4 +7,5 @@ export const {
   TimeoutError,
   AbortError,
   InvalidResponseError,
-} = sdk;
+} from "./index.cjs";
+export type * from "./index.cjs";

@@ -1,8 +1,9 @@
-"use strict";
-const { schemas } = require("./contract.cjs");
-function valid(s, v, depth = 0) {
-  if (depth > 64) return false;
-  if (s.$ref) return valid(schemas[s.$ref.split("/").pop()], v, depth + 1);
+import { schemas } from "./contract.cjs";
+import { record, type Schema } from "./schema.cjs";
+export function valid(s: Schema | undefined, v: unknown, depth = 0): boolean {
+  if (!s || depth > 64) return false;
+  if (s.$ref)
+    return valid(schemas[s.$ref.split("/").pop() ?? ""], v, depth + 1);
   if (s.anyOf) return s.anyOf.some((x) => valid(x, v, depth + 1));
   if ("const" in s && v !== s.const) return false;
   if (s.enum && !s.enum.includes(v)) return false;
@@ -58,14 +59,14 @@ function valid(s, v, depth = 0) {
         v.every((x) => valid(s.items, x, depth + 1))
       );
     case "object": {
-      if (v === null || typeof v !== "object" || Array.isArray(v)) return false;
+      if (!record(v)) return false;
       const keys = Object.keys(v);
       return (
         (s.minProperties === undefined || keys.length >= s.minProperties) &&
         (s.required ?? []).every((k) => Object.hasOwn(v, k)) &&
         keys.every((k) =>
           Object.hasOwn(s.properties ?? {}, k)
-            ? valid(s.properties[k], v[k], depth + 1)
+            ? valid(s.properties?.[k], v[k], depth + 1)
             : s.additionalProperties !== false,
         )
       );
@@ -74,13 +75,18 @@ function valid(s, v, depth = 0) {
       return true;
   }
 }
-function decimal(v) {
-  const [a, b = ""] = v.split(".");
-  return BigInt(a) * 10n ** 18n + BigInt(b.padEnd(18, "0"));
+function decimal(value: unknown): bigint | undefined {
+  if (typeof value !== "string" || !/^[0-9]+(?:\.[0-9]{1,18})?$/.test(value))
+    return undefined;
+  const [whole, fraction = ""] = value.split(".");
+  return BigInt(whole) * 10n ** 18n + BigInt(fraction.padEnd(18, "0"));
 }
-function consistent(v, account) {
-  if (!v || typeof v !== "object") return true;
+/** Consistency supplements shape validation; it never trusts unvalidated JSON. */
+export function consistent(value: unknown, account: string): boolean {
+  if (!record(value)) return true;
+  const v = value;
   if (
+    typeof v.object === "string" &&
     [
       "client",
       "investor",
@@ -101,13 +107,21 @@ function consistent(v, account) {
   if (v.object === "account" && account !== "me" && v.id !== account)
     return false;
   if (v.snapshot && v.positions) {
-    const {
-      snapshot: s,
-      investment_account: i,
-      portfolio: p,
-      positions: ps,
-      instruments: ins,
-    } = v;
+    const s = v.snapshot,
+      i = v.investment_account,
+      p = v.portfolio,
+      ps = v.positions,
+      ins = v.instruments;
+    if (
+      !record(s) ||
+      !record(i) ||
+      !record(p) ||
+      !Array.isArray(ps) ||
+      !Array.isArray(ins) ||
+      !ps.every(record) ||
+      !ins.every(record)
+    )
+      return false;
     if (
       s.account !== p.account ||
       i.account !== p.account ||
@@ -124,29 +138,37 @@ function consistent(v, account) {
       ins.length !== ps.length
     )
       return false;
-    if (
-      ps.some(
-        (x) =>
-          x.account !== p.account ||
-          x.snapshot !== s.id ||
-          x.valuation.as_of.date !== s.as_of.date ||
-          !ins.some((y) => y.id === x.instrument),
+    if (!record(s.as_of) || !record(v.total_current_value)) return false;
+    let total = 0n;
+    for (const x of ps) {
+      if (
+        !record(x.valuation) ||
+        !record(x.valuation.as_of) ||
+        !record(x.valuation.market_value)
       )
-    )
-      return false;
-    if (
-      ps.reduce((n, x) => n + decimal(x.valuation.market_value.amount), 0n) !==
-      decimal(v.total_current_value.amount)
-    )
-      return false;
+        return false;
+      if (
+        x.account !== p.account ||
+        x.snapshot !== s.id ||
+        x.valuation.as_of.date !== s.as_of.date ||
+        !ins.some((y) => y.id === x.instrument)
+      )
+        return false;
+      const amount = decimal(x.valuation.market_value.amount);
+      if (amount === undefined) return false;
+      total += amount;
+    }
+    if (total !== decimal(v.total_current_value.amount)) return false;
   }
-  return (
+  const children =
     v.object === "list"
       ? v.data
-      : v.object === "portfolio_history" ? v.holdings
-      : v.snapshot && v.positions
-        ? [v.portfolio, v.investment_account, v.snapshot, ...v.positions]
-        : []
-  ).every((x) => consistent(x, account));
+      : v.object === "portfolio_history"
+        ? v.holdings
+        : v.snapshot && Array.isArray(v.positions)
+          ? [v.portfolio, v.investment_account, v.snapshot, ...v.positions]
+          : [];
+  return (
+    Array.isArray(children) && children.every((x) => consistent(x, account))
+  );
 }
-module.exports = { valid, consistent };

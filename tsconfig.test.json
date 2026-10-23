@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "noEmitOnError": true,
+    "rootDir": "test",
+    "outDir": ".test-build",
+    "typeRoots": ["./tooling/node_modules/@types"],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "skipLibCheck": false,
+    "resolveJsonModule": true
+  },
+  "include": ["test/**/*.ts"],
+  "exclude": ["test/consumer.ts", "test/api-compatibility.ts"]
+}

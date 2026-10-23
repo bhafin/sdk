@@ -11,6 +11,7 @@ Obtain an authorized API origin, account ID, and account key from your Bharosa s
 From the SDK directory:
 
 ```sh
+npm --prefix tooling ci --ignore-scripts
 npm run build
 npm pack --pack-destination /absolute/path/to/artifacts
 ```
