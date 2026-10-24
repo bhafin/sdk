@@ -66,7 +66,6 @@
                   "object": "account",
                   "created": 1792281600,
                   "name": "Rao Family",
-                  "owner": "usr_0123456789abcdef0123456789abcdef",
                   "primary_investor": "inv_11111111111111111111111111111111"
                 }
               }
@@ -351,7 +350,7 @@
             "name": "limit",
             "in": "query",
             "required": false,
-            "description": "1–100; default 10.",
+            "description": "1\u2013100; default 10.",
             "schema": {
               "type": "integer",
               "minimum": 1,
@@ -652,7 +651,7 @@
       "get": {
         "operationId": "retrieve_client",
         "summary": "Retrieve a client",
-        "description": "Read one investor group, such as a family, using the Client ID returned by a list or investor record. This operation retrieves the group’s metadata; it does not select an OAuth application or grant access to its members.",
+        "description": "Read one investor group, such as a family, using the Client ID returned by a list or investor record. This operation retrieves the group\u2019s metadata; it does not select an OAuth application or grant access to its members.",
         "x-required-scope": "clients:read",
         "x-auth-mode-rules": "Direct key only OR delegated application key + same-client active user grant; reject mixtures and invalid supplied credentials. See reviewed-contract.md.",
         "security": [
@@ -1002,7 +1001,7 @@
             "name": "limit",
             "in": "query",
             "required": false,
-            "description": "1–100; default 10.",
+            "description": "1\u2013100; default 10.",
             "schema": {
               "type": "integer",
               "minimum": 1,
@@ -1313,7 +1312,7 @@
       "post": {
         "operationId": "create_investor",
         "summary": "Create an investor",
-        "description": "Create a profile for a person in an existing Client group so their portfolios remain separate from other family members’ portfolios. This records a person; it does not invite them, create a login or authorize access to the account.",
+        "description": "Create a profile for a person in an existing Client group so their portfolios remain separate from other family members\u2019 portfolios. This records a person; it does not invite them, create a login or authorize access to the account.",
         "x-required-scope": "investors:write",
         "x-auth-mode-rules": "Direct key only OR delegated application key + same-client active user grant; reject mixtures and invalid supplied credentials. See reviewed-contract.md.",
         "security": [
@@ -1646,7 +1645,7 @@
       "get": {
         "operationId": "retrieve_investor",
         "summary": "Retrieve an investor",
-        "description": "Read a person’s investor profile, including their display name, relationship to the account owner and Client association. Use the profile’s ID for subsequent requests because names are not unique identifiers.",
+        "description": "Read a person\u2019s investor profile, including their display name, relationship to the account owner and Client association. Use the profile\u2019s ID for subsequent requests because names are not unique identifiers.",
         "x-required-scope": "investors:read",
         "x-auth-mode-rules": "Direct key only OR delegated application key + same-client active user grant; reject mixtures and invalid supplied credentials. See reviewed-contract.md.",
         "security": [
@@ -1962,7 +1961,7 @@
       "post": {
         "operationId": "update_investor",
         "summary": "Update an investor",
-        "description": "Update an investor’s display name or relationship to the account owner. Supply only the fields you intend to change. This operation does not move the investor to a different Client or transfer their portfolios.",
+        "description": "Update an investor\u2019s display name or relationship to the account owner. Supply only the fields you intend to change. This operation does not move the investor to a different Client or transfer their portfolios.",
         "x-required-scope": "investors:write",
         "x-auth-mode-rules": "Direct key only OR delegated application key + same-client active user grant; reject mixtures and invalid supplied credentials. See reviewed-contract.md.",
         "security": [
@@ -2337,7 +2336,7 @@
             "name": "limit",
             "in": "query",
             "required": false,
-            "description": "1–100; default 10.",
+            "description": "1\u2013100; default 10.",
             "schema": {
               "type": "integer",
               "minimum": 1,
@@ -2364,6 +2363,40 @@
               "type": "string",
               "pattern": "^clt_[a-f0-9]{32}$"
             }
+          },
+          {
+            "name": "client_ids",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 100,
+              "items": {
+                "type": "string",
+                "pattern": "^clt_[a-f0-9]{32}$"
+              }
+            },
+            "description": "OR within list. Mutually exclusive with other filter types and legacy client. Repeated query keys; duplicate IDs are deduplicated."
+          },
+          {
+            "name": "investor_ids",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 100,
+              "items": {
+                "type": "string",
+                "pattern": "^inv_[a-f0-9]{32}$"
+              }
+            },
+            "description": "OR within list. Mutually exclusive with other filter types and legacy client. Repeated query keys; duplicate IDs are deduplicated."
           }
         ],
         "responses": {
@@ -2804,7 +2837,7 @@
                       "id": "ins_markets_scheme_101",
                       "object": "instrument",
                       "created": 1792281600,
-                      "name": "Example Equity Fund — Direct Growth",
+                      "name": "Example Equity Fund \u2014 Direct Growth",
                       "identifiers": [],
                       "domicile_country": "IN",
                       "type": "mutual_fund",
@@ -3074,7 +3107,7 @@
       "get": {
         "operationId": "retrieve_portfolio",
         "summary": "Retrieve a portfolio",
-        "description": "Read a saved portfolio’s owner, name and reporting currency. This metadata does not include its holdings. Follow with current_snapshot for current positions and totals, or use the holding-history operations for supported dated positions.",
+        "description": "Read a saved portfolio\u2019s owner, name and reporting currency. This metadata does not include its holdings. Follow with current_snapshot for current positions and totals, or use the holding-history operations for supported dated positions.",
         "x-required-scope": "portfolios:read",
         "x-auth-mode-rules": "Direct key only OR delegated application key + same-client active user grant; reject mixtures and invalid supplied credentials. See reviewed-contract.md.",
         "security": [
@@ -3426,7 +3459,7 @@
             "name": "query",
             "in": "query",
             "required": true,
-            "description": "2–100 characters. Case-insensitive label and identifier search; percent and underscore are literal.",
+            "description": "2\u2013100 characters. Case-insensitive label and identifier search; percent and underscore are literal.",
             "schema": {
               "type": "string",
               "minLength": 2,
@@ -3437,7 +3470,7 @@
             "name": "limit",
             "in": "query",
             "required": false,
-            "description": "1–20; default 10. Search is a bounded result set, not cursor pagination.",
+            "description": "1\u201320; default 10. Search is a bounded result set, not cursor pagination.",
             "schema": {
               "type": "integer",
               "minimum": 1,
@@ -3474,7 +3507,7 @@
                         "id": "ins_markets_scheme_101",
                         "object": "instrument",
                         "created": 1792281600,
-                        "name": "Example Equity Fund — Direct Growth",
+                        "name": "Example Equity Fund \u2014 Direct Growth",
                         "identifiers": [],
                         "domicile_country": "IN",
                         "type": "mutual_fund",
@@ -3799,11 +3832,11 @@
             "name": "instruments",
             "in": "query",
             "required": true,
-            "description": "1–100 distinct instrument IDs in one query parameter. Unknown, inactive or unsupported IDs appear in missing.",
+            "description": "1\u2013100 distinct instrument IDs in one query parameter. Unknown, inactive or unsupported IDs appear in missing.",
             "schema": {
               "type": "string",
               "minLength": 1,
-              "description": "1–100 distinct IDs separated by commas, singleton query parameter."
+              "description": "1\u2013100 distinct IDs separated by commas, singleton query parameter."
             }
           }
         ],
@@ -3835,7 +3868,7 @@
                         "id": "ins_markets_scheme_101",
                         "object": "instrument",
                         "created": 1792281600,
-                        "name": "Example Equity Fund — Direct Growth",
+                        "name": "Example Equity Fund \u2014 Direct Growth",
                         "identifiers": [],
                         "domicile_country": "IN",
                         "type": "mutual_fund",
@@ -4262,7 +4295,7 @@
                       "id": "ins_markets_scheme_101",
                       "object": "instrument",
                       "created": 1792281600,
-                      "name": "Example Equity Fund — Direct Growth",
+                      "name": "Example Equity Fund \u2014 Direct Growth",
                       "identifiers": [],
                       "domicile_country": "IN",
                       "type": "mutual_fund",
@@ -4697,7 +4730,7 @@
                       "id": "ins_markets_scheme_101",
                       "object": "instrument",
                       "created": 1792281600,
-                      "name": "Example Equity Fund — Direct Growth",
+                      "name": "Example Equity Fund \u2014 Direct Growth",
                       "identifiers": [],
                       "domicile_country": "IN",
                       "type": "mutual_fund",
@@ -6138,7 +6171,7 @@
       "post": {
         "operationId": "import_history",
         "summary": "Import holding history",
-        "description": "Add opening quantities, buy/sell transactions and declared complete ranges to an existing portfolio. Use this when you have source history to record, rather than trying to infer past purchases from today’s value. Holding history is locally implemented; the API feature is not publicly deployed.",
+        "description": "Add opening quantities, buy/sell transactions and declared complete ranges to an existing portfolio. Use this when you have source history to record, rather than trying to infer past purchases from today\u2019s value. Holding history is locally implemented; the API feature is not publicly deployed.",
         "x-required-scope": "portfolios:write",
         "x-auth-mode-rules": "Direct key only OR delegated application key + same-client active user grant; reject mixtures and invalid supplied credentials. See reviewed-contract.md.",
         "security": [
@@ -7870,7 +7903,7 @@
       "get": {
         "operationId": "holding_position",
         "summary": "Resolve a dated holding position",
-        "description": "Resolve one holding’s position on a date, using an exact observation or supported transaction history. An observed value can have an unknown quantity; the API does not fill missing dates by carrying today’s balance backward. Holding history is locally implemented; the API feature is not publicly deployed.",
+        "description": "Resolve one holding\u2019s position on a date, using an exact observation or supported transaction history. An observed value can have an unknown quantity; the API does not fill missing dates by carrying today\u2019s balance backward. Holding history is locally implemented; the API feature is not publicly deployed.",
         "x-required-scope": "portfolios:read",
         "x-auth-mode-rules": "Direct key only OR delegated application key + same-client active user grant; reject mixtures and invalid supplied credentials. See reviewed-contract.md.",
         "security": [
@@ -8244,7 +8277,10 @@
             "const": "INR"
           }
         },
-        "required": ["amount", "currency"],
+        "required": [
+          "amount",
+          "currency"
+        ],
         "additionalProperties": true
       },
       "FinancialDate": {
@@ -8263,7 +8299,11 @@
             "const": "Asia/Kolkata"
           }
         },
-        "required": ["precision", "date", "time_zone"],
+        "required": [
+          "precision",
+          "date",
+          "time_zone"
+        ],
         "additionalProperties": true
       },
       "Account": {
@@ -8287,10 +8327,6 @@
             "maxLength": 200,
             "pattern": "\\S"
           },
-          "owner": {
-            "type": "string",
-            "pattern": "^usr_[a-f0-9]{32}$"
-          },
           "primary_investor": {
             "anyOf": [
               {
@@ -8301,9 +8337,26 @@
                 "type": "null"
               }
             ]
+          },
+          "personal_client_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^clt_[a-f0-9]{32}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Authenticated human user personal household in this account; null for machine account keys or no link. This context grants no access."
           }
         },
-        "required": ["id", "object", "created", "owner", "primary_investor"],
+        "required": [
+          "id",
+          "object",
+          "created",
+          "primary_investor"
+        ],
         "additionalProperties": true
       },
       "Client": {
@@ -8332,7 +8385,13 @@
             "pattern": "\\S"
           }
         },
-        "required": ["id", "object", "created", "account", "name"],
+        "required": [
+          "id",
+          "object",
+          "created",
+          "account",
+          "name"
+        ],
         "additionalProperties": true
       },
       "Investor": {
@@ -8465,7 +8524,10 @@
                   "type": "string"
                 }
               },
-              "required": ["namespace", "value"],
+              "required": [
+                "namespace",
+                "value"
+              ],
               "additionalProperties": true
             }
           },
@@ -8513,7 +8575,11 @@
               },
               "distribution_policy": {
                 "type": "string",
-                "x-known-values": ["accumulating", "distributing", "unknown"],
+                "x-known-values": [
+                  "accumulating",
+                  "distributing",
+                  "unknown"
+                ],
                 "minLength": 1
               }
             },
@@ -8543,14 +8609,21 @@
         "properties": {
           "kind": {
             "type": "string",
-            "x-known-values": ["manual", "provider", "statement"],
+            "x-known-values": [
+              "manual",
+              "provider",
+              "statement"
+            ],
             "minLength": 1
           },
           "name": {
             "type": "string"
           }
         },
-        "required": ["kind", "name"],
+        "required": [
+          "kind",
+          "name"
+        ],
         "additionalProperties": true
       },
       "MarketData": {
@@ -8558,14 +8631,21 @@
         "properties": {
           "mode": {
             "type": "string",
-            "x-known-values": ["live", "fixture", "unavailable"],
+            "x-known-values": [
+              "live",
+              "fixture",
+              "unavailable"
+            ],
             "minLength": 1
           },
           "notice": {
             "type": "string"
           }
         },
-        "required": ["mode", "notice"],
+        "required": [
+          "mode",
+          "notice"
+        ],
         "additionalProperties": true
       },
       "PositionInput": {
@@ -8579,7 +8659,10 @@
             "$ref": "#/components/schemas/DecimalInput"
           }
         },
-        "required": ["instrument", "current_value"],
+        "required": [
+          "instrument",
+          "current_value"
+        ],
         "additionalProperties": false
       },
       "InvestorCreate": {
@@ -8593,14 +8676,24 @@
           },
           "relationship_to_owner": {
             "type": "string",
-            "enum": ["self", "spouse", "child", "parent", "sibling", "other"]
+            "enum": [
+              "self",
+              "spouse",
+              "child",
+              "parent",
+              "sibling",
+              "other"
+            ]
           },
           "client": {
             "type": "string",
             "pattern": "^clt_[a-f0-9]{32}$"
           }
         },
-        "required": ["name", "relationship_to_owner"],
+        "required": [
+          "name",
+          "relationship_to_owner"
+        ],
         "additionalProperties": false
       },
       "InvestorUpdate": {
@@ -8614,7 +8707,14 @@
           },
           "relationship_to_owner": {
             "type": "string",
-            "enum": ["self", "spouse", "child", "parent", "sibling", "other"]
+            "enum": [
+              "self",
+              "spouse",
+              "child",
+              "parent",
+              "sibling",
+              "other"
+            ]
           }
         },
         "required": [],
@@ -8649,7 +8749,12 @@
             "maxItems": 100
           }
         },
-        "required": ["name", "investor", "as_of", "positions"],
+        "required": [
+          "name",
+          "investor",
+          "as_of",
+          "positions"
+        ],
         "additionalProperties": false
       },
       "SnapshotCreate": {
@@ -8673,7 +8778,11 @@
             "maxItems": 100
           }
         },
-        "required": ["expected_snapshot", "as_of", "positions"],
+        "required": [
+          "expected_snapshot",
+          "as_of",
+          "positions"
+        ],
         "additionalProperties": false
       },
       "InvestmentAccount": {
@@ -8952,7 +9061,10 @@
           },
           "identity_status": {
             "type": "string",
-            "x-known-values": ["resolved", "conflict"],
+            "x-known-values": [
+              "resolved",
+              "conflict"
+            ],
             "minLength": 1
           },
           "latest_nav": {
@@ -8974,7 +9086,11 @@
                     "description": "Real calendar date, 1900-01-01 through today Asia/Kolkata; replacement cannot move backwards."
                   }
                 },
-                "required": ["amount", "currency", "date"],
+                "required": [
+                  "amount",
+                  "currency",
+                  "date"
+                ],
                 "additionalProperties": true
               },
               {
@@ -8984,7 +9100,10 @@
           },
           "data_mode": {
             "type": "string",
-            "x-known-values": ["live", "fixture"],
+            "x-known-values": [
+              "live",
+              "fixture"
+            ],
             "minLength": 1
           },
           "source": {
@@ -9099,11 +9218,19 @@
                 "minLength": 1
               }
             },
-            "required": ["type", "code", "message", "param", "request_id"],
+            "required": [
+              "type",
+              "code",
+              "message",
+              "param",
+              "request_id"
+            ],
             "additionalProperties": true
           }
         },
-        "required": ["error"],
+        "required": [
+          "error"
+        ],
         "additionalProperties": true
       },
       "ClientsList": {
@@ -9125,7 +9252,12 @@
             "type": "string"
           }
         },
-        "required": ["object", "data", "has_more", "url"],
+        "required": [
+          "object",
+          "data",
+          "has_more",
+          "url"
+        ],
         "additionalProperties": true
       },
       "InvestorsList": {
@@ -9147,7 +9279,12 @@
             "type": "string"
           }
         },
-        "required": ["object", "data", "has_more", "url"],
+        "required": [
+          "object",
+          "data",
+          "has_more",
+          "url"
+        ],
         "additionalProperties": true
       },
       "PortfoliosList": {
@@ -9169,7 +9306,12 @@
             "type": "string"
           }
         },
-        "required": ["object", "data", "has_more", "url"],
+        "required": [
+          "object",
+          "data",
+          "has_more",
+          "url"
+        ],
         "additionalProperties": true
       },
       "FundsList": {
@@ -9194,7 +9336,13 @@
             "$ref": "#/components/schemas/MarketData"
           }
         },
-        "required": ["object", "data", "has_more", "url", "market_data"],
+        "required": [
+          "object",
+          "data",
+          "has_more",
+          "url",
+          "market_data"
+        ],
         "additionalProperties": true
       },
       "FundReferences": {
@@ -9252,7 +9400,10 @@
                     "pattern": "^ptf_[a-f0-9]{32}$"
                   }
                 },
-                "required": ["type", "id"],
+                "required": [
+                  "type",
+                  "id"
+                ],
                 "additionalProperties": false
               },
               {
@@ -9279,7 +9430,12 @@
                     "maxItems": 100
                   }
                 },
-                "required": ["type", "valuation_date", "currency", "positions"],
+                "required": [
+                  "type",
+                  "valuation_date",
+                  "currency",
+                  "positions"
+                ],
                 "additionalProperties": false
               },
               {
@@ -9294,7 +9450,10 @@
                     "description": "Portfolio-owning MutualFund ID (positive int64), never AMC or investible scheme ID."
                   }
                 },
-                "required": ["type", "mutual_fund_id"],
+                "required": [
+                  "type",
+                  "mutual_fund_id"
+                ],
                 "additionalProperties": false
               },
               {
@@ -9308,7 +9467,10 @@
                     "pattern": "^ins_[A-Za-z0-9_-]{1,150}$"
                   }
                 },
-                "required": ["type", "instrument"],
+                "required": [
+                  "type",
+                  "instrument"
+                ],
                 "additionalProperties": false
               }
             ]
@@ -9332,7 +9494,9 @@
             "description": "Real calendar date, 1900-01-01 through today Asia/Kolkata; replacement cannot move backwards."
           }
         },
-        "required": ["portfolio"],
+        "required": [
+          "portfolio"
+        ],
         "additionalProperties": false
       },
       "AssetMix": {
@@ -9395,7 +9559,10 @@
                     "const": "INR"
                   }
                 },
-                "required": ["amount", "currency"],
+                "required": [
+                  "amount",
+                  "currency"
+                ],
                 "additionalProperties": false
               },
               {
@@ -9425,7 +9592,11 @@
                   "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
                 }
               },
-              "required": ["mutual_fund_id", "portfolio_id", "date"],
+              "required": [
+                "mutual_fund_id",
+                "portfolio_id",
+                "date"
+              ],
               "additionalProperties": false
             },
             "minItems": 1,
@@ -9473,7 +9644,12 @@
                   ]
                 }
               },
-              "required": ["code", "message", "mutual_fund_id", "path"],
+              "required": [
+                "code",
+                "message",
+                "mutual_fund_id",
+                "path"
+              ],
               "additionalProperties": false
             }
           },
@@ -9482,7 +9658,10 @@
             "properties": {
               "status": {
                 "type": "string",
-                "x-known-values": ["available", "unavailable"],
+                "x-known-values": [
+                  "available",
+                  "unavailable"
+                ],
                 "minLength": 1
               },
               "denominator": {
@@ -9492,7 +9671,9 @@
                 "anyOf": [
                   {
                     "type": "string",
-                    "x-known-values": ["no_eligible_contributions"],
+                    "x-known-values": [
+                      "no_eligible_contributions"
+                    ],
                     "minLength": 1
                   },
                   {
@@ -9522,7 +9703,10 @@
                       "pattern": "^-?(1000000000000(\\.0{1,10})?|[0-9]{1,12}(\\.[0-9]{1,10})?)$"
                     }
                   },
-                  "required": ["code", "percentage"],
+                  "required": [
+                    "code",
+                    "percentage"
+                  ],
                   "additionalProperties": false
                 }
               }
@@ -9618,7 +9802,10 @@
                     "const": "INR"
                   }
                 },
-                "required": ["amount", "currency"],
+                "required": [
+                  "amount",
+                  "currency"
+                ],
                 "additionalProperties": false
               },
               {
@@ -9648,7 +9835,11 @@
                   "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
                 }
               },
-              "required": ["mutual_fund_id", "portfolio_id", "date"],
+              "required": [
+                "mutual_fund_id",
+                "portfolio_id",
+                "date"
+              ],
               "additionalProperties": false
             },
             "minItems": 1,
@@ -9696,7 +9887,12 @@
                   ]
                 }
               },
-              "required": ["code", "message", "mutual_fund_id", "path"],
+              "required": [
+                "code",
+                "message",
+                "mutual_fund_id",
+                "path"
+              ],
               "additionalProperties": false
             }
           },
@@ -9705,7 +9901,10 @@
             "properties": {
               "status": {
                 "type": "string",
-                "x-known-values": ["available", "unavailable"],
+                "x-known-values": [
+                  "available",
+                  "unavailable"
+                ],
                 "minLength": 1
               },
               "denominator": {
@@ -9715,7 +9914,9 @@
                 "anyOf": [
                   {
                     "type": "string",
-                    "x-known-values": ["no_eligible_contributions"],
+                    "x-known-values": [
+                      "no_eligible_contributions"
+                    ],
                     "minLength": 1
                   },
                   {
@@ -9783,7 +9984,11 @@
                       "pattern": "^(100(\\.0{1,10})?|[0-9]{1,2}(\\.[0-9]{1,10})?)$"
                     }
                   },
-                  "required": ["code", "label", "percentage"],
+                  "required": [
+                    "code",
+                    "label",
+                    "percentage"
+                  ],
                   "additionalProperties": false
                 }
               }
@@ -9879,7 +10084,10 @@
                     "const": "INR"
                   }
                 },
-                "required": ["amount", "currency"],
+                "required": [
+                  "amount",
+                  "currency"
+                ],
                 "additionalProperties": false
               },
               {
@@ -9909,7 +10117,11 @@
                   "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
                 }
               },
-              "required": ["mutual_fund_id", "portfolio_id", "date"],
+              "required": [
+                "mutual_fund_id",
+                "portfolio_id",
+                "date"
+              ],
               "additionalProperties": false
             },
             "minItems": 1,
@@ -9957,7 +10169,12 @@
                   ]
                 }
               },
-              "required": ["code", "message", "mutual_fund_id", "path"],
+              "required": [
+                "code",
+                "message",
+                "mutual_fund_id",
+                "path"
+              ],
               "additionalProperties": false
             }
           },
@@ -9966,7 +10183,10 @@
             "properties": {
               "status": {
                 "type": "string",
-                "x-known-values": ["available", "unavailable"],
+                "x-known-values": [
+                  "available",
+                  "unavailable"
+                ],
                 "minLength": 1
               },
               "denominator": {
@@ -9976,7 +10196,9 @@
                 "anyOf": [
                   {
                     "type": "string",
-                    "x-known-values": ["no_eligible_contributions"],
+                    "x-known-values": [
+                      "no_eligible_contributions"
+                    ],
                     "minLength": 1
                   },
                   {
@@ -10058,7 +10280,10 @@
         "properties": {
           "kind": {
             "type": "string",
-            "enum": ["user", "statement"]
+            "enum": [
+              "user",
+              "statement"
+            ]
           },
           "reference": {
             "type": "string",
@@ -10066,7 +10291,10 @@
             "maxLength": 255
           }
         },
-        "required": ["kind", "reference"],
+        "required": [
+          "kind",
+          "reference"
+        ],
         "additionalProperties": false
       },
       "HistoryRange": {
@@ -10085,7 +10313,10 @@
             "description": "Real calendar date, 1900-01-01 through today Asia/Kolkata; replacement cannot move backwards."
           }
         },
-        "required": ["from", "through"],
+        "required": [
+          "from",
+          "through"
+        ],
         "additionalProperties": false
       },
       "HistoryOpening": {
@@ -10102,7 +10333,10 @@
             "pattern": "^(0|[1-9][0-9]{0,19})(\\.[0-9]{1,18})?$"
           }
         },
-        "required": ["date", "quantity"],
+        "required": [
+          "date",
+          "quantity"
+        ],
         "additionalProperties": false
       },
       "HistoryTransaction": {
@@ -10126,14 +10360,23 @@
           },
           "kind": {
             "type": "string",
-            "enum": ["buy", "sell"]
+            "enum": [
+              "buy",
+              "sell"
+            ]
           },
           "quantity": {
             "type": "string",
             "pattern": "^(0|[1-9][0-9]{0,19})(\\.[0-9]{1,18})?$"
           }
         },
-        "required": ["external_id", "date", "sequence", "kind", "quantity"],
+        "required": [
+          "external_id",
+          "date",
+          "sequence",
+          "kind",
+          "quantity"
+        ],
         "additionalProperties": false
       },
       "HistoryObservation": {
@@ -10160,7 +10403,9 @@
             "$ref": "#/components/schemas/Money"
           }
         },
-        "required": ["date"],
+        "required": [
+          "date"
+        ],
         "additionalProperties": false
       },
       "HistoryHoldingInput": {
@@ -10196,7 +10441,11 @@
             "$ref": "#/components/schemas/HistoryObservation"
           }
         },
-        "required": ["external_id", "investment_account", "instrument"],
+        "required": [
+          "external_id",
+          "investment_account",
+          "instrument"
+        ],
         "additionalProperties": false
       },
       "HistoryImport": {
@@ -10217,7 +10466,10 @@
             "$ref": "#/components/schemas/HistoryRange"
           }
         },
-        "required": ["source", "holdings"],
+        "required": [
+          "source",
+          "holdings"
+        ],
         "additionalProperties": false
       },
       "Holding": {
@@ -10248,7 +10500,11 @@
           },
           "position_backing": {
             "type": "string",
-            "x-known-values": ["snapshot", "ledger", "mixed"],
+            "x-known-values": [
+              "snapshot",
+              "ledger",
+              "mixed"
+            ],
             "minLength": 1
           }
         },
@@ -10310,7 +10566,10 @@
                     "$ref": "#/components/schemas/FinancialDate"
                   }
                 },
-                "required": ["market_value", "as_of"],
+                "required": [
+                  "market_value",
+                  "as_of"
+                ],
                 "additionalProperties": true
               },
               {
@@ -10320,7 +10579,11 @@
           },
           "position_backing": {
             "type": "string",
-            "x-known-values": ["snapshot", "ledger", "mixed"],
+            "x-known-values": [
+              "snapshot",
+              "ledger",
+              "mixed"
+            ],
             "minLength": 1
           },
           "history_complete": {
@@ -10363,7 +10626,11 @@
           },
           "position_backing": {
             "type": "string",
-            "x-known-values": ["snapshot", "ledger", "mixed"],
+            "x-known-values": [
+              "snapshot",
+              "ledger",
+              "mixed"
+            ],
             "minLength": 1
           },
           "reasons": {
@@ -10403,7 +10670,12 @@
             "type": "string"
           }
         },
-        "required": ["object", "data", "has_more", "url"],
+        "required": [
+          "object",
+          "data",
+          "has_more",
+          "url"
+        ],
         "additionalProperties": true
       },
       "HistoryImportResult": {
@@ -10430,12 +10702,19 @@
                   "pattern": "^hld_[a-f0-9]{32}$"
                 }
               },
-              "required": ["id"],
+              "required": [
+                "id"
+              ],
               "additionalProperties": true
             }
           }
         },
-        "required": ["object", "account", "portfolio", "holdings"],
+        "required": [
+          "object",
+          "account",
+          "portfolio",
+          "holdings"
+        ],
         "additionalProperties": true
       },
       "HistoryView": {
@@ -10502,7 +10781,11 @@
                 },
                 "position_backing": {
                   "type": "string",
-                  "x-known-values": ["snapshot", "ledger", "mixed"],
+                  "x-known-values": [
+                    "snapshot",
+                    "ledger",
+                    "mixed"
+                  ],
                   "minLength": 1
                 },
                 "external_id": {
@@ -10527,7 +10810,11 @@
                           "$ref": "#/components/schemas/HistorySource"
                         }
                       },
-                      "required": ["date", "quantity", "source"],
+                      "required": [
+                        "date",
+                        "quantity",
+                        "source"
+                      ],
                       "additionalProperties": true
                     },
                     {
@@ -10578,7 +10865,10 @@
                       },
                       "kind": {
                         "type": "string",
-                        "x-known-values": ["buy", "sell"],
+                        "x-known-values": [
+                          "buy",
+                          "sell"
+                        ],
                         "minLength": 1
                       },
                       "quantity": {
@@ -10629,7 +10919,11 @@
                           "$ref": "#/components/schemas/HistorySource"
                         }
                       },
-                      "required": ["date", "quantity", "source"],
+                      "required": [
+                        "date",
+                        "quantity",
+                        "source"
+                      ],
                       "additionalProperties": true
                     },
                     {

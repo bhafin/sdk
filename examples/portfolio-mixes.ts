@@ -3,7 +3,7 @@ import type { Bharosa } from "bharosa";
 export async function savedMixes(client: Bharosa, portfolioId: string) {
   const portfolio = await client.portfolios.retrieve(portfolioId);
   const snapshot = await portfolio.currentSnapshot();
-  const cutoff = { asOf: "2026-10-18" };
+  const cutoff = { asOf: "2026-10-01" };
   return {
     snapshot,
     asset: await portfolio.assetMix(cutoff),

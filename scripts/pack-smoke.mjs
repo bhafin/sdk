@@ -21,11 +21,18 @@ assert.ok(dry.files.some((x) => x.path === "LICENSE"));
 for (const f of dry.files)
   assert.match(
     f.path,
-    /^(dist\/[^/]+\.(?:cjs|mjs|d\.ts|d\.cts|d\.mts)|README\.md|CONTRIBUTING\.md|SECURITY\.md|CHANGELOG\.md|docs\/(?:index|getting-started|portfolios|reliability|releasing|provenance)\.md|examples\/(?:README\.md|(?:read-account|portfolio-mixes|create-investor)\.ts)|LICENSE|CONTRACT-SHA256|FIRST-PARTY-CONTRACT-SHA256|package\.json)$/,
+    /^(dist\/[^/]+\.(?:cjs|mjs|d\.ts|d\.cts|d\.mts)|README\.md|CONTRIBUTING\.md|SECURITY\.md|CHANGELOG\.md|docs\/(?:index|getting-started|portfolios|reliability|releasing|provenance|testing|monthly-market-data)\.md|examples\/(?:README\.md|(?:read-account|portfolio-mixes|create-investor)\.ts)|LICENSE|CONTRACT-SHA256|FIRST-PARTY-CONTRACT-SHA256|MONTHLY-MARKET-CONTRACT-SHA256|package\.json)$/,
   );
 assert.ok(
-  !dry.files.some((x) =>
-    /(test|fixture|\.env|source.?map|AGENTS|HANDOFF)/i.test(x.path),
+  !dry.files.some(
+    (x) =>
+      !new Set([
+        "dist/testing.cjs",
+        "dist/testing.d.cts",
+        "dist/testing.d.ts",
+        "docs/testing.md",
+      ]).has(x.path) &&
+      /(test|fixture|\.env|source.?map|AGENTS|HANDOFF)/i.test(x.path),
   ),
 );
 const packed = JSON.parse(
@@ -46,6 +53,14 @@ for (const [name, source] of [
   [
     "esm.mjs",
     "import {Bharosa} from 'bharosa'; if(typeof Bharosa !== 'function')throw Error('export');",
+  ],
+  [
+    "testing.cjs",
+    "const t=require('bharosa/testing'); if(t.samplePortfolios().length!==4)throw Error('samples'); if('samplePortfolios' in require('bharosa'))throw Error('testing leaked into main');",
+  ],
+  [
+    "testing.mjs",
+    "import {sampleFunds} from 'bharosa/testing'; if(sampleFunds().length!==4)throw Error('sample funds');",
   ],
   [
     "cjs.cjs",

@@ -5,7 +5,9 @@ Build a Node.js integration with the Bharosa resource API. This SDK is not yet p
 1. [Install locally and make your first request](getting-started.md).
 2. [Work with portfolios and mixes](portfolios.md).
 3. [Handle errors, cancellation, and retries](reliability.md).
-4. [Run the synthetic examples](../examples/README.md).
+4. [Use monthly market snapshots](monthly-market-data.md).
+5. [Use deterministic synthetic sample portfolios](testing.md).
+6. [Run the synthetic examples](../examples/README.md).
 
 For development, start with [CONTRIBUTING.md](../CONTRIBUTING.md). See the [source and package release checklist](releasing.md) before any distribution.
 

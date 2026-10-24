@@ -3,10 +3,19 @@ import { Bharosa as Current } from "../dist/index.js";
 import { Bharosa as Previous } from "./legacy-types/index.js";
 declare const current: Current;
 declare const previous: Previous;
-const previousSurface: Previous = current;
-const currentSurface: Current = previous;
+// Intentional prelaunch changes: resource aliases are additive; Account.owner is removed.
+const previousSurface: Omit<Previous, "accounts"> = current;
+const currentSurface: Omit<
+  Current,
+  "marketSnapshots" | "mutualFundSchemes" | "mutualFunds" | "accounts"
+> = previous;
+const previousFunds: Previous["mutualFunds"] = current.mutualFunds;
+const currentFunds: Omit<Current["mutualFunds"], "portfolios"> =
+  previous.mutualFunds;
 void previousSurface;
 void currentSurface;
+void previousFunds;
+void currentFunds;
 
 import * as CurrentErrors from "../dist/index.js";
 import * as PreviousErrors from "./legacy-types/index.js";

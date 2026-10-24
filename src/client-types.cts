@@ -1,3 +1,4 @@
+import type { MonthlyMarketClient } from "./monthly-types.cjs";
 import type {
   MarketDataClient,
   CurrentHoldingsInput,
@@ -81,6 +82,12 @@ export interface ListOptions {
 }
 export interface FilteredListOptions extends ListOptions {
   client?: string;
+}
+export interface PortfolioListOptions extends ListOptions {
+  /** Compatibility alias; cannot be combined with plural filters. */
+  client?: string;
+  client_ids?: string[];
+  investor_ids?: string[];
 }
 export type MutationOutcome =
   "not_applicable" | "not_sent" | "rejected" | "unknown";
@@ -222,6 +229,14 @@ export type FundObjectReferences = Omit<Fields<FundReferences>, "data"> & {
   >;
 };
 export interface ClientSurface {
+  readonly marketSnapshots: MonthlyMarketClient;
+  readonly mutualFundSchemes: {
+    readonly navs: { readonly retrieve: MonthlyMarketClient["schemes"]["nav"] };
+    readonly expenseRatios: {
+      readonly retrieve: MonthlyMarketClient["schemes"]["expenseRatio"];
+    };
+    readonly valuation: MonthlyMarketClient["schemes"]["valuation"];
+  };
   readonly marketData: MarketDataClient;
   readonly accounts: {
     readonly retrieve: (options?: RequestOptions) => Promise<Account>;
@@ -261,7 +276,7 @@ export interface ClientSurface {
       input: InMemoryPortfolioInput,
     ) => InMemoryPortfolio;
     readonly list: (
-      params?: FilteredListOptions,
+      params?: PortfolioListOptions,
       options?: RequestOptions,
     ) => Promise<PortfolioObjectsList>;
     readonly retrieve: (
@@ -285,6 +300,12 @@ export interface ClientSurface {
     };
   };
   readonly mutualFunds: {
+    readonly portfolios: {
+      readonly retrieve: MonthlyMarketClient["funds"]["portfolio"];
+      readonly holdings: {
+        readonly list: MonthlyMarketClient["funds"]["holdings"];
+      };
+    };
     readonly fromId: (mutualFundId: string) => MutualFundObject;
     readonly fromInstrument: (instrument: string) => MutualFundObject;
     readonly search: (

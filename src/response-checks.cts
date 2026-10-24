@@ -61,7 +61,7 @@ export function responseMatches(
     )
       return false;
     if (
-      id === "md_valuation" &&
+      (id === "md_valuation" || id === "monthly_valuation") &&
       ((b("position_date") !== undefined &&
         d("position_date") !== b("position_date")) ||
         later(d("nav", "date"), d("as_of")) ||
@@ -132,6 +132,44 @@ export function responseMatches(
       d("valuation_date") !== b("valuation_date"))
   )
     return false;
+  if (id.startsWith("monthly_") && id !== "monthly_valuation") {
+    const observation = d("observation_date"),
+      requested = d("requested_date"),
+      data = d("data");
+    if (requested !== params.as_of) return false;
+    if (d("status") === "available") {
+      if (
+        typeof observation !== "string" ||
+        typeof requested !== "string" ||
+        observation > requested
+      )
+        return false;
+      if (id === "monthly_nav" || id === "monthly_expense") {
+        if (
+          field(data, "scheme_id") !== params.id ||
+          field(data, "date") !== observation
+        )
+          return false;
+      }
+      if (
+        id === "monthly_portfolio" &&
+        (field(data, "fund_id") !== params.id ||
+          field(data, "date") !== observation)
+      )
+        return false;
+      if (
+        id === "monthly_holdings" &&
+        (field(data, "portfolio", "fund_id") !== params.id ||
+          field(data, "portfolio", "date") !== observation ||
+          rows(field(data, "holdings", "data")).some(
+            (h) =>
+              field(h, "date") !== observation ||
+              field(h, "portfolio_id") !== field(data, "portfolio", "id"),
+          ))
+      )
+        return false;
+    }
+  }
   if (id === "fund_references") {
     if (typeof params.instruments !== "string") return false;
     const asked = params.instruments.split(","),

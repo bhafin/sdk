@@ -19,6 +19,9 @@ const { requestExamples } = await import(
 const { Bharosa } = await import(
   pathToFileURL(path.join(consumer, "node_modules/bharosa/dist/index.mjs"))
 );
+const testing = await import(
+  pathToFileURL(path.join(consumer, "node_modules/bharosa/dist/testing.cjs"))
+);
 const env = {
   BHAROSA_SECRET_KEY: "synthetic-secret",
   BHAROSA_APPLICATION_KEY: "synthetic-app-key",
@@ -118,6 +121,21 @@ if (process.env.BHAROSA_TSC) {
     .readFileSync(path.join(marketing, "src/content/guides.ts"), "utf8")
     .replace('"./product"', JSON.stringify(productUrl))
     .replace(
+      '"./reference-design.ts"',
+      JSON.stringify(
+        pathToFileURL(path.join(marketing, "src/content/reference-design.ts"))
+          .href,
+      ),
+    )
+    .replace(
+      '"./saved-portfolio-example"',
+      JSON.stringify(
+        pathToFileURL(
+          path.join(marketing, "src/content/saved-portfolio-example.ts"),
+        ).href,
+      ),
+    )
+    .replace(
       '"./examples"',
       JSON.stringify(
         pathToFileURL(path.join(marketing, "src/content/examples.ts")).href,
@@ -174,7 +192,12 @@ if (process.env.BHAROSA_TSC) {
         }
       }
       const js = ts.transpileModule(
-        executable.replace('import { Bharosa } from "bharosa";', ""),
+        executable
+          .replace('import { Bharosa } from "bharosa";', "")
+          .replace(
+            /import\s*\{([^}]+)\}\s*from\s*["']bharosa\/testing["'];?/g,
+            "const {$1} = testing;",
+          ),
         {
           compilerOptions: {
             module: ts.ModuleKind.ESNext,
@@ -182,11 +205,19 @@ if (process.env.BHAROSA_TSC) {
           },
         },
       ).outputText;
-      await new AsyncFunction("Bharosa", "process", "crypto", "console", js)(
+      await new AsyncFunction(
+        "Bharosa",
+        "process",
+        "crypto",
+        "console",
+        "testing",
+        js,
+      )(
         GuideClient,
         { env },
         { randomUUID: () => "synthetic-guide-key" },
         { log() {} },
+        testing,
       );
       fs.writeFileSync(
         path.join(consumer, `website-guide-${guide.slug}-${section.id}.ts`),

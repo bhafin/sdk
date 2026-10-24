@@ -1,3 +1,5 @@
+import type { MonthlyMarketClient, MonthSelection } from "./monthly-types.cjs";
+export type * from "./monthly-types.cjs";
 import { createTransport, check, keys } from "./transport.cjs";
 import { schemas } from "./contract.cjs";
 import { valid } from "./validate.cjs";
@@ -38,11 +40,31 @@ export class Bharosa implements T.ClientSurface {
   readonly investors: T.ClientSurface["investors"];
   readonly portfolios: T.ClientSurface["portfolios"];
   readonly mutualFunds: T.ClientSurface["mutualFunds"];
+  readonly mutualFundSchemes: T.ClientSurface["mutualFundSchemes"];
+  readonly marketSnapshots: MonthlyMarketClient;
   readonly marketData: D.MarketDataClient;
   constructor(config: T.BharosaConfig) {
     const call = createTransport(config);
     const list = (p: T.FilteredListOptions) => {
       keys(p, ["limit", "startingAfter", "client"]);
+      return Object.fromEntries(
+        Object.entries(p)
+          .filter(([, v]) => v !== undefined)
+          .map(([k, v]) => [k === "startingAfter" ? "starting_after" : k, v]),
+      );
+    };
+    const portfolioList = (p: T.PortfolioListOptions) => {
+      keys(p, [
+        "limit",
+        "startingAfter",
+        "client",
+        "client_ids",
+        "investor_ids",
+      ]);
+      check(
+        [p.client, p.client_ids, p.investor_ids].filter((v) => v !== undefined)
+          .length <= 1,
+      );
       return Object.fromEntries(
         Object.entries(p)
           .filter(([, v]) => v !== undefined)
@@ -217,8 +239,13 @@ export class Bharosa implements T.ClientSurface {
     this.portfolios = Object.freeze({
       build,
       fromPositions: build,
-      list: async (p: T.FilteredListOptions = {}, o?: T.RequestOptions) => {
-        const result = await call("list_portfolios", list(p), undefined, o);
+      list: async (p: T.PortfolioListOptions = {}, o?: T.RequestOptions) => {
+        const result = await call(
+          "list_portfolios",
+          portfolioList(p),
+          undefined,
+          o,
+        );
         return { ...result, data: result.data.map(savedPortfolio) };
       },
       retrieve: async (portfolio: string, o?: T.RequestOptions) =>
@@ -261,6 +288,17 @@ export class Bharosa implements T.ClientSurface {
       });
     };
     this.mutualFunds = Object.freeze({
+      portfolios: Object.freeze({
+        retrieve: (id: string, q: MonthSelection, o?: T.RequestOptions) =>
+          this.marketSnapshots.funds.portfolio(id, q, o),
+        holdings: Object.freeze({
+          list: (
+            id: string,
+            q: MonthSelection & D.MarketPage,
+            o?: T.RequestOptions,
+          ) => this.marketSnapshots.funds.holdings(id, q, o),
+        }),
+      }),
       fromId: (id: string) => {
         check(
           typeof id === "string" &&
@@ -352,6 +390,61 @@ export class Bharosa implements T.ClientSurface {
           : { starting_after: startingAfter }),
       };
     };
+    const monthlyQuery = (q: MonthSelection & D.MarketPage, paging = false) => {
+      keys(q, paging ? ["asOf", "limit", "startingAfter"] : ["asOf"]);
+      return {
+        as_of: q.asOf,
+        ...(q.limit === undefined ? {} : { limit: q.limit }),
+        ...(q.startingAfter === undefined
+          ? {}
+          : { starting_after: q.startingAfter }),
+      };
+    };
+    this.marketSnapshots = {
+      schemes: {
+        nav: (id, q, o) =>
+          call("monthly_nav", { id, ...monthlyQuery(q) }, undefined, o),
+        expenseRatio: (id, q, o) =>
+          call("monthly_expense", { id, ...monthlyQuery(q) }, undefined, o),
+        valuation: (id, input = {}, o) => {
+          keys(input, ["units", "asOf", "positionDate", "observedValue"]);
+          return call(
+            "monthly_valuation",
+            {},
+            {
+              scheme_id: id,
+              ...(input.units === undefined ? {} : { units: input.units }),
+              ...(input.asOf === undefined ? {} : { as_of: input.asOf }),
+              ...(input.positionDate === undefined
+                ? {}
+                : { position_date: input.positionDate }),
+              ...(input.observedValue === undefined
+                ? {}
+                : { observed_value: input.observedValue }),
+            },
+            o,
+          );
+        },
+      },
+      funds: {
+        portfolio: (id, q, o) =>
+          call("monthly_portfolio", { id, ...monthlyQuery(q) }, undefined, o),
+        holdings: (id, q, o) =>
+          call(
+            "monthly_holdings",
+            { id, ...monthlyQuery(q, true) },
+            undefined,
+            o,
+          ),
+      },
+    };
+    this.mutualFundSchemes = Object.freeze({
+      navs: Object.freeze({ retrieve: this.marketSnapshots.schemes.nav }),
+      expenseRatios: Object.freeze({
+        retrieve: this.marketSnapshots.schemes.expenseRatio,
+      }),
+      valuation: this.marketSnapshots.schemes.valuation,
+    });
     this.marketData = Object.freeze({
       funds: {
         list: (q, o) => call("md_funds", query(q), undefined, o),

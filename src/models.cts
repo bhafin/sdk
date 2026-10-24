@@ -2,7 +2,7 @@
 export type DecimalInput = string;
 export type Money = { "amount": string; "currency": "INR"; [key: string]: unknown; };
 export type FinancialDate = { "precision": "date"; "date": string; "time_zone": "Asia/Kolkata"; [key: string]: unknown; };
-export type Account = { "id": string; "object": "account"; "created": number; "name"?: string; "owner": string; "primary_investor": string | null; [key: string]: unknown; };
+export type Account = { "id": string; "object": "account"; "created": number; "name"?: string; "primary_investor": string | null; "personal_client_id"?: string | null; [key: string]: unknown; };
 export type Client = { "id": string; "object": "client"; "created": number; "account": string; "name": string; [key: string]: unknown; };
 export type Investor = { "id": string; "object": "investor"; "created": number; "account": string; "client": string; "name": string; "relationship_to_owner": string; [key: string]: unknown; };
 export type Portfolio = { "id": string; "object": "portfolio"; "created": number; "account": string; "investor": string; "name": string; "reporting_currency": "INR"; [key: string]: unknown; };

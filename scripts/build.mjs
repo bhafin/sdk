@@ -15,6 +15,8 @@ const result = spawnSync(
 );
 if (result.status !== 0) process.exit(result.status ?? 1);
 for (const name of [
+  "monthly-market-data.cjs",
+  "monthly-market-data.d.cts",
   "contract.cjs",
   "market-data.cjs",
   "contract.d.cts",

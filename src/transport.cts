@@ -1,3 +1,4 @@
+import { operations as monthlyOperations } from "./monthly-market-data.cjs";
 import type { OperationResults } from "./operation-types.cjs";
 import { schemas, operations as resourceOperations } from "./contract.cjs";
 import { operations as marketOperations } from "./market-data.cjs";
@@ -14,7 +15,11 @@ import {
   type ErrorMetadata,
 } from "./errors.cjs";
 import type { BharosaConfig, RequestOptions } from "./client-types.cjs";
-const operations = { ...resourceOperations, ...marketOperations };
+const operations = {
+  ...resourceOperations,
+  ...marketOperations,
+  ...monthlyOperations,
+};
 function assertServer() {
   if (
     typeof window !== "undefined" ||
@@ -247,7 +252,11 @@ export function createTransport(config: BharosaConfig) {
             "{" + p.name + "}",
             encodeURIComponent(String(value)),
           );
-        if (p.in === "query") query.set(p.name, String(value));
+        if (p.in === "query") {
+          if (Array.isArray(value))
+            for (const item of value) query.append(p.name, String(item));
+          else query.set(p.name, String(value));
+        }
       }
       check(!op.request || body !== undefined);
       if (body !== undefined) {

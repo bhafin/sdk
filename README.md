@@ -108,3 +108,9 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for reproducible tooling, synthetic tests
 [MIT](LICENSE) — Copyright (c) 2026 Bharosa Technoserve Private Limited.
 
 The license covers this SDK. The Bharosa API service, analytics implementation, ingestion adapters, and provider datasets are separate and are not included or licensed by this repository.
+
+### Monthly market history and synthetic samples
+
+`client.marketSnapshots` exposes month-start historical market observations and latest NAV valuation when your application has explicit access. All external credentials, including direct account keys, use monthly historical market dates; investor transaction and position history retains its full dates. See [monthly snapshots](docs/monthly-market-data.md) for actual observation dates, missing data and availability. This local implementation does not activate live access.
+
+The optional `bharosa/testing` entrypoint supplies fresh, deterministic synthetic portfolios and fictional fund compositions without credentials or network requests. Its seed helper writes only when explicitly called with an authenticated client, confirmed test account, stable run ID and resolved instrument mapping. See [testing samples](docs/testing.md).

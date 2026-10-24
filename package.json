@@ -26,6 +26,10 @@
         "default": "./dist/index.cjs"
       },
       "default": "./dist/browser.cjs"
+    },
+    "./testing": {
+      "types": "./dist/testing.d.cts",
+      "default": "./dist/testing.cjs"
     }
   },
   "files": [
@@ -38,7 +42,8 @@
     "CONTRIBUTING.md",
     "SECURITY.md",
     "CHANGELOG.md",
-    "FIRST-PARTY-CONTRACT-SHA256"
+    "FIRST-PARTY-CONTRACT-SHA256",
+    "MONTHLY-MARKET-CONTRACT-SHA256"
   ],
   "scripts": {
     "build": "node scripts/build.mjs",
@@ -50,6 +55,8 @@
     "generate": "node scripts/generate.mjs",
     "generate:first-party": "node scripts/generate-first-party.mjs",
     "check:first-party": "node scripts/generate-first-party.mjs --check",
-    "typecheck": "node tooling/node_modules/typescript/bin/tsc --noEmit && node tooling/node_modules/typescript/bin/tsc -p tsconfig.test.json --noEmit && node tooling/node_modules/typescript/bin/tsc --noEmit --strict --target ES2022 --module NodeNext --moduleResolution NodeNext --typeRoots tooling/node_modules/@types test/api-compatibility.ts"
+    "typecheck": "node tooling/node_modules/typescript/bin/tsc --noEmit && node tooling/node_modules/typescript/bin/tsc -p tsconfig.test.json --noEmit && node tooling/node_modules/typescript/bin/tsc --noEmit --strict --target ES2022 --module NodeNext --moduleResolution NodeNext --typeRoots tooling/node_modules/@types test/api-compatibility.ts",
+    "generate:monthly": "node scripts/generate-monthly.mjs",
+    "check:monthly": "node scripts/generate-monthly.mjs --check"
   }
 }

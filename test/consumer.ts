@@ -178,3 +178,64 @@ async function currentViewTypes(client: Bharosa, id: string) {
   return { units, date };
 }
 void currentViewTypes;
+
+import { samplePortfolios, seedSamplePortfolio } from "bharosa/testing";
+async function monthlyTypes(
+  client: Bharosa,
+  schemeId: string,
+  ownerId: string,
+) {
+  const nav = await client.marketSnapshots.schemes.nav(schemeId, {
+    asOf: "2026-08-01",
+  });
+  if (nav.status === "available") {
+    const amount: string = nav.data.amount;
+    void amount;
+  } else {
+    const missing: null = nav.data;
+    void missing;
+  }
+  const holdings = await client.marketSnapshots.funds.holdings(ownerId, {
+    asOf: "2026-08-01",
+    limit: 10,
+  });
+  if (holdings.status === "available") {
+    const id: string = holdings.data.portfolio.fund_id;
+    void id;
+  }
+  await client.marketSnapshots.schemes.valuation(schemeId, { units: "1.25" });
+  const samples = samplePortfolios();
+  void samples;
+  // Type check that the actual SDK can be supplied; this function is never executed.
+  await seedSamplePortfolio(client, {
+    confirmTestAccount: "acct_test",
+    runId: "types",
+    scenario: "new-investor",
+    instruments: {},
+  });
+}
+void monthlyTypes;
+
+async function resourceAlignment(
+  client: Bharosa,
+  ownerId: string,
+  schemeId: string,
+  clients: string[],
+) {
+  const account = await client.accounts.retrieve();
+  const family: string | null | undefined = account.personal_client_id;
+  void family;
+  await client.portfolios.list({ client_ids: clients });
+  await client.portfolios.list({ investor_ids: ["inv_" + "a".repeat(32)] });
+  await client.mutualFundSchemes.navs.retrieve(schemeId, {
+    asOf: "2026-08-01",
+  });
+  await client.mutualFundSchemes.expenseRatios.retrieve(schemeId, {
+    asOf: "2026-08-01",
+  });
+  await client.mutualFunds.portfolios.retrieve(ownerId, { asOf: "2026-08-01" });
+  await client.mutualFunds.portfolios.holdings.list(ownerId, {
+    asOf: "2026-08-01",
+  });
+}
+void resourceAlignment;
