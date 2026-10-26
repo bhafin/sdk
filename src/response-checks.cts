@@ -43,6 +43,25 @@ export function responseMatches(
       ))
   )
     return false;
+  if (
+    [
+      "list_clients",
+      "list_investors",
+      "list_portfolios",
+      "list_holdings",
+    ].includes(id)
+  ) {
+    const page = rows(d("data"));
+    const ids = page.map((item) => field(item, "id"));
+    if (
+      new Set(ids).size !== ids.length ||
+      (d("has_more") === true && page.length === 0) ||
+      (params.starting_after !== undefined &&
+        ids.includes(params.starting_after)) ||
+      (typeof params.limit === "number" && page.length > params.limit)
+    )
+      return false;
+  }
   if (op.marketData) {
     if (id.endsWith("_get") && d("id") !== params.id) return false;
     if (

@@ -40,7 +40,7 @@ Use `portfolio.history.import(body, { idempotencyKey })` to import source-tagged
 
 `portfolio.on(positionDate).assetMix({ valuationDate, asOf })` uses server-side reconstruction and calculation. The dated view also supports `sectorMix` and `issuerMix`. Position date, valuation date (defaulting to position date), and underlying composition cutoff (`asOf`) are independent. Exact-date provider NAV is required; missing prices fail explicitly. For external credentials, historical market valuation dates and `asOf` cutoffs must be month starts; investor position dates remain unrestricted. Today’s market cutoff remains supported. Internal first-party access retains full historical dates. Fund handles do not expose investor dated views; in-memory value-only positions cannot reconstruct earlier dates.
 
-Opening quantities apply at start of day; transactions through daily close use explicit sequence order. The account or folio containing the holding determines its timezone (initial default Asia/Kolkata). Decimal strings support up to 20 whole digits and 18 fractional places. Imports are idempotent by scoped source/event identity; conflicting payloads fail. A declared range can extend forward with the same start, and transaction-only imports preserve its source. No acquisition history is invented from an opening balance. Unsupported transfers, splits, corrections, reversals, price imports, tax lots and performance calculations fail explicitly. Check your service operator’s available features before relying on these operations.
+Opening quantities apply at start of day; transactions through daily close use explicit sequence order. The account or folio containing the holding determines its timezone (initial default Asia/Kolkata). New supplied unit strings support up to 20 whole digits and four fractional places. Historical read responses retain earlier precision. Imports are idempotent by scoped source/event identity; conflicting payloads fail. A declared range can extend forward with the same start, and transaction-only imports preserve its source. No acquisition history is invented from an opening balance. Unsupported transfers, splits, corrections, reversals, price imports, tax lots and performance calculations fail explicitly. Check your service operator’s available features before relying on these operations.
 
 ## Current holding entry
 
@@ -52,7 +52,7 @@ and `observed_position`. The observation contains `date` and `quantity` and/or I
 
 Omitting `quantity` converts the supplied dated amount into units on the server
 using NAV on/before that date. The result preserves original amount, position
-date, actual NAV, and half-even rounding to 18 decimal places. Missing NAV fails
+date, actual NAV, and half-even rounding to four decimal places. Missing NAV fails
 the write. Explicit units retain supplied provenance. This creates no purchases
 or transaction-history completeness. Historical snapshot writes are unchanged.
 
@@ -86,3 +86,5 @@ Use `client.portfolios.list({ client_ids: selectedClientIds })` or `client.portf
 The earlier singular `client` option remains supported, but cannot be combined with either plural filter. HTTP clients encode plural filters as repeated keys, for example `client_ids=clt_…&client_ids=clt_…`, without brackets. Investor filtering is newly implemented; it was not previously supported.
 
 `await client.accounts.retrieve()` uses the account configured on the SDK; no repeated account ID is needed. Its nullable `personal_client_id` identifies the authenticated human's linked household, not a new family resource or an access grant. Machine account keys receive null because they do not identify a signed-in person. A null link must not be replaced by guessing from a client name or account owner. The prelaunch public account response no longer exposes the internal `owner` user ID; ownership remains enforced on the server.
+
+Units-first portfolio creation (local, unreleased): `portfolios.create` accepts an initial position with either `current_value` or positive `quantity`, never both, using the supplied `as_of` date. Existing amount requests and amount-only responses remain unchanged. Supplied units are stored atomically without requiring a NAV. Snapshot `quantity` can now be a decimal string and `valuation` can be null; `total_current_value` is null when any snapshot position lacks a reported amount, and `valuation_basis` is `supplied_quantity`. Consumers of general snapshot reads must handle these new nullable values; this is an intentional prelaunch type widening. Older SDKs cannot read units-only snapshots. Snapshot replacement and in-memory analytics remain amount-only. No public package release or availability change is implied.

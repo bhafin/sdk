@@ -28,3 +28,7 @@ See [create-investor.ts](../examples/create-investor.ts) for a typed request tha
 ## Transport boundaries
 
 Requests refuse redirects and omit cookies by default. A caller-owned browser transport may attach session cookies and CSRF headers only within the host application’s approved origin policy. The SDK does not accept arbitrary credential/account/origin header overrides. Response bodies are capped at 16 MiB; `maxResponseBytes` can lower the limit. A custom `fetch` implementation receives credentials, so inject only trusted test or server code. The synthetic examples use a mock transport and never call a live service.
+
+Resource list responses reject duplicate IDs, empty pages claiming more results, inclusion of the incoming exclusive cursor, and pages exceeding the requested limit. These are InvalidResponseError failures, not empty successful lists. Application pagination loops should still detect overlap or cycles across pages. Cancellation also discards response streams returned late by a custom transport that ignored the abort signal.
+
+Browser-conditioned ESM and CommonJS imports are both covered by packed-consumer verification. This export compatibility does not enable API keys in browser code; caller-owned session transport and the existing server credential guard remain unchanged.

@@ -138,27 +138,46 @@ export function consistent(value: unknown, account: string): boolean {
       ins.length !== ps.length
     )
       return false;
-    if (!record(s.as_of) || !record(v.total_current_value)) return false;
-    let total = 0n;
+    if (!record(s.as_of)) return false;
+    let total = 0n,
+      unknown = false;
     for (const x of ps) {
-      if (
-        !record(x.valuation) ||
-        !record(x.valuation.as_of) ||
-        !record(x.valuation.market_value)
-      )
-        return false;
       if (
         x.account !== p.account ||
         x.snapshot !== s.id ||
-        x.valuation.as_of.date !== s.as_of.date ||
         !ins.some((y) => y.id === x.instrument)
+      )
+        return false;
+      if (x.valuation === null) {
+        const units = decimal(x.quantity);
+        if (units === undefined || units <= 0n) return false;
+        unknown = true;
+        continue;
+      }
+      if (
+        x.quantity !== null ||
+        !record(x.valuation) ||
+        !record(x.valuation.as_of) ||
+        !record(x.valuation.market_value) ||
+        x.valuation.as_of.date !== s.as_of.date
       )
         return false;
       const amount = decimal(x.valuation.market_value.amount);
       if (amount === undefined) return false;
       total += amount;
     }
-    if (total !== decimal(v.total_current_value.amount)) return false;
+    if (unknown) {
+      if (
+        v.total_current_value !== null ||
+        v.valuation_basis !== "supplied_quantity"
+      )
+        return false;
+    } else if (
+      !record(v.total_current_value) ||
+      total !== decimal(v.total_current_value.amount) ||
+      v.valuation_basis !== "manual_current_value"
+    )
+      return false;
   }
   const children =
     v.object === "list"

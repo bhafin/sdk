@@ -21,7 +21,7 @@ assert.ok(dry.files.some((x) => x.path === "LICENSE"));
 for (const f of dry.files)
   assert.match(
     f.path,
-    /^(dist\/[^/]+\.(?:cjs|mjs|d\.ts|d\.cts|d\.mts)|README\.md|CONTRIBUTING\.md|SECURITY\.md|CHANGELOG\.md|docs\/(?:index|getting-started|portfolios|reliability|releasing|provenance|testing|monthly-market-data)\.md|examples\/(?:README\.md|(?:read-account|portfolio-mixes|create-investor)\.ts)|LICENSE|CONTRACT-SHA256|FIRST-PARTY-CONTRACT-SHA256|MONTHLY-MARKET-CONTRACT-SHA256|package\.json)$/,
+    /^(dist\/[^/]+\.(?:cjs|mjs|d\.ts|d\.cts|d\.mts)|README\.md|CONTRIBUTING\.md|SECURITY\.md|CHANGELOG\.md|docs\/(?:index|getting-started|portfolios|reliability|releasing|provenance|testing|monthly-market-data)\.md|examples\/(?:README\.md|(?:read-account|portfolio-mixes|create-investor)\.ts|offline-smoke\.mjs)|LICENSE|CONTRACT-SHA256|FIRST-PARTY-CONTRACT-SHA256|MONTHLY-MARKET-CONTRACT-SHA256|package\.json)$/,
   );
 assert.ok(
   !dry.files.some(
@@ -52,7 +52,7 @@ run("npm", [
 for (const [name, source] of [
   [
     "esm.mjs",
-    "import {Bharosa} from 'bharosa'; if(typeof Bharosa !== 'function')throw Error('export');",
+    "import {Bharosa,ValidationError} from 'bharosa'; if(typeof Bharosa !== 'function'||typeof ValidationError !== 'function')throw Error('export');",
   ],
   [
     "testing.cjs",
@@ -70,12 +70,15 @@ for (const [name, source] of [
   fs.writeFileSync(path.join(temp, name), source);
   run(process.execPath, [name]);
 }
-const browser = spawnSync(
-  process.execPath,
-  ["--conditions=browser", "cjs.cjs"],
-  { cwd: temp, env, encoding: "utf8" },
-);
-assert.equal(browser.status, 0, browser.stderr);
+for (const entry of ["cjs.cjs", "esm.mjs"]) {
+  const browser = spawnSync(process.execPath, ["--conditions=browser", entry], {
+    cwd: temp,
+    env,
+    encoding: "utf8",
+  });
+  assert.equal(browser.status, 0, browser.stderr);
+}
+run(process.execPath, ["node_modules/bharosa/examples/offline-smoke.mjs"]);
 const deep = spawnSync(
   process.execPath,
   ["-e", "require('bharosa/dist/index.cjs')"],
@@ -132,7 +135,7 @@ console.log(
         "NodeNext",
         "Node16",
         "Bundler",
-        "browser export",
+        "browser ESM and CJS exports",
         "deep-import rejection",
         "allowlist",
         "private license/publication gates",

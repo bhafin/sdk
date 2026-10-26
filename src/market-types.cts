@@ -173,7 +173,7 @@ export type UnitDerivation =
       original_amount: string;
       position_date: string;
       nav: { amount: string; currency: string; date: string };
-      rounding: "half_even_18_decimal_places";
+      rounding: "half_even_4_decimal_places" | "half_even_18_decimal_places";
       rounded: boolean;
     };
 export interface CurrentHoldingsInput {

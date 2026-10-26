@@ -4,10 +4,14 @@ import { Bharosa as Previous } from "./legacy-types/index.js";
 declare const current: Current;
 declare const previous: Previous;
 // Intentional prelaunch changes: resource aliases are additive; Account.owner is removed.
-const previousSurface: Omit<Previous, "accounts"> = current;
+const previousSurface: Omit<Previous, "accounts" | "portfolios"> = current;
 const currentSurface: Omit<
   Current,
-  "marketSnapshots" | "mutualFundSchemes" | "mutualFunds" | "accounts"
+  | "marketSnapshots"
+  | "mutualFundSchemes"
+  | "mutualFunds"
+  | "accounts"
+  | "portfolios"
 > = previous;
 const previousFunds: Previous["mutualFunds"] = current.mutualFunds;
 const currentFunds: Omit<Current["mutualFunds"], "portfolios"> =
@@ -62,3 +66,19 @@ new CurrentErrors.InvalidResponseError("message");
 new CurrentErrors.InvalidResponseError("message", {
   cause: new Error("cause"),
 });
+
+// Units-first snapshots intentionally introduce nullable valuations; old amount inputs remain accepted.
+declare const legacyCreation: Parameters<Previous["portfolios"]["create"]>[0];
+const acceptedCreation: Parameters<Current["portfolios"]["create"]>[0] =
+  legacyCreation;
+declare const legacyReplacement: Parameters<
+  Previous["portfolios"]["snapshots"]["create"]
+>[1];
+const acceptedReplacement: Parameters<
+  Current["portfolios"]["snapshots"]["create"]
+>[1] = legacyReplacement;
+const preservedInMemory: Previous["portfolios"]["fromPositions"] =
+  current.portfolios.fromPositions;
+void acceptedCreation;
+void acceptedReplacement;
+void preservedInMemory;

@@ -154,9 +154,16 @@ if (process.env.BHAROSA_TSC) {
   let guideCount = 0;
   for (const guide of guides)
     for (const section of guide.sections) {
-      if (!section.code || !/bharosa|Bharosa/.test(section.code)) continue;
-      // Shell examples are checked by the website tooling, not the TS executor.
-      if (/^\s*curl\b/.test(section.code)) continue;
+      if (
+        !section.code ||
+        !/\bBharosa\b|\bbharosa\s*\.|from\s*["']bharosa(?:\/testing)?["']/.test(
+          section.code,
+        )
+      )
+        continue;
+      // Installation commands and MCP host JSON are not SDK TypeScript examples.
+      // Shell examples remain owned by the website tooling.
+      if (/^\s*(?:curl|npm|npx|node)\b/.test(section.code)) continue;
       const source =
         (section.code.includes("import { Bharosa }")
           ? ""

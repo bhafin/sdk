@@ -6,7 +6,7 @@ A TypeScript client for Bharosa accounts, investors, portfolios, and mutual fund
 
 ## Start here
 
-Use Node.js 22.12+ in a supported LTS release. Build and pack this checkout:
+Use Node.js 22.12+ in a supported LTS release. If you have the source checkout, build and pack it:
 
 ```sh
 npm --prefix tooling ci --ignore-scripts
@@ -14,7 +14,7 @@ npm run build
 npm pack --pack-destination /absolute/path/to/artifacts
 ```
 
-Install the generated archive in your backend application:
+If the operator supplied a reviewed archive, skip the source build. Install that archive in your backend application:
 
 ```sh
 npm install /absolute/path/to/artifacts/bharosa-0.0.0-development.tgz
@@ -25,15 +25,20 @@ Configure your application's API origin, account ID, and account key through its
 ```ts
 import { Bharosa } from "bharosa";
 
+function required(name: string): string {
+  const value = process.env[name];
+  if (!value) throw new Error(`Missing ${name}`);
+  return value;
+}
 const bharosa = new Bharosa({
-  baseUrl: process.env.BHAROSA_API_BASE_URL!,
-  account: process.env.BHAROSA_ACCOUNT_ID!,
-  auth: { type: "account_key", apiKey: process.env.BHAROSA_SECRET_KEY! },
+  baseUrl: required("BHAROSA_API_BASE_URL"),
+  account: required("BHAROSA_ACCOUNT_ID"),
+  auth: { type: "account_key", apiKey: required("BHAROSA_SECRET_KEY") },
 });
 const account = await bharosa.accounts.retrieve();
 ```
 
-Validate required environment variables at application startup; the non-null assertions above are TypeScript annotations, not runtime checks. See the [complete setup guide](docs/getting-started.md) for explicit checks and delegated authentication. CommonJS uses `const { Bharosa } = require("bharosa")`.
+The startup check names missing environment variables without printing their values. See the [complete setup guide](docs/getting-started.md) for explicit checks and delegated authentication. CommonJS uses `const { Bharosa } = require("bharosa")`.
 
 ## Calculate a saved portfolio's mix
 
@@ -114,3 +119,7 @@ The license covers this SDK. The Bharosa API service, analytics implementation, 
 `client.marketSnapshots` exposes month-start historical market observations and latest NAV valuation when your application has explicit access. All external credentials, including direct account keys, use monthly historical market dates; investor transaction and position history retains its full dates. See [monthly snapshots](docs/monthly-market-data.md) for actual observation dates, missing data and availability. This local implementation does not activate live access.
 
 The optional `bharosa/testing` entrypoint supplies fresh, deterministic synthetic portfolios and fictional fund compositions without credentials or network requests. Its seed helper writes only when explicitly called with an authenticated client, confirmed test account, stable run ID and resolved instrument mapping. See [testing samples](docs/testing.md).
+
+Unit precision follow-up (local, unreleased): supplied units accept at most four fractional digits; additional digits are rejected, never truncated. Dated amount conversion rounds once to four places using decimal half-even arithmetic; a positive amount rounding to zero returns `units_below_precision`. Currency and NAV precision are unchanged. Exact historical quantities and provenance remain in stored evidence and read responses; the web marks rounded displays with ≈, shows tiny positive values as <0.0001, and makes a rounded edit draft an explicit correction. Existing zero-unit closure remains supported; initial quantities must be positive. No portfolio reset or data rewrite is required. Canonical marketing reconciliation is coordinated through the parent, with deployment pending.
+
+After installing the archive, run `node node_modules/bharosa/examples/offline-smoke.mjs` for a credential-free synthetic read. This checks installed imports and the transport path without contacting Bharosa or creating data. It does not prove live access. Source-checkout verification commands require contributor files that are intentionally excluded from the runtime archive.

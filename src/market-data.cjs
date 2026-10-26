@@ -1879,7 +1879,7 @@ module.exports = {
                       "anyOf": [
                         {
                           "type": "string",
-                          "pattern": "^(0|[1-9][0-9]{0,19})(\\.[0-9]{1,18})?$"
+                          "pattern": "^(0|[1-9][0-9]{0,19})(\\.[0-9]{1,4})?$"
                         },
                         {
                           "type": "null"
@@ -2033,7 +2033,10 @@ module.exports = {
                           "additionalProperties": true
                         },
                         "rounding": {
-                          "const": "half_even_18_decimal_places"
+                          "enum": [
+                            "half_even_4_decimal_places",
+                            "half_even_18_decimal_places"
+                          ]
                         },
                         "rounded": {
                           "type": "boolean"
@@ -2575,7 +2578,10 @@ module.exports = {
                                   "additionalProperties": true
                                 },
                                 "rounding": {
-                                  "const": "half_even_18_decimal_places"
+                                  "enum": [
+                                    "half_even_4_decimal_places",
+                                    "half_even_18_decimal_places"
+                                  ]
                                 },
                                 "rounded": {
                                   "type": "boolean"
@@ -3174,7 +3180,10 @@ module.exports = {
                                   "additionalProperties": true
                                 },
                                 "rounding": {
-                                  "const": "half_even_18_decimal_places"
+                                  "enum": [
+                                    "half_even_4_decimal_places",
+                                    "half_even_18_decimal_places"
+                                  ]
                                 },
                                 "rounded": {
                                   "type": "boolean"
@@ -3742,7 +3751,10 @@ module.exports = {
                                   "additionalProperties": true
                                 },
                                 "rounding": {
-                                  "const": "half_even_18_decimal_places"
+                                  "enum": [
+                                    "half_even_4_decimal_places",
+                                    "half_even_18_decimal_places"
+                                  ]
                                 },
                                 "rounded": {
                                   "type": "boolean"

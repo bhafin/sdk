@@ -333,6 +333,12 @@ export function createTransport(config: BharosaConfig) {
               redirect: "error",
               credentials: "omit",
               cache: "no-store",
+            }).then((received) => {
+              // A caller-owned transport may ignore abort. Discard a late body
+              // instead of retaining an unread stream after the request ended.
+              if (controller.signal.aborted)
+                void received.body?.cancel().catch(() => {});
+              return received;
             }),
             controller.signal,
           );

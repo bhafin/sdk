@@ -377,7 +377,7 @@ test("query mapping and encoding", async () => {
     }),
   });
   await d.investors.list({
-    startingAfter: "inv_0123456789abcdef0123456789abcdef",
+    startingAfter: "inv_abcdef0123456789abcdef0123456789",
   });
   assert.ok(url.includes("starting_after="));
   assert.ok(!url.includes("startingAfter"));
@@ -566,7 +566,7 @@ test("redacted API errors and request ID consistency", async () => {
 test("snapshot links and exact decimal totals", async () => {
   const f = getFixture("current_snapshot");
   for (const mutate of [
-    (v: SnapshotView) => (v.total_current_value.amount = "0"),
+    (v: SnapshotView) => (v.total_current_value!.amount = "0"),
     (v: SnapshotView) => v.snapshot.position_count++,
     (v: SnapshotView) =>
       (v.investment_account.latest_snapshot =
@@ -582,17 +582,18 @@ test("snapshot links and exact decimal totals", async () => {
   const v = structuredClone(f.response);
   let total = 0n;
   for (const p of v.positions) {
-    p.valuation.market_value.amount = "99999999999999999999.123456789012345678";
+    p.valuation!.market_value.amount =
+      "99999999999999999999.123456789012345678";
     total += 99999999999999999999123456789012345678n;
   }
-  v.total_current_value.amount =
+  v.total_current_value!.amount =
     total / 10n ** 18n +
     "." +
     (total % 10n ** 18n).toString().padStart(18, "0");
   const c = new Bharosa({ ...config, fetch: mockFetch(async () => res(v)) });
   assert.equal(
     object(object(await invoke(c, f)).total_current_value).amount,
-    v.total_current_value.amount,
+    v.total_current_value!.amount,
   );
 });
 test("server key modes remain guarded in browser and old Node", () => {
@@ -702,7 +703,7 @@ test("zero and empty snapshots accepted; invalid dates and duplicates rejected",
   value.positions = [];
   value.instruments = [];
   value.snapshot.position_count = 0;
-  value.total_current_value.amount = "0";
+  value.total_current_value!.amount = "0";
   const c = new Bharosa({
     ...config,
     fetch: mockFetch(async () => res(value, 201)),
@@ -1279,4 +1280,142 @@ test("saved portfolio current view sends separate typed operations and validates
   );
   corrupt = true;
   await assert.rejects(saved.current().assetMix(), InvalidResponseError);
+});
+
+test("quantity-first snapshot accepts unknown values and rejects inconsistent totals or quantities", async () => {
+  const f = getFixture("create_portfolio");
+  const v = structuredClone(f.response) as SnapshotView;
+  v.positions[0].quantity = "12.34";
+  v.positions[0].valuation = null;
+  v.total_current_value = null;
+  v.valuation_basis = "supplied_quantity";
+  const body = {
+    ...f.request,
+    positions: f.request.positions.map((p, i) =>
+      i === 0 ? { instrument: p.instrument, quantity: "12.34" } : p,
+    ),
+  };
+  const c = new Bharosa({
+    ...config,
+    fetch: mockFetch(async () => res(v, 201)),
+  });
+  const result = await c.portfolios.create(body, {
+    idempotencyKey: "quantity",
+  });
+  assert.equal(result.total_current_value, null);
+  assert.equal(result.positions[0].quantity, "12.34");
+  for (const quantity of [
+    "0",
+    "0.00",
+    "-1",
+    "NaN",
+    "1e3",
+    "1.12345",
+    "1.00000",
+    "1.1234567890123456789",
+  ]) {
+    await assert.rejects(
+      c.portfolios.create(
+        {
+          ...body,
+          positions: [{ instrument: body.positions[0].instrument, quantity }],
+        },
+        { idempotencyKey: "invalid" },
+      ),
+      ValidationError,
+    );
+  }
+  for (const mutate of [
+    (x: SnapshotView) => {
+      x.total_current_value = { amount: "0", currency: "INR" };
+    },
+    (x: SnapshotView) => {
+      x.positions[0].quantity = null;
+    },
+    (x: SnapshotView) => {
+      x.positions[0].quantity = "0";
+    },
+    (x: SnapshotView) => {
+      x.valuation_basis = "manual_current_value";
+    },
+  ]) {
+    const broken = structuredClone(v);
+    mutate(broken);
+    const bad = new Bharosa({
+      ...config,
+      fetch: mockFetch(async () => res(broken, 201)),
+    });
+    await assert.rejects(
+      bad.portfolios.create(body, { idempotencyKey: "broken" }),
+      InvalidResponseError,
+    );
+  }
+});
+
+test("resource pages reject duplicate IDs, empty continuation and a repeated cursor", async () => {
+  const value = structuredClone(getFixture("list_investors").response);
+  const first = object(array(object(value).data)[0]);
+  for (const page of [
+    { ...value, data: [first, first] },
+    { ...value, data: [], has_more: true },
+    { ...value, data: [first], has_more: true },
+  ]) {
+    const c = new Bharosa({
+      ...config,
+      fetch: mockFetch(async () => res(page)),
+    });
+    await assert.rejects(
+      c.investors.list({ startingAfter: String(first.id) }),
+      InvalidResponseError,
+    );
+  }
+  const other = { ...first, id: "inv_abcdef0123456789abcdef0123456789" };
+  const overLimit = new Bharosa({
+    ...config,
+    fetch: mockFetch(async () => res({ ...value, data: [first, other] })),
+  });
+  await assert.rejects(
+    overLimit.investors.list({ limit: 1 }),
+    InvalidResponseError,
+  );
+  const empty = new Bharosa({
+    ...config,
+    fetch: mockFetch(async () => res({ ...value, data: [], has_more: false })),
+  });
+  assert.equal((await empty.investors.list()).data.length, 0);
+});
+
+test("a late custom-transport response is discarded after cancellation", async () => {
+  let finish!: (response: Response) => void;
+  let started!: () => void;
+  const ready = new Promise<void>((resolve) => {
+    started = resolve;
+  });
+  let cancelled = 0;
+  const controller = new AbortController();
+  const c = new Bharosa({
+    ...config,
+    fetch: mockFetch(() => {
+      started();
+      return new Promise<Response>((resolve) => {
+        finish = resolve;
+      });
+    }),
+  });
+  const pending = c.accounts.retrieve({ signal: controller.signal });
+  const rejected = assert.rejects(pending, AbortError);
+  await ready;
+  controller.abort();
+  await rejected;
+  finish(
+    new Response(
+      new ReadableStream({
+        cancel() {
+          cancelled++;
+        },
+      }),
+    ),
+  );
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(cancelled, 1);
 });
