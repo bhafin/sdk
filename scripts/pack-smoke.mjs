@@ -86,8 +86,7 @@ const deep = spawnSync(
 );
 assert.notEqual(deep.status, 0);
 assert.match(deep.stderr, /ERR_PACKAGE_PATH_NOT_EXPORTED/);
-if (!process.env.BHAROSA_TSC)
-  throw Error("Set BHAROSA_TSC to the TypeScript compiler entry path.");
+process.env.BHAROSA_TSC ??= path.join(root, "tooling/node_modules/typescript/bin/tsc");
 const source = fs.readFileSync(path.join(root, "test/consumer.ts"), "utf8");
 for (const ext of ["mts", "cts", "ts"])
   fs.writeFileSync(path.join(temp, "consumer." + ext), source);
@@ -111,7 +110,9 @@ for (const [module, resolution, files] of [
 const packageJson = JSON.parse(
   fs.readFileSync(path.join(temp, "node_modules/bharosa/package.json")),
 );
-assert.equal(packageJson.private, true);
+assert.equal(packageJson.private, false);
+assert.equal(packageJson.version, "0.1.0");
+assert.equal(packageJson.publishConfig.registry, "https://registry.npmjs.org/");
 assert.equal(packageJson.license, "MIT");
 assert.match(
   fs.readFileSync(path.join(temp, "node_modules/bharosa/LICENSE"), "utf8"),
@@ -138,7 +139,7 @@ console.log(
         "browser ESM and CJS exports",
         "deep-import rejection",
         "allowlist",
-        "private license/publication gates",
+        "release license/publication checks",
       ],
     },
     null,

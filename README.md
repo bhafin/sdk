@@ -2,7 +2,7 @@
 
 A TypeScript client for Bharosa accounts, investors, portfolios, and mutual funds. Use one resource interface from TypeScript, ESM, or CommonJS, with no runtime dependencies.
 
-**Installation:** this package is not yet available on npm. Install the local archive below. You also need an API URL and credentials from the operator of your Bharosa service; installing the SDK does not create an account or grant access.
+**Release target:** `bharosa@0.1.0`. Registry publication is pending; use the reviewed local archive until publication is confirmed. You also need an API URL and credentials from the operator of your Bharosa service; installing the SDK does not create an account or grant access.
 
 ## Start here
 
@@ -17,7 +17,7 @@ npm pack --pack-destination /absolute/path/to/artifacts
 If the operator supplied a reviewed archive, skip the source build. Install that archive in your backend application:
 
 ```sh
-npm install /absolute/path/to/artifacts/bharosa-0.0.0-development.tgz
+npm install /absolute/path/to/artifacts/bharosa-0.1.0.tgz
 ```
 
 Configure your application's API origin, account ID, and account key through its secret manager. Then:

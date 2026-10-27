@@ -1,8 +1,8 @@
 # Changelog
 
-## Unreleased
+## 0.1.0 — release candidate
 
-Local development only. No npm release or public API deployment is claimed.
+Prepared for the first npm release; publication is pending registry authentication and verification. API deployment and external consent activation are separate.
 
 - Typed Node.js client with ESM/CommonJS exports, account-scoped direct/delegated authentication, and 17 public resource operations.
 - Portfolio asset, sector, and issuer mix methods for saved and in-memory targets, with MutualFund conveniences delegated to their underlying Portfolio.

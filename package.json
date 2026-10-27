@@ -1,8 +1,8 @@
 {
   "name": "bharosa",
-  "version": "0.0.0-development",
-  "private": true,
-  "description": "Typed Bharosa resource SDK with server credentials or caller-owned transport. Local development package; not published.",
+  "version": "0.1.0",
+  "private": false,
+  "description": "Typed Bharosa resource SDK with server credentials or caller-owned transport.",
   "license": "MIT",
   "type": "module",
   "engines": {
@@ -50,7 +50,7 @@
     "build": "node scripts/build.mjs",
     "test": "npm run build && npm run typecheck && node scripts/test.mjs",
     "prepack": "npm run build",
-    "prepublishOnly": "node -e \"throw new Error('Publication disabled pending owner release approval')\"",
+    "prepublishOnly": "npm test && npm run test:pack",
     "test:pack": "node scripts/pack-smoke.mjs",
     "test:examples": "node scripts/check-examples.mjs",
     "generate": "node scripts/generate.mjs",
@@ -59,5 +59,13 @@
     "typecheck": "node tooling/node_modules/typescript/bin/tsc --noEmit && node tooling/node_modules/typescript/bin/tsc -p tsconfig.test.json --noEmit && node tooling/node_modules/typescript/bin/tsc --noEmit --strict --target ES2022 --module NodeNext --moduleResolution NodeNext --typeRoots tooling/node_modules/@types test/api-compatibility.ts",
     "generate:monthly": "node scripts/generate-monthly.mjs",
     "check:monthly": "node scripts/generate-monthly.mjs --check"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bhafin/sdk.git"
   }
 }
