@@ -138,10 +138,10 @@ try {
     [
       {
         id: "list_investors",
-        query: "?limit=10&starting_after=inv_0123456789abcdef0123456789abcdef",
+        query: "?limit=10&starting_after=inv_00000000000000000000000000000000",
       },
     ],
-    () => read.nextInvestorPage(client, "inv_0123456789abcdef0123456789abcdef"),
+    () => read.nextInvestorPage(client, "inv_00000000000000000000000000000000"),
   );
   const mixes = await import(
     pathToFileURL(path.join(temp, "build/portfolio-mixes.js"))
