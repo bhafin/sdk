@@ -1,6 +1,6 @@
 # Monthly market snapshots
 
-`client.mutualFundSchemes` and `client.mutualFunds.portfolios` provide month-start market history and current NAV valuation. These methods are implemented locally; availability depends on your service deployment and explicit market-data access. API keys alone do not grant this capability. Request access from your service operator. No application is automatically enrolled by installing the SDK.
+`client.mutualFundSchemes` and `client.mutualFunds.portfolios` provide month-start market history and current NAV valuation. Monthly market data requires no separate application approval. Use authenticated credentials with the required account-read scope; installing the SDK does not authenticate you or grant private account access. Availability still depends on the deployed service and source data.
 
 Resolve an investible scheme through `client.mutualFunds.search()` and its returned `scheme_id`. Fund-owner IDs and scheme IDs are distinct: NAV and expense ratios belong to schemes; portfolio snapshots and holdings belong to fund owners. Do not use an AMC ID as a fund-owner ID.
 
