@@ -27,6 +27,12 @@ export function responseMatches(
   account: string,
 ): boolean {
   if (!valid(op.response, data) || !consistent(data, account)) return false;
+  if (
+    id === "update_portfolio" &&
+    (field(data, "id") !== params.portfolio ||
+      field(data, "name") !== String(field(body, "name")).trim())
+  )
+    return false;
   const d = (...p: string[]) => field(data, ...p),
     b = (...p: string[]) => field(body, ...p);
   if (

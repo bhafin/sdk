@@ -1,6 +1,6 @@
 {
   "name": "bharosa",
-  "version": "0.1.0",
+  "version": "0.1.1-portfolio-lifecycle.0",
   "private": false,
   "description": "Typed Bharosa resource SDK with server credentials or caller-owned transport.",
   "license": "MIT",

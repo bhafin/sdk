@@ -27,6 +27,7 @@ import type {
   Portfolio,
   PortfoliosList,
   PortfolioCreate,
+  PortfolioUpdate,
   SnapshotCreate,
   SnapshotView,
   FundsList,
@@ -271,6 +272,11 @@ export interface ClientSurface {
     ) => Promise<Investor>;
   };
   readonly portfolios: {
+    readonly update: (
+      id: string,
+      body: PortfolioUpdate,
+      options: IdempotentOptions,
+    ) => Promise<PortfolioObject>;
     readonly build: (input: InMemoryPortfolioInput) => InMemoryPortfolio;
     readonly fromPositions: (
       input: InMemoryPortfolioInput,

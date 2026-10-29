@@ -237,6 +237,11 @@ export class Bharosa implements T.ClientSurface {
       );
     };
     this.portfolios = Object.freeze({
+      update: async (
+        portfolio: string,
+        b: M.PortfolioUpdate,
+        o: T.IdempotentOptions,
+      ) => savedPortfolio(await call("update_portfolio", { portfolio }, b, o)),
       build,
       fromPositions: build,
       list: async (p: T.PortfolioListOptions = {}, o?: T.RequestOptions) => {

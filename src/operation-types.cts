@@ -18,6 +18,7 @@ export interface OperationResults {
   create_investor: M.Investor;
   update_investor: M.Investor;
   list_portfolios: M.PortfoliosList;
+  update_portfolio: M.Portfolio;
   retrieve_portfolio: M.Portfolio;
   create_portfolio: M.SnapshotView;
   current_snapshot: M.SnapshotView;

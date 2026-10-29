@@ -71,6 +71,7 @@ const mapping = {
   list_portfolios: ["portfolios", "list"],
   retrieve_portfolio: ["portfolios", "retrieve"],
   create_portfolio: ["portfolios", "create"],
+  update_portfolio: ["portfolios", "update"],
   search_funds: ["mutualFunds", "search"],
   fund_references: ["mutualFunds", "references"],
   current_snapshot: ["portfolios", "snapshots", "retrieveCurrent"],

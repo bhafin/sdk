@@ -10,6 +10,7 @@ type Requests = {
   create_investor: M.InvestorCreate;
   update_investor: M.InvestorUpdate;
   create_portfolio: M.PortfolioCreate;
+  update_portfolio: M.PortfolioUpdate;
   replace_snapshot: M.SnapshotCreate;
   import_history: M.HistoryImport;
 };
