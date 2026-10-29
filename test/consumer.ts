@@ -239,3 +239,18 @@ async function resourceAlignment(
   });
 }
 void resourceAlignment;
+
+// Verify the installed package exposes the lifecycle method and required options.
+async function lifecycleConsumer(client: import("bharosa").Bharosa) {
+  const renamed = await client.portfolios.update(
+    "ptf_0123456789abcdef0123456789abcdef",
+    { name: "Family goals", expected_name: "Family" },
+    { idempotencyKey: "synthetic-rename" },
+  );
+  await renamed.currentSnapshot();
+  // @ts-expect-error Compare-and-set requires expected_name.
+  await client.portfolios.update(renamed.id, { name: "Other" }, { idempotencyKey: "synthetic-2" });
+  // @ts-expect-error Mutations require explicit idempotency options.
+  await client.portfolios.update(renamed.id, { name: "Other", expected_name: "Family goals" });
+}
+void lifecycleConsumer;

@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.0 — 30 October 2026
+
+- Add `portfolios.update(id, { name, expected_name }, { idempotencyKey })` for account-scoped, name-only updates, with optimistic name comparison and validated response identity. Holdings and snapshots remain unchanged.
+- Accept `positions: []` when creating a saved portfolio. Empty portfolio analysis remains unavailable until holdings exist.
+- Clarify that monthly market reads require authenticated account-read access without a separate market-data approval.
+- Preserve existing methods, exports, authentication, quantity precision, and analytics implementation. Requires a companion API with portfolio lifecycle support; package preparation does not establish production availability.
+
+The entries below retain historical preparation notes from the published 0.1.0 package. They are not additional changes in 0.2.0.
+
 ## 0.1.0 — release candidate
 
 Prepared for the first npm release; publication is pending registry authentication and verification. API deployment and external consent activation are separate.
