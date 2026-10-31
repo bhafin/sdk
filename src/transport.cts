@@ -1,3 +1,5 @@
+import { operations as marketSearchOperations } from "./market-search.cjs";
+import { operations as analyticsOperations } from "./analytics-contract.cjs";
 import { operations as monthlyOperations } from "./monthly-market-data.cjs";
 import type { OperationResults } from "./operation-types.cjs";
 import { schemas, operations as resourceOperations } from "./contract.cjs";
@@ -19,6 +21,8 @@ const operations = {
   ...resourceOperations,
   ...marketOperations,
   ...monthlyOperations,
+  ...analyticsOperations,
+  ...marketSearchOperations,
 };
 function assertServer() {
   if (
@@ -158,7 +162,31 @@ async function read(
     reader.releaseLock();
   }
 }
-export function createTransport(config: BharosaConfig) {
+export function createTransport(input: BharosaConfig, marketOnly = false) {
+  let config: Exclude<BharosaConfig, { apiKey: string }>;
+  if (
+    input != null &&
+    typeof input === "object" &&
+    Object.hasOwn(input, "apiKey")
+  ) {
+    keys(input, [
+      "apiKey",
+      "account",
+      "baseUrl",
+      "allowLocalhostHttp",
+      "maxResponseBytes",
+      "fetch",
+    ]);
+    const simple = input as Extract<BharosaConfig, { apiKey: string }>;
+    const { apiKey, account, ...rest } = simple;
+    config = {
+      ...rest,
+      account: account === undefined ? "me" : account,
+      auth: { type: "account_key", apiKey },
+    };
+  } else {
+    config = input as Exclude<BharosaConfig, { apiKey: string }>;
+  }
   const customTransport = config?.transport !== undefined;
   if (!customTransport) assertServer();
   keys(config, [
@@ -174,7 +202,12 @@ export function createTransport(config: BharosaConfig) {
     config.allowLocalhostHttp === undefined ||
       typeof config.allowLocalhostHttp === "boolean",
   );
-  const base = origin(config.baseUrl, config.allowLocalhostHttp);
+  const base = origin(
+    config.baseUrl === undefined
+      ? "https://api.bharosa.finance"
+      : config.baseUrl,
+    config.allowLocalhostHttp,
+  );
   check(
     valid(operations.retrieve_account.parameters[0].schema, config.account),
   );
@@ -197,7 +230,7 @@ export function createTransport(config: BharosaConfig) {
     );
     headers = Object.freeze({
       Authorization: "Bearer " + a.apiKey,
-      ...(a.type === "delegated_application"
+      ...(a.type === "delegated_application" && !marketOnly
         ? { "Bharosa-User-Authorization": "Bearer " + a.userAccessToken }
         : {}),
       Accept: "application/json",
@@ -227,12 +260,37 @@ export function createTransport(config: BharosaConfig) {
     opts: RequestOptions = {},
   ): Promise<OperationResults[K]> => {
     const op = operations[id];
+    if (
+      marketOnly &&
+      ![
+        "monthly_nav",
+        "monthly_expense",
+        "monthly_portfolio",
+        "monthly_holdings",
+        "monthly_valuation",
+        "fund_references",
+        "analytics_scheme",
+        "analytics_category",
+        "searchMarketSchemes",
+      ].includes(id)
+    ) {
+      throw Object.assign(new ValidationError(), {
+        code: "market_only_operation",
+      });
+    }
     let o, serialized, url;
     try {
       o = options(opts);
       const supplied: Record<string, unknown> = { account, ...params };
       const query = new URLSearchParams();
-      let path = op.path;
+      let path = marketOnly
+        ? op.path.replace(
+            "/v1/accounts/{account}/market-data",
+            "/v1/market-data",
+          )
+        : op.path;
+      if (marketOnly && id === "fund_references")
+        path = "/v1/market-data/schemes/references";
       keys(
         params,
         op.parameters

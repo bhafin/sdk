@@ -1,0 +1,753 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Bharosa public market scheme search",
+    "version": "local-candidate"
+  },
+  "paths": {
+    "/v1/market-data/schemes/search": {
+      "get": {
+        "operationId": "searchMarketSchemes",
+        "summary": "Search mutual fund schemes",
+        "description": "Any active API key. Public scheme identities and latest NAV references only; no private account access. Shared market request quota applies. Query must contain 2\u2013100 characters; limit 1\u201320 (default10). No history dates or cursor pagination.",
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "description": "2\u2013100 characters. Case-insensitive label and identifier search; percent and underscore are literal.",
+            "schema": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 100
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "1\u201320; default 10. Search is a bounded result set, not cursor pagination.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20,
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FundsList"
+                },
+                "example": {
+                  "object": "list",
+                  "data": [
+                    {
+                      "instrument": {
+                        "id": "ins_markets_scheme_101",
+                        "object": "instrument",
+                        "created": 1792281600,
+                        "name": "Example Equity Fund \u2014 Direct Growth",
+                        "identifiers": [],
+                        "domicile_country": "IN",
+                        "type": "mutual_fund",
+                        "mutual_fund": {
+                          "fund_name": "Example Equity Fund",
+                          "share_class": "Direct Growth",
+                          "class_currency": "INR",
+                          "distribution_policy": "accumulating"
+                        }
+                      },
+                      "market": "IN",
+                      "currency": "INR",
+                      "scheme_id": "101",
+                      "plan_label": "Direct",
+                      "option_label": "Growth",
+                      "amfi_code": null,
+                      "isin": null,
+                      "identity_status": "resolved",
+                      "latest_nav": {
+                        "amount": "42.125",
+                        "currency": "INR",
+                        "date": "2026-10-16"
+                      },
+                      "data_mode": "live",
+                      "source": "calcengine_market_db",
+                      "freshness": {
+                        "status": "recent",
+                        "checked_at": "2026-10-18T08:00:00Z",
+                        "as_of": "2026-10-18",
+                        "time_zone": "Asia/Kolkata",
+                        "age_days": 2,
+                        "recent_within_days": 3
+                      }
+                    }
+                  ],
+                  "has_more": false,
+                  "url": "/v1/market-data/schemes/search",
+                  "market_data": {
+                    "mode": "live",
+                    "notice": "Reference NAV is separate from entered holdings."
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Any active Bharosa API key; never embed in browser code."
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "x-known-values": [
+                  "authentication_error",
+                  "permission_error",
+                  "idempotency_error",
+                  "rate_limit_error",
+                  "api_error",
+                  "invalid_request_error"
+                ],
+                "minLength": 1
+              },
+              "code": {
+                "type": "string",
+                "minLength": 1
+              },
+              "message": {
+                "type": "string"
+              },
+              "param": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "request_id": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "type",
+              "code",
+              "message",
+              "param",
+              "request_id"
+            ],
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "additionalProperties": true
+      },
+      "FundsList": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "const": "list"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FundReference"
+            }
+          },
+          "has_more": {
+            "type": "boolean"
+          },
+          "url": {
+            "type": "string"
+          },
+          "market_data": {
+            "$ref": "#/components/schemas/MarketData"
+          }
+        },
+        "required": [
+          "object",
+          "data",
+          "has_more",
+          "url",
+          "market_data"
+        ],
+        "additionalProperties": true
+      },
+      "MarketData": {
+        "type": "object",
+        "properties": {
+          "mode": {
+            "type": "string",
+            "x-known-values": [
+              "live",
+              "fixture",
+              "unavailable"
+            ],
+            "minLength": 1
+          },
+          "notice": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "mode",
+          "notice"
+        ],
+        "additionalProperties": true
+      },
+      "FundReference": {
+        "type": "object",
+        "properties": {
+          "instrument": {
+            "$ref": "#/components/schemas/Instrument"
+          },
+          "market": {
+            "const": "IN"
+          },
+          "currency": {
+            "const": "INR"
+          },
+          "scheme_id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Opaque catalogue identifier; production bridge accepts validated positive decimal scheme IDs, fixture IDs are not DB IDs."
+          },
+          "plan_label": {
+            "type": "string"
+          },
+          "option_label": {
+            "type": "string"
+          },
+          "amfi_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "isin": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "identity_status": {
+            "type": "string",
+            "x-known-values": [
+              "resolved",
+              "conflict"
+            ],
+            "minLength": 1
+          },
+          "latest_nav": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "amount": {
+                    "type": "string",
+                    "pattern": "^(0|[1-9][0-9]{0,19})(\\.[0-9]{1,18})?$"
+                  },
+                  "currency": {
+                    "const": "INR"
+                  },
+                  "date": {
+                    "type": "string",
+                    "format": "date",
+                    "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                    "description": "Real calendar date, 1900-01-01 through today Asia/Kolkata; replacement cannot move backwards."
+                  }
+                },
+                "required": [
+                  "amount",
+                  "currency",
+                  "date"
+                ],
+                "additionalProperties": true
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "data_mode": {
+            "type": "string",
+            "x-known-values": [
+              "live",
+              "fixture"
+            ],
+            "minLength": 1
+          },
+          "source": {
+            "type": "string"
+          },
+          "freshness": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "string",
+                "x-known-values": [
+                  "recent",
+                  "stale",
+                  "missing",
+                  "invalid",
+                  "fixture"
+                ],
+                "minLength": 1
+              },
+              "checked_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "as_of": {
+                "type": "string",
+                "format": "date",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                "description": "Real calendar date, 1900-01-01 through today Asia/Kolkata; replacement cannot move backwards."
+              },
+              "time_zone": {
+                "const": "Asia/Kolkata"
+              },
+              "age_days": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "recent_within_days": {
+                "const": 3
+              }
+            },
+            "required": [
+              "status",
+              "checked_at",
+              "as_of",
+              "time_zone",
+              "age_days",
+              "recent_within_days"
+            ],
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "instrument",
+          "market",
+          "currency",
+          "scheme_id",
+          "plan_label",
+          "option_label",
+          "amfi_code",
+          "isin",
+          "identity_status",
+          "latest_nav",
+          "data_mode",
+          "source",
+          "freshness"
+        ],
+        "additionalProperties": true
+      },
+      "Instrument": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^ins_[A-Za-z0-9_-]{1,150}$"
+          },
+          "object": {
+            "const": "instrument"
+          },
+          "created": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "pattern": "\\S"
+          },
+          "identifiers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "namespace": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "namespace",
+                "value"
+              ],
+              "additionalProperties": true
+            }
+          },
+          "domicile_country": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "type": {
+            "const": "mutual_fund"
+          },
+          "mutual_fund": {
+            "type": "object",
+            "properties": {
+              "fund_name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200,
+                "pattern": "\\S"
+              },
+              "share_class": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "class_currency": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "distribution_policy": {
+                "type": "string",
+                "x-known-values": [
+                  "accumulating",
+                  "distributing",
+                  "unknown"
+                ],
+                "minLength": 1
+              }
+            },
+            "required": [
+              "fund_name",
+              "share_class",
+              "class_currency",
+              "distribution_policy"
+            ],
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "id",
+          "object",
+          "created",
+          "name",
+          "identifiers",
+          "domicile_country",
+          "type",
+          "mutual_fund"
+        ],
+        "additionalProperties": true
+      }
+    }
+  }
+}

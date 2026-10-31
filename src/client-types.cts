@@ -1,3 +1,4 @@
+import type * as A from "./analytics-types.cjs";
 import type { MonthlyMarketClient } from "./monthly-types.cjs";
 import type {
   MarketDataClient,
@@ -50,12 +51,13 @@ export interface BharosaTransport {
   send(url: string, request: RequestInit): Promise<Response>;
 }
 interface BharosaBaseConfig {
-  readonly baseUrl: string;
+  /** Defaults to https://api.bharosa.finance. Explicit overrides must be valid origins. */
+  readonly baseUrl?: string;
   readonly account: string;
   readonly allowLocalhostHttp?: boolean;
   readonly maxResponseBytes?: number;
 }
-export type BharosaConfig = BharosaBaseConfig &
+type LegacyBharosaConfig = BharosaBaseConfig &
   (
     | {
         readonly auth: Auth;
@@ -68,6 +70,17 @@ export type BharosaConfig = BharosaBaseConfig &
         readonly fetch?: never;
       }
   );
+/** Simple server-side API-key configuration. Account access remains server-authorized. */
+export type BharosaConfig = LegacyBharosaConfig | {
+  readonly apiKey: string;
+  readonly account?: string;
+  readonly baseUrl?: string;
+  readonly allowLocalhostHttp?: boolean;
+  readonly maxResponseBytes?: number;
+  readonly fetch?: typeof globalThis.fetch;
+  readonly auth?: never;
+  readonly transport?: never;
+};
 export interface RequestOptions {
   idempotencyKey?: string;
   signal?: AbortSignal;
@@ -231,7 +244,17 @@ export type FundObjectReferences = Omit<Fields<FundReferences>, "data"> & {
 };
 export interface ClientSurface {
   readonly marketSnapshots: MonthlyMarketClient;
+  readonly fundCategories: {
+    readonly statistics: A.AnalyticsResource<
+      A.CategorySelection,
+      A.CategoryStatistics
+    >;
+  };
   readonly mutualFundSchemes: {
+    readonly performance: A.AnalyticsResource<
+      A.PerformanceSelection,
+      A.SchemePerformance
+    >;
     readonly navs: { readonly retrieve: MonthlyMarketClient["schemes"]["nav"] };
     readonly expenseRatios: {
       readonly retrieve: MonthlyMarketClient["schemes"]["expenseRatio"];

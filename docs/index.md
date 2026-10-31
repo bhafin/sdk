@@ -1,8 +1,8 @@
 # Bharosa SDK guides
 
-Build a Node.js integration with the Bharosa resource API. This SDK is not yet published on npm; install it from a local archive. Ask your service operator for API access separately.
+Build a Node.js integration with the Bharosa resource API. Install the published SDK with `npm install bharosa`. Use an API key for baseline market data and optional authorized own-account access; other users' accounts require OAuth consent.
 
-1. [Install locally and make your first request](getting-started.md).
+1. [Install and make your first request](getting-started.md).
 2. [Work with portfolios and mixes](portfolios.md).
 3. [Handle errors, cancellation, and retries](reliability.md).
 4. [Use monthly market snapshots](monthly-market-data.md).

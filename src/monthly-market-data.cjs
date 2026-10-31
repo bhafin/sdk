@@ -29,12 +29,13 @@ module.exports = {
         {
           "name": "as_of",
           "in": "query",
-          "required": true,
+          "required": false,
           "schema": {
             "type": "string",
             "format": "date",
             "pattern": "^[0-9]{4}-[0-9]{2}-01$"
-          }
+          },
+          "description": "Omit for latest NAV on or before today in Asia/Kolkata. When supplied, must be the first of a month and not in the future. Actual observation date is returned separately."
         }
       ],
       "response": {

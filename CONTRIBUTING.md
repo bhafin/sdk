@@ -1,6 +1,6 @@
 # Contributing
 
-This is an unpublished SDK under local preparation. Keep changes limited to the client, public contracts, documentation, and synthetic tests. Do not copy API implementation, analytics code, provider data, credentials, or internal operational notes into this repository.
+This repository contains the published Bharosa SDK. Keep changes limited to the client, public contracts, documentation, and synthetic tests. Do not copy API implementation, analytics code, provider data, credentials, or internal operational notes into this repository.
 
 ## Development
 

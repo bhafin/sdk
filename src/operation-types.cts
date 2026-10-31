@@ -1,9 +1,13 @@
+import type * as A from "./analytics-types.cjs";
 import type * as S from "./monthly-types.cjs";
 import type * as M from "./models.cjs";
 import type * as D from "./market-types.cjs";
 import type { CurrentMixEvidence } from "./client-types.cjs";
 /** Each entry is the decoded response of the corresponding generated operation. */
 export interface OperationResults {
+  searchMarketSchemes: M.FundsList;
+  analytics_scheme: A.SchemePerformance;
+  analytics_category: A.CategoryStatistics;
   monthly_nav: S.MarketSnapshot<D.NavObservation>;
   monthly_expense: S.MarketSnapshot<D.ExpenseObservation>;
   monthly_portfolio: S.MarketSnapshot<D.FundPortfolio>;

@@ -68,6 +68,10 @@ export function responseMatches(
     )
       return false;
   }
+  if (id === "searchMarketSchemes") {
+    const page = rows(d("data"));
+    if (d("url") !== op.path || page.length > (typeof params.limit === "number" ? params.limit : 10) || (d("has_more") === true && page.length === 0)) return false;
+  }
   if (op.marketData) {
     if (id.endsWith("_get") && d("id") !== params.id) return false;
     if (
@@ -157,11 +161,100 @@ export function responseMatches(
       d("valuation_date") !== b("valuation_date"))
   )
     return false;
+  if (id.startsWith("analytics_")) {
+    if (id === "analytics_aum") {
+      if (
+        d("requested_date") !== params.as_of ||
+        (d("observation_date") !== null &&
+          String(d("observation_date")) > String(params.as_of))
+      )
+        return false;
+      if (
+        d("status") === "available" &&
+        field(d("data"), "basis") === "reported_fund_total" &&
+        field(field(d("data"), "source"), "date") !== d("observation_date")
+      )
+        return false;
+      if (
+        d("status") === "available" &&
+        (field(d("data"), "fund_id") !== params.id ||
+          field(d("data"), "date") !== d("observation_date") ||
+          String(d("observation_date")) > String(params.as_of))
+      )
+        return false;
+    } else {
+      if (d("requested_as_of") !== params.as_of) return false;
+      const identity =
+        id === "analytics_scheme"
+          ? "scheme_id"
+          : id === "analytics_portfolio"
+            ? "portfolio_id"
+            : "category";
+      if (d(identity) !== params.id) return false;
+      if (id === "analytics_category") {
+        if (
+          d("cohort", "plan") !== (params.plan ?? "direct") ||
+          d("cohort", "option") !== (params.option ?? "growth")
+        )
+          return false;
+        const requested = String(
+          params.metrics ?? "return",
+        ).split(",");
+        const expected = requested.flatMap((m) =>
+          m === "return"
+            ? String(params.periods ?? "1y,3y,5y")
+                .split(",")
+                .map((p) => "return_" + p)
+            : [m],
+        );
+        for (const key of expected) {
+          const metric = d("metrics", key);
+          if (!record(metric)) return false;
+          const eligible = Number(field(metric, "eligible_count")),
+            valid = Number(field(metric, "valid_count"));
+          const excluded = [
+            "missing_count",
+            "stale_count",
+            "invalid_count",
+          ].reduce((n, k) => n + Number(field(metric, k)), 0);
+          if (
+            eligible !== d("cohort", "fund_count") ||
+            valid + excluded !== eligible
+          )
+            return false;
+          if (
+            field(metric, "status") === "available" &&
+            (valid < 3 || valid * 100 < eligible * 80)
+          )
+            return false;
+        }
+      }
+      if (id !== "analytics_category") {
+        const expected = String(params.periods ?? "1y,3y,5y").split(",");
+        const got = rows(d("periods"));
+        if (
+          got.length !== expected.length ||
+          got.some(
+            (p, i) =>
+              field(p, "period") !== expected[i] ||
+              field(p, "requested_end") !== params.as_of ||
+              (id === "analytics_scheme" &&
+                (later(
+                  field(p, "start_observation_date"),
+                  field(p, "requested_start"),
+                ) ||
+                  later(field(p, "end_observation_date"), params.as_of))),
+          )
+        )
+          return false;
+      }
+    }
+  }
   if (id.startsWith("monthly_") && id !== "monthly_valuation") {
     const observation = d("observation_date"),
       requested = d("requested_date"),
       data = d("data");
-    if (requested !== params.as_of) return false;
+    if (!(id === "monthly_nav" && params.as_of === undefined) && requested !== params.as_of) return false;
     if (d("status") === "available") {
       if (
         typeof observation !== "string" ||

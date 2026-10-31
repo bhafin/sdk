@@ -254,3 +254,47 @@ async function lifecycleConsumer(client: import("bharosa").Bharosa) {
   await client.portfolios.update(renamed.id, { name: "Other", expected_name: "Family goals" });
 }
 void lifecycleConsumer;
+
+// Growth-only additive surface; deferred APIs must not appear in the package.
+declare const growthClient: import("bharosa").Bharosa;
+void growthClient.mutualFundSchemes.performance.retrieve("11",{asOf:"2026-10-01",periods:["1y"]});
+void growthClient.fundCategories.statistics.retrieve("equity",{asOf:"2026-10-01",metrics:["return"]});
+// @ts-expect-error AUM is not part of the Growth-return slice.
+void growthClient.mutualFunds.aum;
+// @ts-expect-error Investor monetary returns require the separate ledger release.
+void growthClient.portfolios.performance;
+// @ts-expect-error Category TER is not a supported metric in this slice.
+void growthClient.fundCategories.statistics.retrieve("equity",{asOf:"2026-10-01",metrics:["expense_ratio"]});
+
+// Deferred capability types must not imply a shipped API.
+// @ts-expect-error Investor monetary performance is deferred.
+import type { PortfolioPerformance } from "bharosa";
+// @ts-expect-error Fund AUM is deferred.
+import type { FundAum } from "bharosa";
+
+import { BharosaMarket } from "bharosa";
+const defaultOriginAccount = new Bharosa({
+  account: "acct_0123456789abcdef0123456789abcdef",
+  auth: { type: "account_key", apiKey: "synthetic-key" },
+});
+const defaultOriginMarket = new BharosaMarket({ apiKey: "synthetic-key" });
+void defaultOriginAccount; void defaultOriginMarket;
+
+const simpleKeyClient = new Bharosa({apiKey:"synthetic"});
+void simpleKeyClient;
+// @ts-expect-error API key shorthand cannot mix legacy authentication
+new Bharosa({apiKey:"synthetic",auth:{type:"account_key",apiKey:"other"},account:"me"});
+
+void simpleKeyClient.markets.schemes.nav("45139",{asOf:"2026-10-01"});
+
+void simpleKeyClient.markets.schemes.nav("45139");
+
+void simpleKeyClient.mutualFundSchemes.navs.retrieve("45139");
+void simpleKeyClient.markets.schemes.search({query:'equity',limit:5}).then(result => {
+ const id: string | undefined = result.data[0]?.scheme_id;
+ void id;
+});
+// @ts-expect-error Search does not support historical selection.
+void simpleKeyClient.markets.schemes.search({query:'equity',asOf:'2026-10-01'});
+// @ts-expect-error Search is bounded, not cursor paginated.
+void simpleKeyClient.markets.schemes.search({query:'equity',startingAfter:'101'});

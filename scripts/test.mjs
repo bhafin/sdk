@@ -4,7 +4,9 @@ const run = (args) => {
   const r = spawnSync(process.execPath, args, { stdio: "inherit" });
   if (r.status !== 0) process.exit(r.status ?? 1);
 };
+run(["scripts/generate-market-search.mjs", "--check"]);
 run(["scripts/generate-monthly.mjs", "--check"]);
+run(["scripts/generate-analytics.mjs", "--check"]);
 run(["tooling/node_modules/typescript/bin/tsc", "-p", "tsconfig.test.json"]);
 for (const name of fs.readdirSync("test"))
   if (name.endsWith(".json"))

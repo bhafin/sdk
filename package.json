@@ -1,6 +1,6 @@
 {
   "name": "bharosa",
-  "version": "0.2.0",
+  "version": "0.7.0",
   "private": false,
   "description": "Typed Bharosa resource SDK with server credentials or caller-owned transport.",
   "license": "MIT",
@@ -44,7 +44,9 @@
     "SECURITY.md",
     "CHANGELOG.md",
     "FIRST-PARTY-CONTRACT-SHA256",
-    "MONTHLY-MARKET-CONTRACT-SHA256"
+    "MONTHLY-MARKET-CONTRACT-SHA256",
+    "ANALYTICS-CONTRACT-SHA256",
+    "MARKET-SEARCH-CONTRACT-SHA256"
   ],
   "scripts": {
     "build": "node scripts/build.mjs",
@@ -58,7 +60,11 @@
     "check:first-party": "node scripts/generate-first-party.mjs --check",
     "typecheck": "node tooling/node_modules/typescript/bin/tsc --noEmit && node tooling/node_modules/typescript/bin/tsc -p tsconfig.test.json --noEmit && node tooling/node_modules/typescript/bin/tsc --noEmit --strict --target ES2022 --module NodeNext --moduleResolution NodeNext --typeRoots tooling/node_modules/@types test/api-compatibility.ts",
     "generate:monthly": "node scripts/generate-monthly.mjs",
-    "check:monthly": "node scripts/generate-monthly.mjs --check"
+    "check:monthly": "node scripts/generate-monthly.mjs --check",
+    "generate:analytics": "node scripts/generate-analytics.mjs",
+    "check:analytics": "node scripts/generate-analytics.mjs --check",
+    "generate:market-search": "node scripts/generate-market-search.mjs",
+    "check:market-search": "node scripts/generate-market-search.mjs --check"
   },
   "publishConfig": {
     "access": "public",

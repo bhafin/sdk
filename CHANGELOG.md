@@ -1,17 +1,54 @@
+# 0.7.0 — 31 October 2026
+
+Added baseline scheme performance, category statistics, instrument references and caller-supplied scheme valuation. Existing pure-market methods remain compatible. Private portfolio authorization is unchanged. Matching API permission correction deployed in revision 10.
+
 # Changelog
 
-## 0.2.0 — 30 October 2026
+## 0.6.0
+
+Add `markets.schemes.search` and compatible `BharosaMarket.schemes.search` using the canonical account-independent search route. Keep private search and historical methods unchanged. Correct the getting-started example to use an API key without a required account ID.
+
+
+## 0.5.1
+
+Documentation-only correction: use normal npm installation and released status, describe deployed unified-key/latest-NAV access, and remove stale preview wording. Runtime, public types, contracts and dependencies are unchanged from 0.5.0.
+
+## 0.5.0 — 31 October 2026
+
+Add `new Bharosa({ apiKey })` and `client.markets` for baseline market access. Support latest NAV by omitting the date on baseline and account-scoped NAV methods. Preserve existing auth forms, private authorization, production API origin and monthly limits on explicit historical dates.
+
+## 0.4.0 — 30 October 2026
+
+Add account-scoped Growth scheme performance and category return statistics. Preserve the api.bharosa.finance default introduced in 0.3.3 and explicit overrides. No investor monetary-performance, fund-AUM or stated-TER methods.
+
+## 0.3.3 — 30 October 2026
+
+Change the default API origin to https://api.bharosa.finance. No analytics changes.
+
+## 0.3.2 — 30 October 2026
+
+Default omitted or undefined `baseUrl` to `https://app.bharosa.finance` in Bharosa and BharosaMarket. Preserve explicit overrides, origin validation, redirect rejection and credential boundaries. Remove required origin setup from beginner examples. No analytics additions or API changes.
+
+## 0.3.1 — 30 October 2026
+
+Correct stale publication and activation wording in the README and portfolio guide. Runtime code, API contracts, exports and dependencies are byte-identical to 0.3.0.
+
+## 0.3.0 — published 30 October 2026
+
+Adds server-side BharosaMarket for four authenticated registered-app monthly market operations without an investor token or account argument. Production market-key support is active at app.bharosa.finance in the production environment. Includes the portfolio lifecycle changes below; no analytics additions or general OAuth provisioning.
+
+## Lifecycle changes — included in 0.3.0 (0.2.0 was not published)
 
 - Add `portfolios.update(id, { name, expected_name }, { idempotencyKey })` for account-scoped, name-only updates, with optimistic name comparison and validated response identity. Holdings and snapshots remain unchanged.
 - Accept `positions: []` when creating a saved portfolio. Empty portfolio analysis remains unavailable until holdings exist.
 - Clarify that monthly market reads require authenticated account-read access without a separate market-data approval.
 - Preserve existing methods, exports, authentication, quantity precision, and analytics implementation. Requires a companion API with portfolio lifecycle support; package preparation does not establish production availability.
 
-The entries below retain historical preparation notes from the published 0.1.0 package. They are not additional changes in 0.2.0.
+The entries below are archived preparation notes retained for provenance, not current installation or release instructions. Their historical “unreleased” and “pending” labels describe preparation at that time.
 
-## 0.1.0 — release candidate
+## 0.1.0 — published
 
-Prepared for the first npm release; publication is pending registry authentication and verification. API deployment and external consent activation are separate.
+Initial npm release. API deployment and external consent activation are separate.
 
 - Typed Node.js client with ESM/CommonJS exports, account-scoped direct/delegated authentication, and 17 public resource operations.
 - Portfolio asset, sector, and issuer mix methods for saved and in-memory targets, with MutualFund conveniences delegated to their underlying Portfolio.

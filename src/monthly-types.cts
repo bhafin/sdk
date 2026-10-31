@@ -18,7 +18,7 @@ export interface MonthlyMarketClient {
   schemes: {
     nav(
       id: string,
-      query: MonthSelection,
+      query?: Partial<MonthSelection>,
       options?: RequestOptions,
     ): Promise<MarketSnapshot<D.NavObservation>>;
     expenseRatio(
