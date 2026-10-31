@@ -1,5 +1,6 @@
 export {
   Bharosa,
+  BharosaMarket,
   BharosaError,
   ValidationError,
   APIError,

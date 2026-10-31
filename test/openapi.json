@@ -2681,7 +2681,7 @@
       "post": {
         "operationId": "create_portfolio",
         "summary": "Create a portfolio",
-        "description": "Save a portfolio for an existing investor, together with a manual investment account and the first dated snapshot of entered positions. The operation returns those records together so you can display the saved holdings and retain the snapshot ID for editing.",
+        "description": "Local integration candidate: positions may be empty to save a named portfolio before adding holdings. Save a portfolio for an existing investor, together with a manual investment account and the first dated snapshot of entered positions. The operation returns those records together so you can display the saved holdings and retain the snapshot ID for editing.",
         "x-required-scope": "portfolios:write",
         "x-auth-mode-rules": "Direct key only OR delegated application key + same-client active user grant; reject mixtures and invalid supplied credentials. See reviewed-contract.md.",
         "security": [
@@ -3148,6 +3148,346 @@
             }
           }
         ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Portfolio"
+                },
+                "example": {
+                  "id": "ptf_0123456789abcdef0123456789abcdef",
+                  "object": "portfolio",
+                  "created": 1792281600,
+                  "account": "acct_0123456789abcdef0123456789abcdef",
+                  "investor": "inv_0123456789abcdef0123456789abcdef",
+                  "name": "Long-term savings",
+                  "reporting_currency": "INR"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "See reviewed-contract.md for stable status/code and recovery semantics.",
+            "headers": {
+              "Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "update_portfolio",
+        "summary": "Rename a portfolio",
+        "description": "Local integration candidate, not deployed: change only a saved portfolio name. Supply the exact stored expected_name and retain the idempotency key for unchanged retries. Stale names return portfolio_name_conflict; holdings and snapshots are unchanged.",
+        "x-required-scope": "portfolios:write",
+        "x-auth-mode-rules": "Direct key only OR delegated application key + same-client active user grant; reject mixtures and invalid supplied credentials. See reviewed-contract.md.",
+        "security": [
+          {
+            "DirectAccountKey": []
+          },
+          {
+            "DelegatedApplicationKey": [],
+            "DelegatedUserToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "account",
+            "in": "path",
+            "required": true,
+            "description": "Authorized account. me resolves the account bound to the account-owned key or delegated grant, never an arbitrary user account.",
+            "schema": {
+              "anyOf": [
+                {
+                  "const": "me"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^acct_[a-f0-9]{32}$"
+                }
+              ]
+            }
+          },
+          {
+            "name": "portfolio",
+            "in": "path",
+            "required": true,
+            "description": "ID returned by the portfolios list or creation response.",
+            "schema": {
+              "type": "string",
+              "pattern": "^ptf_[a-f0-9]{32}$"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[!-~]{1,255}$"
+            },
+            "description": "Successful responses retained for 24 hours from server recording time; response record and mutation commit atomically. Retries do not extend retention; current authorization always required before replay."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PortfolioUpdate"
+              },
+              "example": {
+                "name": "Long-term savings",
+                "expected_name": "Previous name"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK",
@@ -8721,6 +9061,28 @@
         "additionalProperties": false,
         "minProperties": 1
       },
+      "PortfolioUpdate": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "pattern": "\\S"
+          },
+          "expected_name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "pattern": "\\S"
+          }
+        },
+        "required": [
+          "name",
+          "expected_name"
+        ],
+        "additionalProperties": false
+      },
       "PortfolioCreate": {
         "type": "object",
         "properties": {
@@ -8745,7 +9107,7 @@
             "items": {
               "$ref": "#/components/schemas/CreationPositionInput"
             },
-            "minItems": 1,
+            "minItems": 0,
             "maxItems": 100
           }
         },

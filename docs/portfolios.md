@@ -87,4 +87,20 @@ The earlier singular `client` option remains supported, but cannot be combined w
 
 `await client.accounts.retrieve()` uses the account configured on the SDK; no repeated account ID is needed. Its nullable `personal_client_id` identifies the authenticated human's linked household, not a new family resource or an access grant. Machine account keys receive null because they do not identify a signed-in person. A null link must not be replaced by guessing from a client name or account owner. The prelaunch public account response no longer exposes the internal `owner` user ID; ownership remains enforced on the server.
 
-Units-first portfolio creation (local, unreleased): `portfolios.create` accepts an initial position with either `current_value` or positive `quantity`, never both, using the supplied `as_of` date. Existing amount requests and amount-only responses remain unchanged. Supplied units are stored atomically without requiring a NAV. Snapshot `quantity` can now be a decimal string and `valuation` can be null; `total_current_value` is null when any snapshot position lacks a reported amount, and `valuation_basis` is `supplied_quantity`. Consumers of general snapshot reads must handle these new nullable values; this is an intentional prelaunch type widening. Older SDKs cannot read units-only snapshots. Snapshot replacement and in-memory analytics remain amount-only. No public package release or availability change is implied.
+Units-first portfolio creation: `portfolios.create` accepts an initial position with either `current_value` or positive `quantity`, never both, using the supplied `as_of` date. Existing amount requests and amount-only responses remain unchanged. Supplied units are stored atomically without requiring a NAV. Snapshot `quantity` can now be a decimal string and `valuation` can be null; `total_current_value` is null when any snapshot position lacks a reported amount, and `valuation_basis` is `supplied_quantity`. Consumers of general snapshot reads must handle these new nullable values; this is an intentional prelaunch type widening. Older SDKs cannot read units-only snapshots. Snapshot replacement and in-memory analytics remain amount-only. These shapes are included in the published SDK.
+
+## Empty creation and name updates (SDK 0.3.0)
+
+The companion API accepts `positions: []` in `portfolios.create`. It persists a portfolio, investment account and zero-position snapshot immediately. Add the first holding afterward through the returned portfolio's `holdings.setCurrent` method. Cancellation before creation sends no request.
+
+```ts
+const renamed = await bharosa.portfolios.update(
+  portfolio.id,
+  { name: 'Family goals', expected_name: portfolio.name },
+  { idempotencyKey: renameAttemptKey },
+);
+```
+
+Use a fresh key for a new operation and the same key for an unchanged retry. Names must contain non-whitespace text and be at most 200 characters; the API trims the new name. `expected_name` must equal the stored name exactly. A concurrent rename returns `portfolio_name_conflict`; reload before deliberately retrying with the latest name. This compares names, not a general resource revision. Replaying a completed key returns its original receipt even if a later rename occurred. The operation returns a Portfolio and changes no holdings or snapshots. Existing account authorization and write-scope restrictions still apply; caller-owned transport does not grant access. These methods require an API deployment with portfolio lifecycle support.
+
+An empty saved portfolio is valid. Mix calculations return HTTP 422 `portfolio_empty` until the selected snapshot/current view contains holdings. Treat this as an unavailable analysis state: “Your portfolio is saved. Add a holding to see its analysis.” Do not retry creation. An empty in-memory calculation remains invalid input. Current holdings added later do not rewrite the original empty snapshot; use the supported current view or save a nonempty snapshot for snapshot-based analysis.

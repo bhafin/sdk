@@ -67,7 +67,9 @@ export function valid(s: Schema | undefined, v: unknown, depth = 0): boolean {
         keys.every((k) =>
           Object.hasOwn(s.properties ?? {}, k)
             ? valid(s.properties?.[k], v[k], depth + 1)
-            : s.additionalProperties !== false,
+            : typeof s.additionalProperties === "object"
+              ? valid(s.additionalProperties, v[k], depth + 1)
+              : s.additionalProperties !== false,
         )
       );
     }

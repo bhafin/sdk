@@ -8,9 +8,9 @@
     "/v1/accounts/{account}/market-data/schemes/{id}/navs": {
       "get": {
         "operationId": "monthly_nav",
-        "x-availability": "first_party_or_configured_monthly_market_data",
+        "x-availability": "authenticated_monthly_market_data",
         "x-sdk-method": "mutualFundSchemes.navs.retrieve",
-        "description": "Requires a first-party browser session or an external credential with explicit server-configured monthly market-data capability, plus active account authorization. This surface applies monthly history limits to all callers. Backward-as-of monthly snapshot; local implementation, not deployment.",
+        "description": "Active API keys require no account permission. Legacy account segment does not select an account for market data. Explicit user tokens remain validated; OAuth bearer-only compatibility retains consent checks. Authorization correction deployed in API revision 10.",
         "parameters": [
           {
             "name": "account",
@@ -33,12 +33,13 @@
           {
             "name": "as_of",
             "in": "query",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "string",
               "format": "date",
               "pattern": "^[0-9]{4}-[0-9]{2}-01$"
-            }
+            },
+            "description": "Omit for latest NAV on or before today in Asia/Kolkata. When supplied, must be the first of a month and not in the future. Actual observation date is returned separately."
           }
         ],
         "responses": {
@@ -158,15 +159,24 @@
               }
             }
           }
+        },
+        "x-required-scope": "market:read",
+        "x-authorization-correction": "deployed_api_revision_10",
+        "x-release-evidence": {
+          "api_task_revision": 10,
+          "api_source_commit": "a5d72da4fa3749af6b81f3f02c48cf1f6d85e450",
+          "api_image_digest": "sha256:888c36a927adf75036b54a8b090970ced1de4790c79dcfaffcc71098d5eec82f",
+          "sdk_introduced": "0.7.0",
+          "authenticated_positive_verification": "pending_separate_trial"
         }
       }
     },
     "/v1/accounts/{account}/market-data/schemes/{id}/expense-ratios": {
       "get": {
         "operationId": "monthly_expense",
-        "x-availability": "first_party_or_configured_monthly_market_data",
+        "x-availability": "authenticated_monthly_market_data",
         "x-sdk-method": "mutualFundSchemes.expenseRatios.retrieve",
-        "description": "Requires a first-party browser session or an external credential with explicit server-configured monthly market-data capability, plus active account authorization. This surface applies monthly history limits to all callers. Backward-as-of monthly snapshot; local implementation, not deployment.",
+        "description": "Active API keys require no account permission. Legacy account segment does not select an account for market data. Explicit user tokens remain validated; OAuth bearer-only compatibility retains consent checks. Authorization correction deployed in API revision 10.",
         "parameters": [
           {
             "name": "account",
@@ -317,15 +327,24 @@
               }
             }
           }
+        },
+        "x-required-scope": "market:read",
+        "x-authorization-correction": "deployed_api_revision_10",
+        "x-release-evidence": {
+          "api_task_revision": 10,
+          "api_source_commit": "a5d72da4fa3749af6b81f3f02c48cf1f6d85e450",
+          "api_image_digest": "sha256:888c36a927adf75036b54a8b090970ced1de4790c79dcfaffcc71098d5eec82f",
+          "sdk_introduced": "0.7.0",
+          "authenticated_positive_verification": "pending_separate_trial"
         }
       }
     },
     "/v1/accounts/{account}/market-data/funds/{id}/portfolios": {
       "get": {
         "operationId": "monthly_portfolio",
-        "x-availability": "first_party_or_configured_monthly_market_data",
+        "x-availability": "authenticated_monthly_market_data",
         "x-sdk-method": "mutualFunds.portfolios.retrieve",
-        "description": "Requires a first-party browser session or an external credential with explicit server-configured monthly market-data capability, plus active account authorization. This surface applies monthly history limits to all callers. Backward-as-of monthly snapshot; local implementation, not deployment.",
+        "description": "Active API keys require no account permission. Legacy account segment does not select an account for market data. Explicit user tokens remain validated; OAuth bearer-only compatibility retains consent checks. Authorization correction deployed in API revision 10.",
         "parameters": [
           {
             "name": "account",
@@ -465,15 +484,24 @@
               }
             }
           }
+        },
+        "x-required-scope": "market:read",
+        "x-authorization-correction": "deployed_api_revision_10",
+        "x-release-evidence": {
+          "api_task_revision": 10,
+          "api_source_commit": "a5d72da4fa3749af6b81f3f02c48cf1f6d85e450",
+          "api_image_digest": "sha256:888c36a927adf75036b54a8b090970ced1de4790c79dcfaffcc71098d5eec82f",
+          "sdk_introduced": "0.7.0",
+          "authenticated_positive_verification": "pending_separate_trial"
         }
       }
     },
     "/v1/accounts/{account}/market-data/funds/{id}/holdings": {
       "get": {
         "operationId": "monthly_holdings",
-        "x-availability": "first_party_or_configured_monthly_market_data",
+        "x-availability": "authenticated_monthly_market_data",
         "x-sdk-method": "mutualFunds.portfolios.holdings.list",
-        "description": "Requires a first-party browser session or an external credential with explicit server-configured monthly market-data capability, plus active account authorization. This surface applies monthly history limits to all callers. Backward-as-of monthly snapshot; local implementation, not deployment.",
+        "description": "Active API keys require no account permission. Legacy account segment does not select an account for market data. Explicit user tokens remain validated; OAuth bearer-only compatibility retains consent checks. Authorization correction deployed in API revision 10.",
         "parameters": [
           {
             "name": "account",
@@ -739,15 +767,24 @@
               }
             }
           }
+        },
+        "x-required-scope": "market:read",
+        "x-authorization-correction": "deployed_api_revision_10",
+        "x-release-evidence": {
+          "api_task_revision": 10,
+          "api_source_commit": "a5d72da4fa3749af6b81f3f02c48cf1f6d85e450",
+          "api_image_digest": "sha256:888c36a927adf75036b54a8b090970ced1de4790c79dcfaffcc71098d5eec82f",
+          "sdk_introduced": "0.7.0",
+          "authenticated_positive_verification": "pending_separate_trial"
         }
       }
     },
     "/v1/accounts/{account}/market-data/valuations": {
       "post": {
         "operationId": "monthly_valuation",
-        "x-availability": "first_party_or_configured_monthly_market_data",
+        "x-availability": "authenticated_monthly_market_data",
         "x-sdk-method": "mutualFundSchemes.valuation",
-        "description": "Latest NAV by default; historical as_of must be a month start for all callers. Requires a first-party browser session or an external credential with explicit server-configured monthly market-data capability, plus active account authorization.",
+        "description": "Active API keys require no account permission. Legacy account segment does not select an account for market data. Explicit user tokens remain validated; OAuth bearer-only compatibility retains consent checks. Authorization correction deployed in API revision 10.",
         "parameters": [
           {
             "name": "account",
@@ -1115,7 +1152,16 @@
             }
           }
         },
-        "x-read-only": true
+        "x-read-only": true,
+        "x-required-scope": "market:read",
+        "x-authorization-correction": "deployed_api_revision_10",
+        "x-release-evidence": {
+          "api_task_revision": 10,
+          "api_source_commit": "a5d72da4fa3749af6b81f3f02c48cf1f6d85e450",
+          "api_image_digest": "sha256:888c36a927adf75036b54a8b090970ced1de4790c79dcfaffcc71098d5eec82f",
+          "sdk_introduced": "0.7.0",
+          "authenticated_positive_verification": "pending_separate_trial"
+        }
       }
     }
   },

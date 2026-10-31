@@ -2,25 +2,19 @@
 
 A TypeScript client for Bharosa accounts, investors, portfolios, and mutual funds. Use one resource interface from TypeScript, ESM, or CommonJS, with no runtime dependencies.
 
-**Release target:** `bharosa@0.1.0`. Registry publication is pending; use the reviewed local archive until publication is confirmed. You also need an API URL and credentials from the operator of your Bharosa service; installing the SDK does not create an account or grant access.
+**Published on npm:** `bharosa`. Both clients use the production API at `https://api.bharosa.finance` by default. Account access and credentials are still required; installing the SDK does not grant access.
 
 ## Start here
 
-Use Node.js 22.12+ in a supported LTS release. If you have the source checkout, build and pack it:
+Use Node.js 22.12+ in a supported LTS release. Install the SDK in your backend application:
 
 ```sh
-npm --prefix tooling ci --ignore-scripts
-npm run build
-npm pack --pack-destination /absolute/path/to/artifacts
+npm install bharosa
 ```
 
-If the operator supplied a reviewed archive, skip the source build. Install that archive in your backend application:
+Source contributors can build and pack a local archive using the commands in CONTRIBUTING.md.
 
-```sh
-npm install /absolute/path/to/artifacts/bharosa-0.1.0.tgz
-```
-
-Configure your application's API origin, account ID, and account key through its secret manager. Then:
+Configure your API key through your backend secret manager. Every active, unexpired API key has baseline market access; private account calls require the optional account permissions. Then:
 
 ```ts
 import { Bharosa } from "bharosa";
@@ -31,11 +25,11 @@ function required(name: string): string {
   return value;
 }
 const bharosa = new Bharosa({
-  baseUrl: required("BHAROSA_API_BASE_URL"),
-  account: required("BHAROSA_ACCOUNT_ID"),
-  auth: { type: "account_key", apiKey: required("BHAROSA_SECRET_KEY") },
+  apiKey: required("BHAROSA_SECRET_KEY"),
 });
-const account = await bharosa.accounts.retrieve();
+const latestNav = await bharosa.markets.schemes.nav("45139");
+// Optional own-account permission is required for this call:
+// const account = await bharosa.accounts.retrieve();
 ```
 
 The startup check names missing environment variables without printing their values. See the [complete setup guide](docs/getting-started.md) for explicit checks and delegated authentication. CommonJS uses `const { Bharosa } = require("bharosa")`.
@@ -116,10 +110,49 @@ The license covers this SDK. The Bharosa API service, analytics implementation, 
 
 ### Monthly market history and synthetic samples
 
-`client.marketSnapshots` exposes month-start historical market observations and latest NAV valuation without a separate market-data approval step, using authenticated credentials with the required account-read scope. All external credentials, including direct account keys, use monthly historical market dates; investor transaction and position history retains its full dates. See [monthly snapshots](docs/monthly-market-data.md) for actual observation dates, missing data and availability. This local implementation does not activate live access.
+`client.marketSnapshots` exposes month-start historical market observations and latest NAV valuation without a separate market-data approval step, using authenticated credentials with the required account-read scope. All external credentials, including direct account keys, use monthly historical market dates; investor transaction and position history retains its full dates. See [monthly snapshots](docs/monthly-market-data.md) for actual observation dates, missing data and availability. Installing the SDK does not grant account access.
 
 The optional `bharosa/testing` entrypoint supplies fresh, deterministic synthetic portfolios and fictional fund compositions without credentials or network requests. Its seed helper writes only when explicitly called with an authenticated client, confirmed test account, stable run ID and resolved instrument mapping. See [testing samples](docs/testing.md).
 
-Unit precision follow-up (local, unreleased): supplied units accept at most four fractional digits; additional digits are rejected, never truncated. Dated amount conversion rounds once to four places using decimal half-even arithmetic; a positive amount rounding to zero returns `units_below_precision`. Currency and NAV precision are unchanged. Exact historical quantities and provenance remain in stored evidence and read responses; the web marks rounded displays with ≈, shows tiny positive values as <0.0001, and makes a rounded edit draft an explicit correction. Existing zero-unit closure remains supported; initial quantities must be positive. No portfolio reset or data rewrite is required. Canonical marketing reconciliation is coordinated through the parent, with deployment pending.
+Unit precision: supplied units accept at most four fractional digits; additional digits are rejected, never truncated. Dated amount conversion rounds once to four places using decimal half-even arithmetic; a positive amount rounding to zero returns `units_below_precision`. Currency and NAV precision are unchanged. Exact historical quantities and provenance remain in stored evidence and read responses; the web marks rounded displays with ≈, shows tiny positive values as <0.0001, and makes a rounded edit draft an explicit correction. Existing zero-unit closure remains supported; initial quantities must be positive. No portfolio reset or data rewrite is required. 
 
-After installing the archive, run `node node_modules/bharosa/examples/offline-smoke.mjs` for a credential-free synthetic read. This checks installed imports and the transport path without contacting Bharosa or creating data. It does not prove live access. Source-checkout verification commands require contributor files that are intentionally excluded from the runtime archive.
+After installing the package, run `node node_modules/bharosa/examples/offline-smoke.mjs` for a credential-free synthetic read. This checks installed imports and the transport path without contacting Bharosa or creating data. It does not prove live access. Source-checkout verification commands require contributor files that are intentionally excluded from the runtime archive.
+
+### Baseline market access
+
+Use `new Bharosa({ apiKey })` and `client.markets` for account-independent latest NAV and monthly snapshots. Existing `new BharosaMarket({ apiKey })` clients remain compatible. Active, unexpired API keys have baseline market access without an investor OAuth token or a separate market-data approval. Legacy market-only keys still cannot access private accounts. Optional own-account permissions apply only to the key's authorized account; accessing another user's account still requires OAuth consent. Keep all secrets server-side.
+
+### Optional API origin override
+
+Set `baseUrl` only for another deployment or tests. Omitted or `undefined` uses `https://api.bharosa.finance`; invalid explicit values fail validation and never fall back. Overrides must be HTTPS origins without credentials, paths, queries or fragments. Local HTTP also requires `allowLocalhostHttp: true`. The SDK does not read `BHAROSA_API_BASE_URL` automatically.
+
+## Growth performance and category returns
+
+Provides `mutualFundSchemes.performance.retrieve` and `fundCategories.statistics.retrieve` for authenticated market access. See [analytics methods, coverage and limitations](docs/analytics.md). These legacy methods are available in SDK 0.6.0. SDK 0.7.0 also exposes the baseline methods described below. The API permission correction is deployed in revision 10.
+
+## Unified API keys
+
+SDK 0.5.0 introduced `new Bharosa({ apiKey })` and `client.markets`, using the existing account-independent market routes. Omit the NAV selection for latest NAV, or pass `{ asOf: "2026-10-01" }` for a monthly snapshot. Missing observations return `status: "missing"` and `data: null`. Explicit dates must be month starts. The account-scoped NAV method also accepts omission, while keeping account authorization.
+
+Existing `auth` configurations and `BharosaMarket` remain supported. Baseline calls use only the API key; delegated private calls still require user consent and a valid user token. The production origin remains `https://api.bharosa.finance`. Unified-key support is deployed. Private permissions remain optional and are enforced by the server; installing the SDK grants no additional access.
+
+## Find a scheme with baseline market access
+
+```ts
+const choices = await bharosa.markets.schemes.search({ query: "equity", limit: 5 });
+const selected = choices.data[0];
+if (selected) {
+  const nav = await bharosa.markets.schemes.nav(selected.scheme_id);
+  console.log(selected.plan_label, selected.option_label, nav.status);
+}
+```
+
+Choose the intended scheme and plan from the results. `query` must have 2–100 characters, with at least two after trimming; `limit` is 1–20 and defaults to 10. If `has_more` is true, refine the query; search has no cursor or historical date parameter. An empty `data` array is a valid result. Search returns scheme identities and latest NAV references, including freshness and data-mode information. It does not grant private account access. Existing `mutualFunds.search` remains account-scoped. `BharosaMarket` users can call `schemes.search` directly.
+
+Available in SDK 0.6.0 and later, using the account-independent `/v1/market-data/schemes/search` route.
+
+## Baseline analytics and valuation
+
+SDK 0.7.0 adds `markets.schemes.performance.retrieve`, `markets.categories.statistics.retrieve`, `markets.schemes.references` and `markets.schemes.valuation`. `BharosaMarket` exposes the same methods without the `markets` prefix. These aliases and the legacy market-route authorization correction are deployed in API revision 10. The new SDK aliases are not present in SDK 0.6.0.
+
+Caller-supplied valuation uses provided units and market NAV, never saved positions. Private account/portfolio holdings, history and mixes retain their authorization and consent requirements. Existing monthly date limits, production API origin and error handling remain unchanged. See [analytics](docs/analytics.md) and [market snapshots](docs/monthly-market-data.md) for these interfaces.

@@ -67,62 +67,91 @@ try {
       id: operation.operationId,
     })),
   );
+  operations.push({route: "/v1/market-data/schemes/search", method: "GET", id: "baseline_search"});
+  // Literal routes must win over parameter routes (asset_mix vs {portfolio}).
+  operations.sort((a, b) =>
+    (a.route.match(/\{/g)?.length ?? 0) - (b.route.match(/\{/g)?.length ?? 0),
+  );
+  operations.push({route: "/v1/market-data/schemes/{schemeId}/navs", method: "GET", id: "baseline_nav"});
   const account = "acct_0123456789abcdef0123456789abcdef";
   const portfolioId = "ptf_0123456789abcdef0123456789abcdef";
   let expectations = [];
   let calls = 0;
+  let fetchAssertion;
   const client = new Bharosa({
     baseUrl: "https://synthetic.invalid",
     account,
     auth: { type: "account_key", apiKey: "synthetic-example-key" },
     fetch: async (url, init) => {
-      const expected = expectations.shift();
-      assert.ok(expected, "Unexpected request");
-      const parsed = new URL(url);
-      assert.equal(parsed.origin, "https://synthetic.invalid");
-      assert.ok(
-        parsed.pathname === `/v1/accounts/${account}` ||
-          parsed.pathname.startsWith(`/v1/accounts/${account}/`),
-      );
-      assert.equal(init.headers.Authorization, "Bearer synthetic-example-key");
-      assert.equal(init.redirect, "error");
-      const operation = operations.find(
-        (op) =>
-          op.method === init.method &&
-          new RegExp(
-            "^" + op.route.replace(/\{[^}]+\}/g, "[^/]+") + "$",
-            "u",
-          ).test(parsed.pathname),
-      );
-      assert.equal(operation?.id, expected.id);
-      const body = init.body ? JSON.parse(init.body) : undefined;
-      if (expected.body) assert.deepEqual(body, expected.body);
-      if (expected.query) assert.equal(parsed.search, expected.query);
-      if (expected.key)
-        assert.equal(init.headers["Idempotency-Key"], expected.key);
-      const fixture = fixtures.find(
-        (item) => item.operation_id === operation.id,
-      );
-      assert.ok(fixture);
-      const response = structuredClone(expected.response ?? fixture.response);
-      if (operation.id.endsWith("_mix")) {
-        response.portfolio =
-          body.portfolio.type === "saved" ? body.portfolio.id : null;
-        if (body.as_of) response.as_of_date = body.as_of;
+      try {
+        const expected = expectations.shift();
+        assert.ok(expected, "Unexpected request");
+        const parsed = new URL(url);
+        assert.equal(parsed.origin, "https://synthetic.invalid");
+        assert.ok(
+          /^\/v1\/market-data\/schemes\/(?:search|(?:45139|101)\/navs)$/.test(parsed.pathname) ||
+          parsed.pathname === `/v1/accounts/${account}` ||
+            parsed.pathname.startsWith(`/v1/accounts/${account}/`),
+        );
+        assert.equal(init.headers.Authorization, "Bearer synthetic-example-key");
+        assert.equal(init.redirect, "error");
+        const operation = operations.find(
+          (op) =>
+            op.method === init.method &&
+            new RegExp(
+              "^" + op.route.replace(/\{[^}]+\}/g, "[^/]+") + "$",
+              "u",
+            ).test(parsed.pathname),
+        );
+        assert.equal(operation?.id, expected.id);
+        const body = init.body ? JSON.parse(init.body) : undefined;
+        if (expected.body) assert.deepEqual(body, expected.body);
+        if (expected.query) assert.equal(parsed.search, expected.query);
+        if (expected.key)
+          assert.equal(init.headers["Idempotency-Key"], expected.key);
+        if (operation.id === "baseline_search") {
+          calls++;
+          const contract = JSON.parse(fs.readFileSync(path.join(root, "test/market-search.openapi.json"), "utf8"));
+          return Response.json(contract.paths["/v1/market-data/schemes/search"].get.responses["200"].content["application/json"].example);
+        }
+        if (operation.id === "baseline_nav") {
+          calls++;
+          return Response.json({object: "market_snapshot", requested_date: "2026-10-31", observation_date: null, status: "missing", data: null});
+        }
+        const fixture = fixtures.find(
+          (item) => item.operation_id === operation.id,
+        );
+        assert.ok(fixture);
+        const response = structuredClone(expected.response ?? fixture.response);
+        if (operation.id.endsWith("_mix")) {
+          response.portfolio =
+            body.portfolio.type === "saved" ? body.portfolio.id : null;
+          if (body.as_of) response.as_of_date = body.as_of;
+        }
+        calls++;
+        return new Response(JSON.stringify(response), {
+          status: fixture.status,
+          headers: {
+            "Content-Type": "application/json",
+            "Request-Id": "req_synthetic_example",
+          },
+        });
+      } catch (error) {
+        fetchAssertion = error;
+        throw error;
       }
-      calls++;
-      return new Response(JSON.stringify(response), {
-        status: fixture.status,
-        headers: {
-          "Content-Type": "application/json",
-          "Request-Id": "req_synthetic_example",
-        },
-      });
     },
   });
   async function run(expected, invoke) {
     expectations = expected;
-    const value = await invoke();
+    fetchAssertion = undefined;
+    let value;
+    try {
+      value = await invoke();
+    } catch (error) {
+      // SDK transport wrapping must not hide a failed synthetic assertion.
+      throw fetchAssertion ?? error;
+    }
     assert.equal(expectations.length, 0, "Missing expected requests");
     return value;
   }
@@ -212,7 +241,7 @@ try {
   );
   assert.equal(
     snippets.length,
-    3,
+    4,
     "Review README example coverage when snippets change",
   );
   const readmeSource = `declare const process: { env: Record<string, string | undefined> };\n${snippets[0]}\n${snippets
@@ -249,7 +278,7 @@ try {
   const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
   class ExampleClient {
     constructor(config) {
-      assert.equal(config.account, account);
+      assert.deepEqual(config, {apiKey: "synthetic-example-key"});
       return client;
     }
   }
@@ -262,11 +291,13 @@ try {
   };
   await run(
     [
-      { id: "retrieve_account" },
+      { id: "baseline_nav" },
       { id: "retrieve_portfolio" },
       { id: "current_snapshot" },
       { id: "asset_mix", body: { portfolio: saved } },
       { id: "search_funds" },
+      { id: "baseline_search", query: "?query=equity&limit=5" },
+      { id: "baseline_nav" },
     ],
     () =>
       new AsyncFunction("Bharosa", "process", readmeJs)(
@@ -330,7 +361,7 @@ try {
       ),
     /Choose a family/,
   );
-  assert.equal(calls, 25);
+  assert.equal(calls, 27);
   console.log(
     `Compiled ${examples.length} example files and ${snippets.length} README snippets; verified ${calls} synthetic requests including setup; no live API used.`,
   );

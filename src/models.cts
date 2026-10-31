@@ -12,6 +12,7 @@ export type MarketData = { "mode": string; "notice": string; [key: string]: unkn
 export type PositionInput = { "instrument": string; "current_value": DecimalInput; };
 export type InvestorCreate = { "name": string; "relationship_to_owner": "self" | "spouse" | "child" | "parent" | "sibling" | "other"; "client"?: string; };
 export type InvestorUpdate = { "name"?: string; "relationship_to_owner"?: "self" | "spouse" | "child" | "parent" | "sibling" | "other"; };
+export type PortfolioUpdate = { "name": string; "expected_name": string; };
 export type PortfolioCreate = { "name": string; "investor": string; "as_of": string; "positions": Array<CreationPositionInput>; };
 export type SnapshotCreate = { "expected_snapshot": string; "as_of": string; "positions": Array<PositionInput>; };
 export type InvestmentAccount = { "id": string; "object": "investment_account"; "created": number; "account": string; "portfolio": string; "name": string; "kind": "manual"; "institution_name": null; "reference_masked": null; "latest_snapshot": string; [key: string]: unknown; };

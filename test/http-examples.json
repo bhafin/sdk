@@ -134,6 +134,26 @@
     }
   },
   {
+    "operation_id": "update_portfolio",
+    "method": "POST",
+    "path": "/v1/accounts/{account}/portfolios/{portfolio}",
+    "query": "",
+    "status": 200,
+    "request": {
+      "name": "Long-term savings",
+      "expected_name": "Previous name"
+    },
+    "response": {
+      "id": "ptf_0123456789abcdef0123456789abcdef",
+      "object": "portfolio",
+      "created": 1792281600,
+      "account": "acct_0123456789abcdef0123456789abcdef",
+      "investor": "inv_0123456789abcdef0123456789abcdef",
+      "name": "Long-term savings",
+      "reporting_currency": "INR"
+    }
+  },
+  {
     "operation_id": "create_investor",
     "method": "POST",
     "path": "/v1/accounts/{account}/investors",
@@ -188,7 +208,7 @@
             "id": "ins_markets_scheme_101",
             "object": "instrument",
             "created": 1792281600,
-            "name": "Example Equity Fund \u2014 Direct Growth",
+            "name": "Example Equity Fund — Direct Growth",
             "identifiers": [],
             "domicile_country": "IN",
             "type": "mutual_fund",
@@ -247,7 +267,7 @@
             "id": "ins_markets_scheme_101",
             "object": "instrument",
             "created": 1792281600,
-            "name": "Example Equity Fund \u2014 Direct Growth",
+            "name": "Example Equity Fund — Direct Growth",
             "identifiers": [],
             "domicile_country": "IN",
             "type": "mutual_fund",
@@ -383,7 +403,7 @@
           "id": "ins_markets_scheme_101",
           "object": "instrument",
           "created": 1792281600,
-          "name": "Example Equity Fund \u2014 Direct Growth",
+          "name": "Example Equity Fund — Direct Growth",
           "identifiers": [],
           "domicile_country": "IN",
           "type": "mutual_fund",
@@ -487,7 +507,7 @@
           "id": "ins_markets_scheme_101",
           "object": "instrument",
           "created": 1792281600,
-          "name": "Example Equity Fund \u2014 Direct Growth",
+          "name": "Example Equity Fund — Direct Growth",
           "identifiers": [],
           "domicile_country": "IN",
           "type": "mutual_fund",
@@ -600,7 +620,7 @@
           "id": "ins_markets_scheme_101",
           "object": "instrument",
           "created": 1792281600,
-          "name": "Example Equity Fund \u2014 Direct Growth",
+          "name": "Example Equity Fund — Direct Growth",
           "identifiers": [],
           "domicile_country": "IN",
           "type": "mutual_fund",

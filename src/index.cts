@@ -1,3 +1,5 @@
+import type * as A from "./analytics-types.cjs";
+export type * from "./analytics-types.cjs";
 import type { MonthlyMarketClient, MonthSelection } from "./monthly-types.cjs";
 export type * from "./monthly-types.cjs";
 import { createTransport, check, keys } from "./transport.cjs";
@@ -33,18 +35,81 @@ function checkedDate(value: string): string {
   );
   return value;
 }
+const analyticsQuery = (
+  q: A.PerformanceSelection | A.CategorySelection,
+  extra: string[] = [],
+) => {
+  keys(q, ["asOf", "periods", ...extra]);
+  checkedDate(q.asOf);
+  check(q.asOf.endsWith("-01"));
+  if (q.periods !== undefined)
+    check(
+      Array.isArray(q.periods) &&
+        q.periods.length > 0 &&
+        q.periods.length <= 4 &&
+        new Set(q.periods).size === q.periods.length &&
+        q.periods.every((p) =>
+          ["1y", "3y", "5y", "since_inception"].includes(p),
+        ),
+    );
+  return {
+    as_of: q.asOf,
+    ...(q.periods === undefined ? {} : { periods: q.periods.join(",") }),
+  };
+};
+
+function categoryMethods(
+  call: ReturnType<typeof createTransport>,
+): T.ClientSurface["fundCategories"] {
+  return Object.freeze({
+    statistics: Object.freeze({
+      retrieve: (id: string, q: A.CategorySelection, o?: T.RequestOptions) => {
+        const query = analyticsQuery(q, ["metrics", "plan", "option"]);
+        if (q.metrics !== undefined)
+          check(
+            Array.isArray(q.metrics) &&
+              q.metrics.length > 0 &&
+              q.metrics.length <= 3 &&
+              new Set(q.metrics).size === q.metrics.length &&
+              q.metrics.every((m) => m === "return"),
+          );
+        check(
+          !(q.periods as string[] | undefined)?.includes("since_inception"),
+        );
+        check(!(q.metrics && !q.metrics.includes("return") && q.periods));
+        return call(
+          "analytics_category",
+          {
+            id,
+            ...query,
+            ...(q.metrics ? { metrics: q.metrics.join(",") } : {}),
+            ...(q.plan ? { plan: q.plan } : {}),
+            ...(q.option ? { option: q.option } : {}),
+          },
+          undefined,
+          o,
+        );
+      },
+    }),
+  });
+}
 type Target = M.PortfolioMixRequest["portfolio"];
 export class Bharosa implements T.ClientSurface {
   readonly accounts: T.ClientSurface["accounts"];
   readonly clients: T.ClientSurface["clients"];
   readonly investors: T.ClientSurface["investors"];
   readonly portfolios: T.ClientSurface["portfolios"];
+  readonly fundCategories: T.ClientSurface["fundCategories"];
   readonly mutualFunds: T.ClientSurface["mutualFunds"];
   readonly mutualFundSchemes: T.ClientSurface["mutualFundSchemes"];
+  readonly markets: BaselineMarketClient;
   readonly marketSnapshots: MonthlyMarketClient;
   readonly marketData: D.MarketDataClient;
   constructor(config: T.BharosaConfig) {
+    this.markets = baselineMarkets(createTransport(config, true));
     const call = createTransport(config);
+    this.fundCategories = categoryMethods(call);
+
     const list = (p: T.FilteredListOptions) => {
       keys(p, ["limit", "startingAfter", "client"]);
       return Object.fromEntries(
@@ -237,6 +302,11 @@ export class Bharosa implements T.ClientSurface {
       );
     };
     this.portfolios = Object.freeze({
+      update: async (
+        portfolio: string,
+        b: M.PortfolioUpdate,
+        o: T.IdempotentOptions,
+      ) => savedPortfolio(await call("update_portfolio", { portfolio }, b, o)),
       build,
       fromPositions: build,
       list: async (p: T.PortfolioListOptions = {}, o?: T.RequestOptions) => {
@@ -402,8 +472,15 @@ export class Bharosa implements T.ClientSurface {
     };
     this.marketSnapshots = {
       schemes: {
-        nav: (id, q, o) =>
-          call("monthly_nav", { id, ...monthlyQuery(q) }, undefined, o),
+        nav: (id, q = {}, o) => {
+          keys(q, ["asOf"]);
+          return call(
+            "monthly_nav",
+            { id, ...(q.asOf === undefined ? {} : { as_of: q.asOf }) },
+            undefined,
+            o,
+          );
+        },
         expenseRatio: (id, q, o) =>
           call("monthly_expense", { id, ...monthlyQuery(q) }, undefined, o),
         valuation: (id, input = {}, o) => {
@@ -439,6 +516,14 @@ export class Bharosa implements T.ClientSurface {
       },
     };
     this.mutualFundSchemes = Object.freeze({
+      performance: Object.freeze({
+        retrieve: (
+          id: string,
+          q: A.PerformanceSelection,
+          o?: T.RequestOptions,
+        ) =>
+          call("analytics_scheme", { id, ...analyticsQuery(q) }, undefined, o),
+      }),
       navs: Object.freeze({ retrieve: this.marketSnapshots.schemes.nav }),
       expenseRatios: Object.freeze({
         retrieve: this.marketSnapshots.schemes.expenseRatio,
@@ -499,4 +584,148 @@ export class Bharosa implements T.ClientSurface {
       Object.freeze(collection);
     Object.freeze(this);
   }
+}
+
+export interface BharosaMarketConfig {
+  /** Defaults to https://api.bharosa.finance. */
+  baseUrl?: string;
+  apiKey: string;
+  allowLocalhostHttp?: boolean;
+  maxResponseBytes?: number;
+  fetch?: typeof globalThis.fetch;
+}
+/** Server-only baseline market access. No account or user token. */
+export class BharosaMarket {
+  readonly schemes: BaselineMarketClient["schemes"];
+  readonly categories: BaselineMarketClient["categories"];
+  readonly funds: MonthlyMarketClient["funds"];
+  constructor(config: BharosaMarketConfig) {
+    keys(config, [
+      "baseUrl",
+      "apiKey",
+      "allowLocalhostHttp",
+      "maxResponseBytes",
+      "fetch",
+    ]);
+    const { apiKey, ...rest } = config;
+    const call = createTransport(
+      { ...rest, account: "me", auth: { type: "account_key", apiKey } },
+      true,
+    );
+    const resources = baselineMarkets(call);
+    this.schemes = resources.schemes;
+    this.categories = resources.categories;
+    this.funds = resources.funds;
+  }
+}
+export interface BaselineMarketClient {
+  readonly categories: T.ClientSurface["fundCategories"];
+  readonly schemes: {
+    references(
+      query: { instruments: string[] },
+      options?: T.RequestOptions,
+    ): Promise<M.FundReferences>;
+    performance: T.ClientSurface["mutualFundSchemes"]["performance"];
+    valuation: MonthlyMarketClient["schemes"]["valuation"];
+    search(
+      query: { query: string; limit?: number },
+      options?: T.RequestOptions,
+    ): Promise<M.FundsList>;
+    nav(
+      id: string,
+      selection?: { asOf?: string },
+      options?: T.RequestOptions,
+    ): ReturnType<MonthlyMarketClient["schemes"]["nav"]>;
+    expenseRatio: MonthlyMarketClient["schemes"]["expenseRatio"];
+  };
+  readonly funds: MonthlyMarketClient["funds"];
+}
+function baselineMarkets(
+  call: ReturnType<typeof createTransport>,
+): BaselineMarketClient {
+  const query = (q: MonthSelection & D.MarketPage, paging = false) => {
+    keys(q, paging ? ["asOf", "limit", "startingAfter"] : ["asOf"]);
+    return {
+      as_of: q.asOf,
+      ...(q.limit === undefined ? {} : { limit: q.limit }),
+      ...(q.startingAfter === undefined
+        ? {}
+        : { starting_after: q.startingAfter }),
+    };
+  };
+  const schemes: BaselineMarketClient["schemes"] = {
+    references: (p, o) => {
+      keys(p, ["instruments"]);
+      check(
+        Array.isArray(p.instruments) &&
+          p.instruments.length >= 1 &&
+          p.instruments.length <= 100 &&
+          new Set(p.instruments).size === p.instruments.length &&
+          p.instruments.every(
+            (x) =>
+              typeof x === "string" && /^ins_[A-Za-z0-9_-]{1,150}$/.test(x),
+          ),
+      );
+      return call(
+        "fund_references",
+        { instruments: p.instruments.join(",") },
+        undefined,
+        o,
+      );
+    },
+    performance: Object.freeze({
+      retrieve: (id: string, q: A.PerformanceSelection, o?: T.RequestOptions) =>
+        call("analytics_scheme", { id, ...analyticsQuery(q) }, undefined, o),
+    }),
+    valuation: (id, input = {}, o) => {
+      keys(input, ["units", "asOf", "positionDate", "observedValue"]);
+      return call(
+        "monthly_valuation",
+        {},
+        {
+          scheme_id: id,
+          units: input.units,
+          ...(input.asOf === undefined ? {} : { as_of: input.asOf }),
+          ...(input.positionDate === undefined
+            ? {}
+            : { position_date: input.positionDate }),
+          ...(input.observedValue === undefined
+            ? {}
+            : { observed_value: input.observedValue }),
+        },
+        o,
+      );
+    },
+    search: async (p, o) => {
+      keys(p, ["query", "limit"]);
+      check(
+        typeof p.query === "string" &&
+          p.query.trim().length >= 2 &&
+          p.query.length <= 100,
+      );
+      return call("searchMarketSchemes", p, undefined, o);
+    },
+    nav: (id, q = {}, o) => {
+      keys(q, ["asOf"]);
+      return call(
+        "monthly_nav",
+        { id, ...(q.asOf === undefined ? {} : { as_of: q.asOf }) },
+        undefined,
+        o,
+      );
+    },
+    expenseRatio: (id, q, o) =>
+      call("monthly_expense", { id, ...query(q) }, undefined, o),
+  };
+  const funds: BaselineMarketClient["funds"] = {
+    portfolio: (id, q, o) =>
+      call("monthly_portfolio", { id, ...query(q) }, undefined, o),
+    holdings: (id, q, o) =>
+      call("monthly_holdings", { id, ...query(q, true) }, undefined, o),
+  };
+  return Object.freeze({
+    schemes: Object.freeze(schemes),
+    funds: Object.freeze(funds),
+    categories: categoryMethods(call),
+  });
 }

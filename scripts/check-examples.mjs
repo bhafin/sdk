@@ -163,7 +163,7 @@ if (process.env.BHAROSA_TSC) {
         continue;
       // Installation commands and MCP host JSON are not SDK TypeScript examples.
       // Shell examples remain owned by the website tooling.
-      if (/^\s*(?:curl|npm|npx|node)\b/.test(section.code)) continue;
+      if (/^(?:\s*#[^\n]*(?:\n|$))*\s*(?:curl|npm|npx|node|claude|codex)\b/.test(section.code)) continue;
       const source =
         (section.code.includes("import { Bharosa }")
           ? ""

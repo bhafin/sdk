@@ -7,6 +7,8 @@ declare const previous: Previous;
 const previousSurface: Omit<Previous, "accounts" | "portfolios"> = current;
 const currentSurface: Omit<
   Current,
+  | "markets"
+  | "fundCategories"
   | "marketSnapshots"
   | "mutualFundSchemes"
   | "mutualFunds"
