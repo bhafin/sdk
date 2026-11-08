@@ -17,6 +17,7 @@ import {
   InvalidResponseError,
 } from "../dist/index.mjs";
 import validation from "../dist/validate.cjs";
+import {createTransport} from "../dist/transport.cjs";
 import contract from "../dist/contract.cjs";
 import fixtureJson from "./http-examples.json" with { type: "json" };
 import futures from "./future-enums.json" with { type: "json" };
@@ -169,7 +170,7 @@ async function invoke(
 for (const f of fixtures)
   test("operation " + f.operation_id, async () => {
     let called = 0;
-    const c = new Bharosa({
+    const transportConfig = {
       ...config,
       fetch: mockFetch(async (url, init) => {
         called++;
@@ -200,8 +201,9 @@ for (const f of fixtures)
         if (f.request) assert.deepEqual(parseBody(init), f.request);
         return res(f.response, f.status);
       }),
-    });
-    assert.deepEqual(await invoke(c, f), f.response);
+    };
+    const c = new Bharosa(transportConfig);
+    assert.deepEqual(f.operation_id === "search_funds" ? await createTransport(transportConfig)("search_funds", {query:"Example",limit:10}) : await invoke(c, f), f.response);
     assert.equal(
       called,
       f.operation_id === "holding_position"
@@ -365,10 +367,10 @@ test("query mapping and encoding", async () => {
     ...config,
     fetch: mockFetch(async (u) => {
       url = u;
-      return res(getFixture("search_funds").response);
+      return res({...getFixture("search_funds").response, url: "/v1/market-data/schemes/search"});
     }),
   });
-  await c.mutualFunds.search({ query: "A & ? / %", limit: 2 });
+  await c.mutualFundSchemes.search({ query: "A & ? / %", limit: 2 });
   assert.equal(new URL(url).searchParams.get("query"), "A & ? / %");
   const d = new Bharosa({
     ...config,
@@ -957,7 +959,7 @@ test("fund convenience methods delegate to the same underlying portfolio", async
   });
   const fund = c.mutualFunds.fromId("201");
   await fund.assetMix();
-  await fund.portfolio.assetMix();
+  await fund.assetMix();
   assert.deepEqual(seen, [
     { portfolio: { type: "mutual_fund", mutual_fund_id: "201" } },
     { portfolio: { type: "mutual_fund", mutual_fund_id: "201" } },

@@ -1,0 +1,2055 @@
+"use strict";
+// Generated from the unreleased stored benchmark contract; all references resolved locally.
+module.exports = {
+  "operations": {
+    "benchmark_indexes": {
+      "path": "/v1/market-data/indexes",
+      "method": "GET",
+      "status": 200,
+      "marketData": true,
+      "readOnly": true,
+      "parameters": [
+        {
+          "name": "query",
+          "in": "query",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 100
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "schema": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          }
+        },
+        {
+          "name": "starting_after",
+          "in": "query",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]{0,18}$"
+          }
+        }
+      ],
+      "response": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "const": "list"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "object": {
+                  "const": "index"
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]{0,18}$"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "variants": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "pattern": "^[1-9][0-9]{0,18}$"
+                      },
+                      "type": {
+                        "enum": [
+                          "tri",
+                          "pri",
+                          "adj_tri"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "type"
+                    ],
+                    "additionalProperties": true
+                  },
+                  "maxItems": 100
+                },
+                "default_sub_index_id": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^[1-9][0-9]{0,18}$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "object",
+                "id",
+                "name",
+                "variants",
+                "default_sub_index_id"
+              ],
+              "additionalProperties": true
+            },
+            "maxItems": 100
+          },
+          "has_more": {
+            "type": "boolean"
+          },
+          "url": {
+            "const": "/v1/market-data/indexes"
+          }
+        },
+        "required": [
+          "object",
+          "data",
+          "has_more",
+          "url"
+        ],
+        "additionalProperties": true
+      }
+    },
+    "benchmark_index": {
+      "path": "/v1/market-data/indexes/{id}",
+      "method": "GET",
+      "status": 200,
+      "marketData": true,
+      "readOnly": true,
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]{0,18}$"
+          }
+        }
+      ],
+      "response": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "const": "index"
+          },
+          "id": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]{0,18}$"
+          },
+          "name": {
+            "type": "string"
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]{0,18}$"
+                },
+                "type": {
+                  "enum": [
+                    "tri",
+                    "pri",
+                    "adj_tri"
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "type"
+              ],
+              "additionalProperties": true
+            },
+            "maxItems": 100
+          },
+          "default_sub_index_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[1-9][0-9]{0,18}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "object",
+          "id",
+          "name",
+          "variants",
+          "default_sub_index_id"
+        ],
+        "additionalProperties": true
+      }
+    },
+    "benchmark_index_performance": {
+      "path": "/v1/market-data/indexes/{id}/performance",
+      "method": "GET",
+      "status": 200,
+      "marketData": true,
+      "readOnly": true,
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]{0,18}$"
+          }
+        },
+        {
+          "name": "as_of",
+          "in": "query",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^\\d{4}-\\d{2}-01$"
+          }
+        },
+        {
+          "name": "periods",
+          "in": "query",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "pattern": "^(1y|3y|5y)(,(1y|3y|5y)){0,2}$"
+          }
+        },
+        {
+          "name": "sub_index_id",
+          "in": "query",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]{0,18}$"
+          }
+        }
+      ],
+      "response": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "const": "index_performance"
+          },
+          "index_id": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]{0,18}$"
+          },
+          "sub_index_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[1-9][0-9]{0,18}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "currency": {
+            "const": "INR"
+          },
+          "requested_as_of": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "source_cutoff": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "source_version": {
+            "type": "string"
+          },
+          "methodology_version": {
+            "const": "stored_weighted_component_returns_v1"
+          },
+          "basis": {
+            "const": "stored_quotes"
+          },
+          "mapping_basis": {
+            "const": "current_stored"
+          },
+          "weighting": {
+            "const": "stored_percentage_weights_without_normalization"
+          },
+          "calculation_precision": {
+            "const": "decimal_inputs_float64_returns"
+          },
+          "freshness_policy": {
+            "type": "object",
+            "properties": {
+              "quote_days": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "quote_days"
+            ],
+            "additionalProperties": true
+          },
+          "components": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]{0,18}$"
+                },
+                "index_id": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]{0,18}$"
+                },
+                "index_name": {
+                  "type": "string"
+                },
+                "sub_index_id": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]{0,18}$"
+                },
+                "variant": {
+                  "enum": [
+                    "tri",
+                    "pri",
+                    "adj_tri"
+                  ]
+                },
+                "benchmark_type": {
+                  "enum": [
+                    "fund",
+                    "default",
+                    "assigned"
+                  ]
+                },
+                "weight_pct": {
+                  "type": "string",
+                  "pattern": "^-?[0-9]+(?:\\.[0-9]+)?$"
+                }
+              },
+              "required": [
+                "id",
+                "index_id",
+                "index_name",
+                "sub_index_id",
+                "variant",
+                "benchmark_type",
+                "weight_pct"
+              ],
+              "additionalProperties": true
+            },
+            "maxItems": 100
+          },
+          "periods": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "period": {
+                  "enum": [
+                    "1y",
+                    "3y",
+                    "5y"
+                  ]
+                },
+                "requested_start": {
+                  "type": "string",
+                  "format": "date",
+                  "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                },
+                "requested_end": {
+                  "type": "string",
+                  "format": "date",
+                  "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                },
+                "status": {
+                  "enum": [
+                    "available",
+                    "unavailable"
+                  ]
+                },
+                "reason": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "total_return_pct": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "const": "available"
+                        },
+                        "value": {
+                          "type": "string",
+                          "pattern": "^-?[0-9]+(?:\\.[0-9]+)?$"
+                        },
+                        "reason": {
+                          "type": "null"
+                        }
+                      },
+                      "required": [
+                        "status",
+                        "value",
+                        "reason"
+                      ],
+                      "additionalProperties": true
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "const": "unavailable"
+                        },
+                        "value": {
+                          "type": "null"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "status",
+                        "value",
+                        "reason"
+                      ],
+                      "additionalProperties": true
+                    }
+                  ]
+                },
+                "cagr_pct": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "const": "available"
+                        },
+                        "value": {
+                          "type": "string",
+                          "pattern": "^-?[0-9]+(?:\\.[0-9]+)?$"
+                        },
+                        "reason": {
+                          "type": "null"
+                        }
+                      },
+                      "required": [
+                        "status",
+                        "value",
+                        "reason"
+                      ],
+                      "additionalProperties": true
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "const": "unavailable"
+                        },
+                        "value": {
+                          "type": "null"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "status",
+                        "value",
+                        "reason"
+                      ],
+                      "additionalProperties": true
+                    }
+                  ]
+                },
+                "annualization_basis": {
+                  "const": "observed_quote_dates_365_25"
+                },
+                "components": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "sub_index_id": {
+                        "type": "string",
+                        "pattern": "^[1-9][0-9]{0,18}$"
+                      },
+                      "weight_pct": {
+                        "type": "string",
+                        "pattern": "^-?[0-9]+(?:\\.[0-9]+)?$"
+                      },
+                      "start_observation_date": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "format": "date",
+                            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "end_observation_date": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "format": "date",
+                            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "start_quote": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "pattern": "^-?[0-9]+(?:\\.[0-9]+)?$"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "end_quote": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "pattern": "^-?[0-9]+(?:\\.[0-9]+)?$"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "currency": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "start_lag_days": {
+                        "anyOf": [
+                          {
+                            "type": "number"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "end_lag_days": {
+                        "anyOf": [
+                          {
+                            "type": "number"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "elapsed_days": {
+                        "anyOf": [
+                          {
+                            "type": "number"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "status": {
+                        "enum": [
+                          "available",
+                          "unavailable"
+                        ]
+                      },
+                      "reason": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "total_return_pct": {
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "status": {
+                                "const": "available"
+                              },
+                              "value": {
+                                "type": "string",
+                                "pattern": "^-?[0-9]+(?:\\.[0-9]+)?$"
+                              },
+                              "reason": {
+                                "type": "null"
+                              }
+                            },
+                            "required": [
+                              "status",
+                              "value",
+                              "reason"
+                            ],
+                            "additionalProperties": true
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "status": {
+                                "const": "unavailable"
+                              },
+                              "value": {
+                                "type": "null"
+                              },
+                              "reason": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "status",
+                              "value",
+                              "reason"
+                            ],
+                            "additionalProperties": true
+                          }
+                        ]
+                      },
+                      "cagr_pct": {
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "status": {
+                                "const": "available"
+                              },
+                              "value": {
+                                "type": "string",
+                                "pattern": "^-?[0-9]+(?:\\.[0-9]+)?$"
+                              },
+                              "reason": {
+                                "type": "null"
+                              }
+                            },
+                            "required": [
+                              "status",
+                              "value",
+                              "reason"
+                            ],
+                            "additionalProperties": true
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "status": {
+                                "const": "unavailable"
+                              },
+                              "value": {
+                                "type": "null"
+                              },
+                              "reason": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "status",
+                              "value",
+                              "reason"
+                            ],
+                            "additionalProperties": true
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "sub_index_id",
+                      "weight_pct",
+                      "start_observation_date",
+                      "end_observation_date",
+                      "start_quote",
+                      "end_quote",
+                      "currency",
+                      "start_lag_days",
+                      "end_lag_days",
+                      "elapsed_days",
+                      "status",
+                      "reason",
+                      "total_return_pct",
+                      "cagr_pct"
+                    ],
+                    "additionalProperties": true
+                  },
+                  "maxItems": 100
+                }
+              },
+              "required": [
+                "period",
+                "requested_start",
+                "requested_end",
+                "status",
+                "reason",
+                "total_return_pct",
+                "cagr_pct",
+                "annualization_basis",
+                "components"
+              ],
+              "additionalProperties": true
+            },
+            "maxItems": 3,
+            "minItems": 1
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 100
+          }
+        },
+        "required": [
+          "object",
+          "index_id",
+          "sub_index_id",
+          "currency",
+          "requested_as_of",
+          "source_cutoff",
+          "source_version",
+          "methodology_version",
+          "basis",
+          "mapping_basis",
+          "weighting",
+          "calculation_precision",
+          "freshness_policy",
+          "components",
+          "periods",
+          "warnings"
+        ],
+        "additionalProperties": true
+      }
+    },
+    "benchmark_fund": {
+      "path": "/v1/market-data/funds/{id}/benchmark",
+      "method": "GET",
+      "status": 200,
+      "marketData": true,
+      "readOnly": true,
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]{0,18}$"
+          }
+        }
+      ],
+      "response": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "const": "fund_benchmark"
+          },
+          "fund_id": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]{0,18}$"
+          },
+          "scheme_id": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]{0,18}$"
+          },
+          "mapping_basis": {
+            "const": "current_stored"
+          },
+          "components": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]{0,18}$"
+                },
+                "index_id": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]{0,18}$"
+                },
+                "index_name": {
+                  "type": "string"
+                },
+                "sub_index_id": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]{0,18}$"
+                },
+                "variant": {
+                  "enum": [
+                    "tri",
+                    "pri",
+                    "adj_tri"
+                  ]
+                },
+                "benchmark_type": {
+                  "enum": [
+                    "fund",
+                    "default",
+                    "assigned"
+                  ]
+                },
+                "weight_pct": {
+                  "type": "string",
+                  "pattern": "^-?[0-9]+(?:\\.[0-9]+)?$"
+                }
+              },
+              "required": [
+                "id",
+                "index_id",
+                "index_name",
+                "sub_index_id",
+                "variant",
+                "benchmark_type",
+                "weight_pct"
+              ],
+              "additionalProperties": true
+            },
+            "maxItems": 100
+          }
+        },
+        "required": [
+          "object",
+          "fund_id",
+          "mapping_basis",
+          "components"
+        ],
+        "additionalProperties": true
+      }
+    },
+    "benchmark_fund_performance": {
+      "path": "/v1/market-data/funds/{id}/benchmark/performance",
+      "method": "GET",
+      "status": 200,
+      "marketData": true,
+      "readOnly": true,
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]{0,18}$"
+          }
+        },
+        {
+          "name": "as_of",
+          "in": "query",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^\\d{4}-\\d{2}-01$"
+          }
+        },
+        {
+          "name": "periods",
+          "in": "query",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "pattern": "^(1y|3y|5y)(,(1y|3y|5y)){0,2}$"
+          }
+        }
+      ],
+      "response": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "const": "fund_benchmark_performance"
+          },
+          "fund_id": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]{0,18}$"
+          },
+          "scheme_id": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]{0,18}$"
+          },
+          "currency": {
+            "const": "INR"
+          },
+          "requested_as_of": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "source_cutoff": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "source_version": {
+            "type": "string"
+          },
+          "methodology_version": {
+            "const": "stored_weighted_component_returns_v1"
+          },
+          "basis": {
+            "const": "stored_quotes"
+          },
+          "mapping_basis": {
+            "const": "current_stored"
+          },
+          "weighting": {
+            "const": "stored_percentage_weights_without_normalization"
+          },
+          "calculation_precision": {
+            "const": "decimal_inputs_float64_returns"
+          },
+          "freshness_policy": {
+            "type": "object",
+            "properties": {
+              "quote_days": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "quote_days"
+            ],
+            "additionalProperties": true
+          },
+          "components": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]{0,18}$"
+                },
+                "index_id": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]{0,18}$"
+                },
+                "index_name": {
+                  "type": "string"
+                },
+                "sub_index_id": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]{0,18}$"
+                },
+                "variant": {
+                  "enum": [
+                    "tri",
+                    "pri",
+                    "adj_tri"
+                  ]
+                },
+                "benchmark_type": {
+                  "enum": [
+                    "fund",
+                    "default",
+                    "assigned"
+                  ]
+                },
+                "weight_pct": {
+                  "type": "string",
+                  "pattern": "^-?[0-9]+(?:\\.[0-9]+)?$"
+                }
+              },
+              "required": [
+                "id",
+                "index_id",
+                "index_name",
+                "sub_index_id",
+                "variant",
+                "benchmark_type",
+                "weight_pct"
+              ],
+              "additionalProperties": true
+            },
+            "maxItems": 100
+          },
+          "periods": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "period": {
+                  "enum": [
+                    "1y",
+                    "3y",
+                    "5y"
+                  ]
+                },
+                "requested_start": {
+                  "type": "string",
+                  "format": "date",
+                  "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                },
+                "requested_end": {
+                  "type": "string",
+                  "format": "date",
+                  "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                },
+                "status": {
+                  "enum": [
+                    "available",
+                    "unavailable"
+                  ]
+                },
+                "reason": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "total_return_pct": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "const": "available"
+                        },
+                        "value": {
+                          "type": "string",
+                          "pattern": "^-?[0-9]+(?:\\.[0-9]+)?$"
+                        },
+                        "reason": {
+                          "type": "null"
+                        }
+                      },
+                      "required": [
+                        "status",
+                        "value",
+                        "reason"
+                      ],
+                      "additionalProperties": true
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "const": "unavailable"
+                        },
+                        "value": {
+                          "type": "null"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "status",
+                        "value",
+                        "reason"
+                      ],
+                      "additionalProperties": true
+                    }
+                  ]
+                },
+                "cagr_pct": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "const": "available"
+                        },
+                        "value": {
+                          "type": "string",
+                          "pattern": "^-?[0-9]+(?:\\.[0-9]+)?$"
+                        },
+                        "reason": {
+                          "type": "null"
+                        }
+                      },
+                      "required": [
+                        "status",
+                        "value",
+                        "reason"
+                      ],
+                      "additionalProperties": true
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "const": "unavailable"
+                        },
+                        "value": {
+                          "type": "null"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "status",
+                        "value",
+                        "reason"
+                      ],
+                      "additionalProperties": true
+                    }
+                  ]
+                },
+                "annualization_basis": {
+                  "const": "observed_quote_dates_365_25"
+                },
+                "components": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "sub_index_id": {
+                        "type": "string",
+                        "pattern": "^[1-9][0-9]{0,18}$"
+                      },
+                      "weight_pct": {
+                        "type": "string",
+                        "pattern": "^-?[0-9]+(?:\\.[0-9]+)?$"
+                      },
+                      "start_observation_date": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "format": "date",
+                            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "end_observation_date": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "format": "date",
+                            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "start_quote": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "pattern": "^-?[0-9]+(?:\\.[0-9]+)?$"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "end_quote": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "pattern": "^-?[0-9]+(?:\\.[0-9]+)?$"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "currency": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "start_lag_days": {
+                        "anyOf": [
+                          {
+                            "type": "number"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "end_lag_days": {
+                        "anyOf": [
+                          {
+                            "type": "number"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "elapsed_days": {
+                        "anyOf": [
+                          {
+                            "type": "number"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "status": {
+                        "enum": [
+                          "available",
+                          "unavailable"
+                        ]
+                      },
+                      "reason": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "total_return_pct": {
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "status": {
+                                "const": "available"
+                              },
+                              "value": {
+                                "type": "string",
+                                "pattern": "^-?[0-9]+(?:\\.[0-9]+)?$"
+                              },
+                              "reason": {
+                                "type": "null"
+                              }
+                            },
+                            "required": [
+                              "status",
+                              "value",
+                              "reason"
+                            ],
+                            "additionalProperties": true
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "status": {
+                                "const": "unavailable"
+                              },
+                              "value": {
+                                "type": "null"
+                              },
+                              "reason": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "status",
+                              "value",
+                              "reason"
+                            ],
+                            "additionalProperties": true
+                          }
+                        ]
+                      },
+                      "cagr_pct": {
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "status": {
+                                "const": "available"
+                              },
+                              "value": {
+                                "type": "string",
+                                "pattern": "^-?[0-9]+(?:\\.[0-9]+)?$"
+                              },
+                              "reason": {
+                                "type": "null"
+                              }
+                            },
+                            "required": [
+                              "status",
+                              "value",
+                              "reason"
+                            ],
+                            "additionalProperties": true
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "status": {
+                                "const": "unavailable"
+                              },
+                              "value": {
+                                "type": "null"
+                              },
+                              "reason": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "status",
+                              "value",
+                              "reason"
+                            ],
+                            "additionalProperties": true
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "sub_index_id",
+                      "weight_pct",
+                      "start_observation_date",
+                      "end_observation_date",
+                      "start_quote",
+                      "end_quote",
+                      "currency",
+                      "start_lag_days",
+                      "end_lag_days",
+                      "elapsed_days",
+                      "status",
+                      "reason",
+                      "total_return_pct",
+                      "cagr_pct"
+                    ],
+                    "additionalProperties": true
+                  },
+                  "maxItems": 100
+                }
+              },
+              "required": [
+                "period",
+                "requested_start",
+                "requested_end",
+                "status",
+                "reason",
+                "total_return_pct",
+                "cagr_pct",
+                "annualization_basis",
+                "components"
+              ],
+              "additionalProperties": true
+            },
+            "maxItems": 3,
+            "minItems": 1
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 100
+          }
+        },
+        "required": [
+          "object",
+          "fund_id",
+          "currency",
+          "requested_as_of",
+          "source_cutoff",
+          "source_version",
+          "methodology_version",
+          "basis",
+          "mapping_basis",
+          "weighting",
+          "calculation_precision",
+          "freshness_policy",
+          "components",
+          "periods",
+          "warnings"
+        ],
+        "additionalProperties": true
+      }
+    },
+    "benchmark_scheme": {
+      "path": "/v1/market-data/schemes/{id}/benchmark",
+      "method": "GET",
+      "status": 200,
+      "marketData": true,
+      "readOnly": true,
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]{0,18}$"
+          }
+        }
+      ],
+      "response": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "const": "fund_benchmark"
+          },
+          "fund_id": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]{0,18}$"
+          },
+          "scheme_id": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]{0,18}$"
+          },
+          "mapping_basis": {
+            "const": "current_stored"
+          },
+          "components": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]{0,18}$"
+                },
+                "index_id": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]{0,18}$"
+                },
+                "index_name": {
+                  "type": "string"
+                },
+                "sub_index_id": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]{0,18}$"
+                },
+                "variant": {
+                  "enum": [
+                    "tri",
+                    "pri",
+                    "adj_tri"
+                  ]
+                },
+                "benchmark_type": {
+                  "enum": [
+                    "fund",
+                    "default",
+                    "assigned"
+                  ]
+                },
+                "weight_pct": {
+                  "type": "string",
+                  "pattern": "^-?[0-9]+(?:\\.[0-9]+)?$"
+                }
+              },
+              "required": [
+                "id",
+                "index_id",
+                "index_name",
+                "sub_index_id",
+                "variant",
+                "benchmark_type",
+                "weight_pct"
+              ],
+              "additionalProperties": true
+            },
+            "maxItems": 100
+          }
+        },
+        "required": [
+          "object",
+          "fund_id",
+          "mapping_basis",
+          "components"
+        ],
+        "additionalProperties": true
+      }
+    },
+    "benchmark_scheme_performance": {
+      "path": "/v1/market-data/schemes/{id}/benchmark/performance",
+      "method": "GET",
+      "status": 200,
+      "marketData": true,
+      "readOnly": true,
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]{0,18}$"
+          }
+        },
+        {
+          "name": "as_of",
+          "in": "query",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^\\d{4}-\\d{2}-01$"
+          }
+        },
+        {
+          "name": "periods",
+          "in": "query",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "pattern": "^(1y|3y|5y)(,(1y|3y|5y)){0,2}$"
+          }
+        }
+      ],
+      "response": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "const": "fund_benchmark_performance"
+          },
+          "fund_id": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]{0,18}$"
+          },
+          "scheme_id": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]{0,18}$"
+          },
+          "currency": {
+            "const": "INR"
+          },
+          "requested_as_of": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "source_cutoff": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "source_version": {
+            "type": "string"
+          },
+          "methodology_version": {
+            "const": "stored_weighted_component_returns_v1"
+          },
+          "basis": {
+            "const": "stored_quotes"
+          },
+          "mapping_basis": {
+            "const": "current_stored"
+          },
+          "weighting": {
+            "const": "stored_percentage_weights_without_normalization"
+          },
+          "calculation_precision": {
+            "const": "decimal_inputs_float64_returns"
+          },
+          "freshness_policy": {
+            "type": "object",
+            "properties": {
+              "quote_days": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "quote_days"
+            ],
+            "additionalProperties": true
+          },
+          "components": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]{0,18}$"
+                },
+                "index_id": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]{0,18}$"
+                },
+                "index_name": {
+                  "type": "string"
+                },
+                "sub_index_id": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]{0,18}$"
+                },
+                "variant": {
+                  "enum": [
+                    "tri",
+                    "pri",
+                    "adj_tri"
+                  ]
+                },
+                "benchmark_type": {
+                  "enum": [
+                    "fund",
+                    "default",
+                    "assigned"
+                  ]
+                },
+                "weight_pct": {
+                  "type": "string",
+                  "pattern": "^-?[0-9]+(?:\\.[0-9]+)?$"
+                }
+              },
+              "required": [
+                "id",
+                "index_id",
+                "index_name",
+                "sub_index_id",
+                "variant",
+                "benchmark_type",
+                "weight_pct"
+              ],
+              "additionalProperties": true
+            },
+            "maxItems": 100
+          },
+          "periods": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "period": {
+                  "enum": [
+                    "1y",
+                    "3y",
+                    "5y"
+                  ]
+                },
+                "requested_start": {
+                  "type": "string",
+                  "format": "date",
+                  "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                },
+                "requested_end": {
+                  "type": "string",
+                  "format": "date",
+                  "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                },
+                "status": {
+                  "enum": [
+                    "available",
+                    "unavailable"
+                  ]
+                },
+                "reason": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "total_return_pct": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "const": "available"
+                        },
+                        "value": {
+                          "type": "string",
+                          "pattern": "^-?[0-9]+(?:\\.[0-9]+)?$"
+                        },
+                        "reason": {
+                          "type": "null"
+                        }
+                      },
+                      "required": [
+                        "status",
+                        "value",
+                        "reason"
+                      ],
+                      "additionalProperties": true
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "const": "unavailable"
+                        },
+                        "value": {
+                          "type": "null"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "status",
+                        "value",
+                        "reason"
+                      ],
+                      "additionalProperties": true
+                    }
+                  ]
+                },
+                "cagr_pct": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "const": "available"
+                        },
+                        "value": {
+                          "type": "string",
+                          "pattern": "^-?[0-9]+(?:\\.[0-9]+)?$"
+                        },
+                        "reason": {
+                          "type": "null"
+                        }
+                      },
+                      "required": [
+                        "status",
+                        "value",
+                        "reason"
+                      ],
+                      "additionalProperties": true
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "const": "unavailable"
+                        },
+                        "value": {
+                          "type": "null"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "status",
+                        "value",
+                        "reason"
+                      ],
+                      "additionalProperties": true
+                    }
+                  ]
+                },
+                "annualization_basis": {
+                  "const": "observed_quote_dates_365_25"
+                },
+                "components": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "sub_index_id": {
+                        "type": "string",
+                        "pattern": "^[1-9][0-9]{0,18}$"
+                      },
+                      "weight_pct": {
+                        "type": "string",
+                        "pattern": "^-?[0-9]+(?:\\.[0-9]+)?$"
+                      },
+                      "start_observation_date": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "format": "date",
+                            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "end_observation_date": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "format": "date",
+                            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "start_quote": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "pattern": "^-?[0-9]+(?:\\.[0-9]+)?$"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "end_quote": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "pattern": "^-?[0-9]+(?:\\.[0-9]+)?$"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "currency": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "start_lag_days": {
+                        "anyOf": [
+                          {
+                            "type": "number"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "end_lag_days": {
+                        "anyOf": [
+                          {
+                            "type": "number"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "elapsed_days": {
+                        "anyOf": [
+                          {
+                            "type": "number"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "status": {
+                        "enum": [
+                          "available",
+                          "unavailable"
+                        ]
+                      },
+                      "reason": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "total_return_pct": {
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "status": {
+                                "const": "available"
+                              },
+                              "value": {
+                                "type": "string",
+                                "pattern": "^-?[0-9]+(?:\\.[0-9]+)?$"
+                              },
+                              "reason": {
+                                "type": "null"
+                              }
+                            },
+                            "required": [
+                              "status",
+                              "value",
+                              "reason"
+                            ],
+                            "additionalProperties": true
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "status": {
+                                "const": "unavailable"
+                              },
+                              "value": {
+                                "type": "null"
+                              },
+                              "reason": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "status",
+                              "value",
+                              "reason"
+                            ],
+                            "additionalProperties": true
+                          }
+                        ]
+                      },
+                      "cagr_pct": {
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "status": {
+                                "const": "available"
+                              },
+                              "value": {
+                                "type": "string",
+                                "pattern": "^-?[0-9]+(?:\\.[0-9]+)?$"
+                              },
+                              "reason": {
+                                "type": "null"
+                              }
+                            },
+                            "required": [
+                              "status",
+                              "value",
+                              "reason"
+                            ],
+                            "additionalProperties": true
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "status": {
+                                "const": "unavailable"
+                              },
+                              "value": {
+                                "type": "null"
+                              },
+                              "reason": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "status",
+                              "value",
+                              "reason"
+                            ],
+                            "additionalProperties": true
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "sub_index_id",
+                      "weight_pct",
+                      "start_observation_date",
+                      "end_observation_date",
+                      "start_quote",
+                      "end_quote",
+                      "currency",
+                      "start_lag_days",
+                      "end_lag_days",
+                      "elapsed_days",
+                      "status",
+                      "reason",
+                      "total_return_pct",
+                      "cagr_pct"
+                    ],
+                    "additionalProperties": true
+                  },
+                  "maxItems": 100
+                }
+              },
+              "required": [
+                "period",
+                "requested_start",
+                "requested_end",
+                "status",
+                "reason",
+                "total_return_pct",
+                "cagr_pct",
+                "annualization_basis",
+                "components"
+              ],
+              "additionalProperties": true
+            },
+            "maxItems": 3,
+            "minItems": 1
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 100
+          }
+        },
+        "required": [
+          "object",
+          "fund_id",
+          "currency",
+          "requested_as_of",
+          "source_cutoff",
+          "source_version",
+          "methodology_version",
+          "basis",
+          "mapping_basis",
+          "weighting",
+          "calculation_precision",
+          "freshness_policy",
+          "components",
+          "periods",
+          "warnings"
+        ],
+        "additionalProperties": true
+      }
+    }
+  }
+};

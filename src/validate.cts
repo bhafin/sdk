@@ -4,6 +4,8 @@ export function valid(s: Schema | undefined, v: unknown, depth = 0): boolean {
   if (!s || depth > 64) return false;
   if (s.$ref)
     return valid(schemas[s.$ref.split("/").pop() ?? ""], v, depth + 1);
+  if (s.oneOf && s.oneOf.filter((x) => valid(x, v, depth + 1)).length !== 1)
+    return false;
   if (s.anyOf) return s.anyOf.some((x) => valid(x, v, depth + 1));
   if ("const" in s && v !== s.const) return false;
   if (s.enum && !s.enum.includes(v)) return false;
@@ -41,12 +43,42 @@ export function valid(s: Schema | undefined, v: unknown, depth = 0): boolean {
           v <= today
         );
       }
-      if (s.format === "date-time")
-        return (
-          /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/.test(
+      if (s.format === "date-time") {
+        const m =
+          /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d+)?(?:Z|[+-](\d{2}):(\d{2}))$/.exec(
             v,
-          ) && Number.isFinite(Date.parse(v))
+          );
+        if (!m) return false;
+        const year = Number(m[1]),
+          month = Number(m[2]),
+          day = Number(m[3]);
+        const leap = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+        const days = [
+          31,
+          leap ? 29 : 28,
+          31,
+          30,
+          31,
+          30,
+          31,
+          31,
+          30,
+          31,
+          30,
+          31,
+        ];
+        return (
+          month >= 1 &&
+          month <= 12 &&
+          day >= 1 &&
+          day <= days[month - 1]! &&
+          Number(m[4]) < 24 &&
+          Number(m[5]) < 60 &&
+          Number(m[6]) < 60 &&
+          (m[7] === undefined || (Number(m[7]) < 24 && Number(m[8]) < 60)) &&
+          Number.isFinite(Date.parse(v))
         );
+      }
       return true;
     }
     case "array":

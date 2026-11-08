@@ -1,6 +1,7 @@
 /** The JSON Schema subset emitted by our contract generators. */
 export interface Schema {
   $ref?: string;
+  oneOf?: readonly Schema[];
   anyOf?: readonly Schema[];
   const?: unknown;
   enum?: readonly unknown[];

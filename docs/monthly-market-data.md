@@ -15,10 +15,10 @@ SDK 0.6.0 adds baseline discovery through `client.markets.schemes.search({ query
 
 SDK 0.7.0 adds `markets.schemes.performance.retrieve`, `markets.categories.statistics.retrieve`, `markets.schemes.references`, and `markets.schemes.valuation`. Valuation uses only caller-supplied units and market NAV; it never reads saved positions. Private holdings/history/portfolio calculations keep account permissions and consent. Legacy account segments on market aliases are ignored for data selection; explicitly supplied user tokens remain validated.
 
-Resolve an investible scheme through `client.mutualFunds.search()` and its returned `scheme_id`. Fund-owner IDs and scheme IDs are distinct: NAV and expense ratios belong to schemes; portfolio snapshots and holdings belong to fund owners. Do not use an AMC ID as a fund-owner ID.
+Resolve an investible scheme through `client.mutualFundSchemes.search()` and its returned `scheme_id`. Fund-owner IDs and scheme IDs are distinct: NAV and expense ratios belong to schemes; portfolio snapshots and holdings belong to fund owners. Do not use an AMC ID as a fund-owner ID.
 
 ```ts
-const matches = await client.mutualFunds.search({ query: "fund name" });
+const matches = await client.mutualFundSchemes.search({ query: "fund name" });
 const match = matches.data[0];
 if (!match) throw new Error("No matching fund; choose another search.");
 const snapshot = await client.mutualFundSchemes.navs.retrieve(match.scheme_id, {

@@ -1,3 +1,4 @@
+import type * as B from "./benchmark-types.cjs";
 import type * as A from "./analytics-types.cjs";
 import type * as S from "./monthly-types.cjs";
 import type * as M from "./models.cjs";
@@ -5,7 +6,19 @@ import type * as D from "./market-types.cjs";
 import type { CurrentMixEvidence } from "./client-types.cjs";
 /** Each entry is the decoded response of the corresponding generated operation. */
 export interface OperationResults {
+  searchMutualFunds: D.MarketList<D.FundOwner>;
+  retrieveMutualFundScheme: D.FundScheme;
+  listMutualFundSchemes: D.MarketList<D.FundScheme>;
+  baseline_fund: D.FundOwner;
+  benchmark_indexes: B.IndexList;
+  benchmark_index: B.MarketIndex;
+  benchmark_index_performance: B.IndexPerformance;
+  benchmark_fund: B.FundBenchmark;
+  benchmark_fund_performance: B.FundBenchmarkPerformance;
+  benchmark_scheme: B.FundBenchmark;
+  benchmark_scheme_performance: B.FundBenchmarkPerformance;
   searchMarketSchemes: M.FundsList;
+  analytics_aum: A.FundAum;
   analytics_scheme: A.SchemePerformance;
   analytics_category: A.CategoryStatistics;
   monthly_nav: S.MarketSnapshot<D.NavObservation>;

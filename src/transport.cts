@@ -1,3 +1,4 @@
+import { operations as benchmarkOperations } from "./benchmark-contract.cjs";
 import { operations as marketSearchOperations } from "./market-search.cjs";
 import { operations as analyticsOperations } from "./analytics-contract.cjs";
 import { operations as monthlyOperations } from "./monthly-market-data.cjs";
@@ -23,6 +24,7 @@ const operations = {
   ...monthlyOperations,
   ...analyticsOperations,
   ...marketSearchOperations,
+  ...benchmarkOperations,
 };
 function assertServer() {
   if (
@@ -263,15 +265,27 @@ export function createTransport(input: BharosaConfig, marketOnly = false) {
     if (
       marketOnly &&
       ![
+        "baseline_fund",
+        "searchMutualFunds",
+        "retrieveMutualFundScheme",
+        "listMutualFundSchemes",
         "monthly_nav",
         "monthly_expense",
         "monthly_portfolio",
         "monthly_holdings",
         "monthly_valuation",
         "fund_references",
+        "analytics_aum",
         "analytics_scheme",
         "analytics_category",
         "searchMarketSchemes",
+        "benchmark_indexes",
+        "benchmark_index",
+        "benchmark_index_performance",
+        "benchmark_fund",
+        "benchmark_fund_performance",
+        "benchmark_scheme",
+        "benchmark_scheme_performance",
       ].includes(id)
     ) {
       throw Object.assign(new ValidationError(), {

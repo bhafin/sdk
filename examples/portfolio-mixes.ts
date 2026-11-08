@@ -30,7 +30,7 @@ export async function fundMixes(client: Bharosa, instrumentId: string) {
   const fund = client.mutualFunds.fromInstrument(instrumentId);
   return {
     asset: await fund.assetMix(),
-    sector: await fund.portfolio.sectorMix(),
+    sector: await fund.sectorMix(),
     issuer: await fund.issuerMix(),
   };
 }
@@ -47,9 +47,15 @@ export async function selectedSavedMix(
     load: (cursor?: string) => Promise<{ data: T[]; has_more: boolean }>,
   ): Promise<T[]> {
     const rows: T[] = [];
+    const seen = new Set<string>();
     let cursor: string | undefined;
     for (;;) {
       const page = await load(cursor);
+      for (const row of page.data) {
+        if (seen.has(row.id))
+          throw new Error("The list repeated records. Try loading it again.");
+        seen.add(row.id);
+      }
       rows.push(...page.data);
       if (!page.has_more) return rows;
       const next = page.data.at(-1)?.id;

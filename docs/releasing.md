@@ -1,3 +1,7 @@
+## v0.10 release provenance
+
+The v0.10 release uses verified reconstructed SDK 0.9/API13 content. Original signed release ancestry remains unavailable; new source integration commits preserve existing public history without claiming recovery of those signatures. No production data migration or TER change is required. Publication requires coordinated API, SDK, documentation and plugin verification.
+
 # Source and package release gates
 
 Source preparation does not authorize a push, a visibility change, npm publication, API deployment, or release of any sibling project.

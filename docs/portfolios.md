@@ -12,7 +12,7 @@ Saved portfolio objects also expose `currentSnapshot(requestOptions?)`, which de
 
 ## In-memory portfolios
 
-`bharosa.portfolios.build({ valuationDate, positions, currency: "INR" })` creates a local handle. First call `mutualFunds.search({ query })` and let the user select the intended fund and plan; use the selected result’s `instrument.id`. Each position has an `instrument` ID and a decimal-string `current_value`. Calling a mix method sends the target to the API without saving a portfolio. Only supported India INR mutual-fund portfolios are accepted.
+`bharosa.portfolios.build({ valuationDate, positions, currency: "INR" })` creates a local handle. First call `mutualFundSchemes.search({ query })` and let the user select the intended fund and plan; use the selected result’s `instrument.id`. Each position has an `instrument` ID and a decimal-string `current_value`. Calling a mix method sends the target to the API without saving a portfolio. Only supported India INR mutual-fund portfolios are accepted.
 
 The handle exposes the supplied `positions` as a defensively copied, frozen collection with frozen entries. It is not a mutable persistence collection: create a new handle to change the supplied positions. `fromPositions(...)` remains an equivalent alias. Use `portfolios.create(...)` for persistence. Convenience properties and methods do not change serialized JSON fields.
 

@@ -660,6 +660,336 @@ module.exports = {
         ],
         "additionalProperties": true
       }
+    },
+    "analytics_aum": {
+      "path": "/v1/accounts/{account}/market-data/funds/{id}/aum",
+      "method": "GET",
+      "status": 200,
+      "marketData": true,
+      "readOnly": true,
+      "parameters": [
+        {
+          "name": "account",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^(me|acct_[a-f0-9]{32})$"
+          }
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]{0,18}$"
+          }
+        },
+        {
+          "name": "as_of",
+          "in": "query",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^\\d{4}-\\d{2}-01$"
+          }
+        }
+      ],
+      "response": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "object": {
+                "const": "market_snapshot"
+              },
+              "fund_id": {
+                "type": "string",
+                "pattern": "^[1-9][0-9]{0,18}$"
+              },
+              "requested_date": {
+                "type": "string",
+                "format": "date",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+              },
+              "source_cutoff": {
+                "type": "string",
+                "format": "date",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+              },
+              "source_version": {
+                "type": "string"
+              },
+              "history_basis": {
+                "const": "current_source_vintage"
+              },
+              "status": {
+                "const": "available"
+              },
+              "observation_date": {
+                "type": "string",
+                "format": "date",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+              },
+              "data": {
+                "type": "object",
+                "properties": {
+                  "fund_id": {
+                    "type": "string",
+                    "pattern": "^[1-9][0-9]{0,18}$"
+                  },
+                  "date": {
+                    "type": "string",
+                    "format": "date",
+                    "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                  },
+                  "amount": {
+                    "type": "string",
+                    "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$"
+                  },
+                  "currency": {
+                    "const": "INR"
+                  },
+                  "unit": {
+                    "const": "rupee"
+                  },
+                  "scope": {
+                    "const": "fund"
+                  },
+                  "basis": {
+                    "const": "stored_fund_portfolio_value"
+                  },
+                  "source": {
+                    "type": "object",
+                    "properties": {
+                      "table": {
+                        "const": "portfolios"
+                      },
+                      "field": {
+                        "const": "value_cents"
+                      },
+                      "portfolio_id": {
+                        "type": "string",
+                        "pattern": "^[1-9][0-9]{0,18}$"
+                      },
+                      "date": {
+                        "type": "string",
+                        "format": "date"
+                      },
+                      "source_unit": {
+                        "const": "paise"
+                      }
+                    },
+                    "required": [
+                      "table",
+                      "field",
+                      "portfolio_id",
+                      "date",
+                      "source_unit"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "fund_id",
+                  "date",
+                  "amount",
+                  "currency",
+                  "unit",
+                  "scope",
+                  "basis",
+                  "source"
+                ],
+                "additionalProperties": false
+              },
+              "quality": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "fresh",
+                      "stale"
+                    ]
+                  },
+                  "age_days": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "limit_days": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                },
+                "required": [
+                  "status",
+                  "age_days",
+                  "limit_days"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "object",
+              "fund_id",
+              "requested_date",
+              "source_cutoff",
+              "source_version",
+              "history_basis",
+              "status",
+              "observation_date",
+              "data",
+              "quality"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "object": {
+                "const": "market_snapshot"
+              },
+              "fund_id": {
+                "type": "string",
+                "pattern": "^[1-9][0-9]{0,18}$"
+              },
+              "requested_date": {
+                "type": "string",
+                "format": "date",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+              },
+              "source_cutoff": {
+                "type": "string",
+                "format": "date",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+              },
+              "source_version": {
+                "type": "string"
+              },
+              "history_basis": {
+                "const": "current_source_vintage"
+              },
+              "status": {
+                "const": "missing"
+              },
+              "observation_date": {
+                "type": "null"
+              },
+              "data": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "object",
+              "fund_id",
+              "requested_date",
+              "source_cutoff",
+              "source_version",
+              "history_basis",
+              "status",
+              "observation_date",
+              "data"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "object": {
+                "const": "market_snapshot"
+              },
+              "fund_id": {
+                "type": "string",
+                "pattern": "^[1-9][0-9]{0,18}$"
+              },
+              "requested_date": {
+                "type": "string",
+                "format": "date",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+              },
+              "source_cutoff": {
+                "type": "string",
+                "format": "date",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+              },
+              "source_version": {
+                "type": "string"
+              },
+              "history_basis": {
+                "const": "current_source_vintage"
+              },
+              "status": {
+                "const": "unavailable"
+              },
+              "reason": {
+                "type": "string"
+              },
+              "observation_date": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date",
+                    "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "data": {
+                "type": "null"
+              },
+              "quality": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "enum": [
+                          "fresh",
+                          "stale"
+                        ]
+                      },
+                      "age_days": {
+                        "type": "number",
+                        "minimum": 0
+                      },
+                      "limit_days": {
+                        "type": "number",
+                        "minimum": 0
+                      }
+                    },
+                    "required": [
+                      "status",
+                      "age_days",
+                      "limit_days"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "object",
+              "fund_id",
+              "requested_date",
+              "source_cutoff",
+              "source_version",
+              "history_basis",
+              "status",
+              "reason",
+              "observation_date",
+              "data",
+              "quality"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      }
     }
   }
 };

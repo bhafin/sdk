@@ -294,6 +294,17 @@ module.exports = {
                     "recent_within_days"
                   ],
                   "additionalProperties": true
+                },
+                "mutual_fund_id": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^[1-9][0-9]{0,18}$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               },
               "required": [
