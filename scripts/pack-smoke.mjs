@@ -113,7 +113,8 @@ for (const [module, resolution, files] of [
 const packageJson = JSON.parse(
   fs.readFileSync(path.join(temp, "node_modules/bharosa/package.json")),
 );
-assert.equal(packageJson.private, false); // Reviewed, explicitly authorized release candidate.
+assert.equal(packageJson.private, undefined); // Authorized public v0.10 release.
+assert.equal(packageJson.scripts.prepublishOnly, undefined);
 assert.equal(
   packageJson.version,
   JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8")).version,
@@ -124,7 +125,7 @@ assert.match(
   fs.readFileSync(path.join(temp, "node_modules/bharosa/LICENSE"), "utf8"),
   /Copyright \(c\) 2026 Bharosa Technoserve Private Limited/,
 );
-assert.ok(packageJson.scripts.prepublishOnly);
+
 console.log(
   JSON.stringify(
     {

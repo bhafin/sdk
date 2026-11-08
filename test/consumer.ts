@@ -54,11 +54,11 @@ async function types() {
       positions: [{ instrument: "ins_example", current_value: "1" }],
     })
     .sectorMix({}, { maxRetries: 1 });
-  await c.mutualFunds.fromId("46").portfolio.assetMix();
+  await c.mutualFunds.fromId("46").assetMix();
   await c.mutualFunds.fromInstrument("ins_example").issuerMix();
   await (
     await c.mutualFunds.search({ query: "Example" })
-  ).data[0].instrument.sectorMix();
+  ).data[0].sectorMix();
   await (
     await c.mutualFunds.references({ instruments: ["ins_example"] })
   ).data[0].instrument.assetMix();
@@ -299,3 +299,29 @@ void simpleKeyClient.markets.schemes.search({query:'equity',limit:5}).then(resul
 void simpleKeyClient.markets.schemes.search({query:'equity',asOf:'2026-10-01'});
 // @ts-expect-error Search is bounded, not cursor paginated.
 void simpleKeyClient.markets.schemes.search({query:'equity',startingAfter:'101'});
+
+async function catalogMigration(client: Bharosa) {
+  const fund = (await client.mutualFunds.search({query:"Example"})).data[0];
+  const schemes = await fund.schemes({limit:1, plan:4, option:0});
+  const scheme = await client.mutualFundSchemes.retrieve(schemes.data[0].id);
+  const parent = await scheme.fund();
+  await scheme.nav({asOf:"2026-10-01"});
+  await parent?.portfolio({asOf:"2026-10-01"});
+  // @ts-expect-error ordinary method has no analytics properties
+  fund.portfolio.assetMix();
+  // @ts-expect-error resource is not a custom thenable
+  fund.then(() => {});
+  // @ts-expect-error a parent cannot be overridden through listing options
+  fund.schemes({fund:"9"});
+}
+void catalogMigration;
+
+// Named metadata must survive FundsList's extension index signature in the installed package.
+void simpleKeyClient.mutualFundSchemes.search({query:"Example"}).then(result => {
+  const hasMore: boolean = result.has_more;
+  const url: string = result.url;
+  const object: "list" = result.object;
+  const mode: string = result.market_data.mode;
+  const id: string | undefined = result.data[0]?.id;
+  void [hasMore, url, object, mode, id];
+});

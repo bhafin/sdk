@@ -6,6 +6,9 @@ import type * as D from "./market-types.cjs";
 import type { CurrentMixEvidence } from "./client-types.cjs";
 /** Each entry is the decoded response of the corresponding generated operation. */
 export interface OperationResults {
+  searchMutualFunds: D.MarketList<D.FundOwner>;
+  retrieveMutualFundScheme: D.FundScheme;
+  listMutualFundSchemes: D.MarketList<D.FundScheme>;
   baseline_fund: D.FundOwner;
   benchmark_indexes: B.IndexList;
   benchmark_index: B.MarketIndex;

@@ -266,6 +266,9 @@ export function createTransport(input: BharosaConfig, marketOnly = false) {
       marketOnly &&
       ![
         "baseline_fund",
+        "searchMutualFunds",
+        "retrieveMutualFundScheme",
+        "listMutualFundSchemes",
         "monthly_nav",
         "monthly_expense",
         "monthly_portfolio",

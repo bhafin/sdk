@@ -295,7 +295,7 @@ try {
       { id: "retrieve_portfolio" },
       { id: "current_snapshot" },
       { id: "asset_mix", body: { portfolio: saved } },
-      { id: "search_funds" },
+      { id: "baseline_search" },
       { id: "baseline_search", query: "?query=equity&limit=5" },
       { id: "baseline_nav" },
     ],

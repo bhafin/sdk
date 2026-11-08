@@ -339,87 +339,143 @@ export class Bharosa implements T.ClientSurface {
         ) => snapshot(await call("replace_snapshot", { portfolio }, b, o)),
       }),
     });
-    const fund = <A extends object>(
+    const instrumentFund = <A extends object>(
       target: Target,
       data: A,
     ): A & T.MutualFundObject => {
+      const common = mixMethods(target);
+      return methods(data, { portfolio: common, ...common });
+    };
+    const fund = <A extends object>(
+      target: Extract<Target, { type: "mutual_fund" }>,
+      data: A,
+    ): A & T.PublicMutualFundObject => {
       const common = mixMethods(target),
-        portfolio = methods(
-          target.type === "mutual_fund"
-            ? async (
-                selection: Partial<MonthSelection> = {},
-                options?: T.RequestOptions,
-              ): Promise<T.FundPortfolioResource | null> => {
-                keys(selection, ["asOf"]);
-                const asOf = selection.asOf;
-                if (asOf !== undefined) {
-                  checkedDate(asOf);
-                  check(asOf.endsWith("-01"));
-                }
-                const id = target.mutual_fund_id;
-                const selected = await marketCall(
-                  "monthly_portfolio",
-                  { id, ...(asOf === undefined ? {} : { as_of: asOf }) },
+        portfolio = async (
+          selection: Partial<MonthSelection> = {},
+          options?: T.RequestOptions,
+        ): Promise<T.FundPortfolioResource | null> => {
+          keys(selection, ["asOf"]);
+          const asOf = selection.asOf;
+          if (asOf !== undefined) {
+            checkedDate(asOf);
+            check(asOf.endsWith("-01"));
+          }
+          check(target.type === "mutual_fund");
+          const id = target.mutual_fund_id;
+          const selected = await marketCall(
+            "monthly_portfolio",
+            { id, ...(asOf === undefined ? {} : { as_of: asOf }) },
+            undefined,
+            options,
+          );
+          if (selected.status === "missing") return null;
+          const selectedId = selected.data.id,
+            selectedDate = selected.observation_date;
+          return methods(
+            {
+              ...selected.data,
+              requested_date: selected.requested_date,
+              observation_date: selectedDate,
+            },
+            {
+              holdings: async (
+                query: D.MarketPage = {},
+                requestOptions?: T.RequestOptions,
+              ) => {
+                keys(query, ["limit", "startingAfter"]);
+                const response = await marketCall(
+                  "monthly_holdings",
+                  {
+                    id,
+                    ...(asOf === undefined ? {} : { as_of: asOf }),
+                    portfolio_id: selectedId,
+                    portfolio_date: selectedDate,
+                    ...(query.limit === undefined
+                      ? {}
+                      : { limit: query.limit }),
+                    ...(query.startingAfter === undefined
+                      ? {}
+                      : { starting_after: query.startingAfter }),
+                  },
                   undefined,
-                  options,
+                  requestOptions,
                 );
-                if (selected.status === "missing") return null;
-                const selectedId = selected.data.id,
-                  selectedDate = selected.observation_date;
-                return methods(
-                  {
-                    ...selected.data,
-                    requested_date: selected.requested_date,
-                    observation_date: selectedDate,
-                  },
-                  {
-                    holdings: async (
-                      query: D.MarketPage = {},
-                      requestOptions?: T.RequestOptions,
-                    ) => {
-                      keys(query, ["limit", "startingAfter"]);
-                      const response = await marketCall(
-                        "monthly_holdings",
-                        {
-                          id,
-                          ...(asOf === undefined ? {} : { as_of: asOf }),
-                          portfolio_id: selectedId,
-                          ...(query.limit === undefined
-                            ? {}
-                            : { limit: query.limit }),
-                          ...(query.startingAfter === undefined
-                            ? {}
-                            : { starting_after: query.startingAfter }),
-                        },
-                        undefined,
-                        requestOptions,
-                      );
-                      if (
-                        response.status !== "available" ||
-                        response.data.portfolio.id !== selectedId ||
-                        response.observation_date !== selectedDate
-                      )
-                        throw new InvalidResponseError();
-                      return response.data.holdings;
-                    },
-                  },
-                );
-              }
-            : {},
-          {
-            assetMix: common.assetMix,
-            sectorMix: common.sectorMix,
-            issuerMix: common.issuerMix,
-          },
-        );
+                if (
+                  response.status !== "available" ||
+                  response.data.portfolio.id !== selectedId ||
+                  response.observation_date !== selectedDate
+                )
+                  throw new InvalidResponseError();
+                return response.data.holdings;
+              },
+            },
+          );
+        };
       return methods(data, {
         portfolio,
-        assetMix: (p?: T.MixOptions, o?: T.RequestOptions) =>
-          portfolio.assetMix(p, o),
-        sectorMix: (p?: T.MixOptions, o?: T.RequestOptions) =>
-          portfolio.sectorMix(p, o),
-        issuerMix: (p?: T.MixOptions, o?: T.RequestOptions) =>
-          portfolio.issuerMix(p, o),
+        schemes: async (q: T.SchemeListQuery = {}, o?: T.RequestOptions) => {
+          check(target.type === "mutual_fund");
+          keys(q, ["limit", "startingAfter", "query", "plan", "option"]);
+          const result = await marketCall(
+            "listMutualFundSchemes",
+            {
+              id: target.mutual_fund_id,
+              limit: q.limit,
+              query: q.query,
+              plan: q.plan,
+              option: q.option,
+              starting_after: q.startingAfter,
+            },
+            undefined,
+            o,
+          );
+          if (result.data.some((row) => row.fund_id !== target.mutual_fund_id))
+            throw new InvalidResponseError();
+          return { ...result, data: result.data.map(scheme) };
+        },
+        ...common,
+      });
+    };
+    const scheme = (row: D.FundScheme): T.MutualFundSchemeObject => {
+      const data = {
+        ...row,
+        mutual_fund_id: row.fund_id,
+        plan:
+          row.plan_code === null
+            ? null
+            : ([
+                "Institutional",
+                "Regular",
+                "Super institutional",
+                "Institutional plus",
+                "Direct",
+                "Regular (standard)",
+              ][row.plan_code] ?? null),
+        option:
+          row.option_code === null
+            ? null
+            : (["Growth", "Dividend / IDCW", "Bonus"][row.option_code] ?? null),
+      };
+      return hydrateScheme(data);
+    };
+    const hydrateScheme = <
+      S extends Omit<T.MutualFundSchemeObject, "fund" | "nav">,
+    >(
+      data: S,
+    ): S & T.MutualFundSchemeObject => {
+      // Bind identities once; public result fields may be edited by callers.
+      const id = data.id,
+        parent = data.mutual_fund_id;
+      const validId = (v: string) =>
+        /^[1-9][0-9]{0,18}$/.test(v) && BigInt(v) <= 9223372036854775807n;
+      if (!validId(id) || (parent !== null && !validId(parent)))
+        throw new InvalidResponseError();
+      return methods(data, {
+        fund: async (o?: T.RequestOptions) =>
+          parent === null ? null : this.mutualFunds.retrieve(parent, o),
+        nav: async (q: { asOf?: string } = {}, o?: T.RequestOptions) =>
+          this.markets.schemes.nav(id, q, o),
       });
     };
     this.mutualFunds = Object.freeze({
@@ -474,22 +530,27 @@ export class Bharosa implements T.ClientSurface {
           typeof instrument === "string" &&
             /^ins_[A-Za-z0-9_-]{1,150}$/.test(instrument),
         );
-        return fund({ type: "fund_instrument", instrument }, { instrument });
+        return instrumentFund(
+          { type: "fund_instrument", instrument },
+          { instrument },
+        );
       },
       search: async (
         p: { query: string; limit?: number },
         o?: T.RequestOptions,
       ) => {
-        const result = await call("search_funds", p, undefined, o);
+        keys(p, ["query", "limit"]);
+        check(
+          typeof p.query === "string" &&
+            p.query.trim().length >= 2 &&
+            p.query.length <= 100,
+        );
+        const result = await marketCall("searchMutualFunds", p, undefined, o);
         return {
           ...result,
-          data: result.data.map((choice) => ({
-            ...choice,
-            instrument: fund(
-              { type: "fund_instrument", instrument: choice.instrument.id },
-              choice.instrument,
-            ),
-          })),
+          data: result.data.map((row) =>
+            fund({ type: "mutual_fund", mutual_fund_id: row.id }, row),
+          ),
         };
       },
       references: async (
@@ -519,7 +580,7 @@ export class Bharosa implements T.ClientSurface {
           ...result,
           data: result.data.map((choice) => ({
             ...choice,
-            instrument: fund(
+            instrument: instrumentFund(
               { type: "fund_instrument", instrument: choice.instrument.id },
               choice.instrument,
             ),
@@ -605,6 +666,45 @@ export class Bharosa implements T.ClientSurface {
       },
     };
     this.mutualFundSchemes = Object.freeze({
+      retrieve: async (id: string, o?: T.RequestOptions) => {
+        check(
+          typeof id === "string" &&
+            /^[1-9][0-9]{0,18}$/.test(id) &&
+            BigInt(id) <= 9223372036854775807n,
+        );
+        const row = await marketCall(
+          "retrieveMutualFundScheme",
+          { id },
+          undefined,
+          o,
+        );
+        if (row.id !== id) throw new InvalidResponseError();
+        return scheme(row);
+      },
+      search: async (
+        p: { query: string; limit?: number },
+        o?: T.RequestOptions,
+      ) => {
+        const result = await this.markets.schemes.search(p, o);
+        return {
+          ...result,
+          data: result.data.map((row) =>
+            hydrateScheme({
+              ...row,
+              id: row.scheme_id,
+              mutual_fund_id:
+                typeof row.mutual_fund_id === "string"
+                  ? row.mutual_fund_id
+                  : null,
+              fund_name: row.instrument.mutual_fund?.fund_name ?? null,
+              plan: row.plan_label,
+              option: row.option_label,
+              amfi_code: row.amfi_code,
+              isin: row.isin,
+            }),
+          ),
+        };
+      },
       performance: Object.freeze({
         retrieve: (
           id: string,

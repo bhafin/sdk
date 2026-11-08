@@ -1,3 +1,7 @@
+# 0.10.0 — local unreleased
+
+Separate parent-fund and scheme discovery/retrieval. Add paginated fund.schemes() and scheme.fund()/nav(). Parent fund.portfolio() is an ordinary async method; use direct fund mix methods instead of portfolio function properties. See docs/fund-aum.md for migration and preserved historical semantics.
+
 # 0.9.0
 
 Adds the public mutual fund → portfolio() → holdings() resource chain, selecting the latest stored portfolio by default and retaining historical month-start selection. Holdings pagination binds to the selected portfolio; AUM stays on that record. Existing mix methods remain compatible. Strengthens calendar and union validation, pagination guards, and constructor transport snapshots.

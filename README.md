@@ -69,9 +69,9 @@ does not change the investor's positions or their valuation date.
 For a fund, search first and let the user select the matching share class:
 
 ```ts
-const matches = await bharosa.mutualFunds.search({ query: "equity" });
+const matches = await bharosa.mutualFundSchemes.search({ query: "equity" });
 // Display matches.data and let the user choose the intended fund/plan.
-// The returned instrument exposes assetMix(), sectorMix() and issuerMix().
+// Use scheme.fund() for the parent, or mutualFunds.fromInstrument(scheme.instrument.id) for mixes.
 ```
 
 Use returned IDs rather than inventing them. The API calculates each mix; the SDK
@@ -86,7 +86,7 @@ Read the [portfolio guide](docs/portfolios.md), or run the
 
 `portfolios.build(...)` creates an in-memory calculation handle with a readable, immutable `positions` collection. It defensively copies supplied positions; changes to your original input cannot change future requests. `fromPositions(...)` remains an equivalent alias. Use `portfolios.create(...)` when you intend to persist a portfolio.
 
-A saved portfolio has `currentSnapshot()` to retrieve its current snapshot using the existing snapshot API. A fund's `portfolio` is a calculation handle, not a downloaded holdings collection. Sector and issuer methods cover equity-only allocation.
+A saved portfolio has `currentSnapshot()` to retrieve its current snapshot using the existing snapshot API. A parent fund's `portfolio()` returns its selected public portfolio snapshot or null, with snapshot-bound `holdings()`. Call `fund.assetMix()`, `fund.sectorMix()` or `fund.issuerMix()` for analytics. Sector and issuer methods cover equity-only allocation.
 
 The SDK also supports account reads, client lists, investor creation/updates, snapshot replacement, and mutual-fund discovery. Body and response fields use snake_case. Monetary values remain decimal strings. Lists use `limit` and `startingAfter`; investor/portfolio lists can filter by `client`. Root exports include TypeScript models and typed error classes.
 
@@ -149,7 +149,7 @@ if (selected) {
 }
 ```
 
-Choose the intended scheme and plan from the results. `query` must have 2–100 characters, with at least two after trimming; `limit` is 1–20 and defaults to 10. If `has_more` is true, refine the query; search has no cursor or historical date parameter. An empty `data` array is a valid result. Search returns scheme identities and latest NAV references, including freshness and data-mode information. It does not grant private account access. Existing `mutualFunds.search` remains compatible and also uses baseline market authentication. `BharosaMarket` users can call `schemes.search` directly.
+Choose the intended scheme and plan from the results. `query` must have 2–100 characters, with at least two after trimming; `limit` is 1–20 and defaults to 10. If `has_more` is true, refine the query; search has no cursor or historical date parameter. An empty `data` array is a valid result. Search returns scheme identities and latest NAV references, including freshness and data-mode information. It does not grant private account access. `mutualFundSchemes.search` returns hydrated schemes with parent IDs, plan/option labels, `fund()` and `nav()`. `mutualFunds.search` now returns parent funds with `schemes()` and `portfolio()`; this is an intentional v0.10 breaking change. `BharosaMarket` users can call `schemes.search` directly.
 
 Available in SDK 0.6.0 and later, using the account-independent `/v1/market-data/schemes/search` route.
 

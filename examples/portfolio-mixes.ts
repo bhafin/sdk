@@ -30,7 +30,7 @@ export async function fundMixes(client: Bharosa, instrumentId: string) {
   const fund = client.mutualFunds.fromInstrument(instrumentId);
   return {
     asset: await fund.assetMix(),
-    sector: await fund.portfolio.sectorMix(),
+    sector: await fund.sectorMix(),
     issuer: await fund.issuerMix(),
   };
 }

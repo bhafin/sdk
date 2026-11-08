@@ -4,7 +4,7 @@ import { Bharosa as Previous } from "./legacy-types/index.js";
 declare const current: Current;
 declare const previous: Previous;
 // Intentional prelaunch changes: resource aliases are additive; Account.owner is removed.
-const previousSurface: Omit<Previous, "accounts" | "portfolios"> = current;
+const previousSurface: Omit<Previous, "accounts" | "portfolios" | "mutualFunds"> = current;
 const currentSurface: Omit<
   Current,
   | "markets"
@@ -15,11 +15,14 @@ const currentSurface: Omit<
   | "accounts"
   | "portfolios"
 > = previous;
-const previousFunds: Previous["mutualFunds"] = current.mutualFunds;
-const currentFunds: Omit<
-  Current["mutualFunds"],
-  "portfolios" | "aum" | "retrieve" | "fromId"
-> = previous.mutualFunds;
+// v0.10 explicitly breaks scheme-returning fund search and function-property accessors.
+// Keep the unaffected references surface checked against the independent oracle.
+const previousFunds: Previous["mutualFunds"]["references"] = current.mutualFunds.references;
+const currentFunds: Current["mutualFunds"]["references"] = previous.mutualFunds.references;
+// @ts-expect-error fund.portfolio is an ordinary async method
+current.mutualFunds.fromId("7").portfolio.assetMix();
+// @ts-expect-error parent-fund search no longer returns scheme instruments
+(await current.mutualFunds.search({query:"Example"})).data[0].instrument;
 void previousSurface;
 void currentSurface;
 void previousFunds;

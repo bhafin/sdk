@@ -55,12 +55,13 @@ test("retrieve fund -> latest portfolio -> bound holdings uses baseline credenti
         return Response.json(snapshot(portfolio));
       assert.equal(u.pathname, "/v1/market-data/funds/7/holdings");
       assert.equal(u.searchParams.get("portfolio_id"), "51");
+      assert.equal(u.searchParams.get("portfolio_date"), "2026-10-22");
       return Response.json(snapshot({ portfolio, holdings: page }));
     },
   });
   const fund = await sdk.mutualFunds.retrieve("7");
   assert.equal(typeof fund.portfolio, "function");
-  assert.equal(typeof fund.portfolio.assetMix, "function");
+  assert.equal(Object.hasOwn(fund.portfolio, "assetMix"), false);
   const selected = await fund.portfolio();
   assert.ok(selected);
   assert.equal(selected.id, "51");
@@ -116,7 +117,7 @@ test("mismatched fund identity and changed holdings selection are not returned",
   assert.ok(selected);
   await assert.rejects(selected.holdings(), InvalidResponseError);
 });
-test("legacy fund.portfolio.assetMix remains callable without a portfolio fetch", async () => {
+test("explicit fund.assetMix remains callable without a portfolio fetch", async () => {
   let calls = 0;
   const sdk = new Bharosa({
     apiKey: "synthetic",
@@ -129,7 +130,7 @@ test("legacy fund.portfolio.assetMix remains callable without a portfolio fetch"
       );
     },
   });
-  await assert.rejects(sdk.mutualFunds.fromId("7").portfolio.assetMix());
+  await assert.rejects(sdk.mutualFunds.fromId("7").assetMix());
   assert.equal(calls, 1);
 });
 test("historical resource captures cutoff and AUM; caller mutation cannot retarget holdings", async () => {
@@ -171,6 +172,8 @@ test("historical resource captures cutoff and AUM; caller mutation cannot retarg
     fetch: async (input) => {
       const u = new URL(String(input));
       assert.equal(u.searchParams.get("as_of"), "2026-10-01");
+      if (u.pathname.endsWith("/holdings"))
+        assert.equal(u.searchParams.get("portfolio_date"), "2026-09-30");
       return Response.json(
         u.pathname.endsWith("/holdings")
           ? envelope({
@@ -206,4 +209,42 @@ test("aborted fund lookup makes no transport call and unknown options are reject
       .portfolio({ asOf: "2026-10-01", unexpected: true } as any),
   );
   assert.equal(calls, 0);
+});
+
+test("resource sends captured date on page two and propagates deliberate409", async () => {
+  let holdingsCalls = 0;
+  const sdk = new Bharosa({
+    apiKey: "synthetic",
+    fetch: async (input) => {
+      const u = new URL(String(input));
+      if (!u.pathname.endsWith("/holdings"))
+        return Response.json(snapshot({ ...portfolio }));
+      assert.equal(u.searchParams.get("portfolio_id"), "51");
+      assert.equal(u.searchParams.get("portfolio_date"), "2026-10-22");
+      holdingsCalls++;
+      if (holdingsCalls === 1)
+        return Response.json(snapshot({ portfolio, holdings: page }));
+      return Response.json(
+        {
+          error: {
+            type: "invalid_request_error",
+            param: null,
+            request_id: "req_fixture",
+            code: "fund_portfolio_changed",
+            message: "Selected portfolio changed",
+          },
+        },
+        { status: 409, headers: {"Request-Id": "req_fixture"} },
+      );
+    },
+  });
+  const selected = await sdk.mutualFunds.fromId("7").portfolio();
+  assert.ok(selected);
+  await selected.holdings();
+  Reflect.set(selected, "observation_date", "2026-10-21");
+  selected.date = "2026-10-21";
+  await assert.rejects(selected.holdings({ startingAfter: "2" }), {
+    status: 409,
+    code: "fund_portfolio_changed",
+  });
 });

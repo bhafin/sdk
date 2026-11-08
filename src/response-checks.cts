@@ -70,6 +70,45 @@ export function responseMatches(
     )
       return false;
   }
+  if (id === "searchMutualFunds" || id === "listMutualFundSchemes") {
+    const page = rows(d("data")),
+      ids = page.map((row) => field(row, "id"));
+    const limit =
+      typeof params.limit === "number"
+        ? params.limit
+        : id === "searchMutualFunds"
+          ? 10
+          : 20;
+    if (
+      page.length > limit ||
+      new Set(ids).size !== ids.length ||
+      ids.some(
+        (value) =>
+          typeof value !== "string" ||
+          !/^[1-9][0-9]{0,18}$/.test(value) ||
+          BigInt(value) > 9223372036854775807n,
+      ) ||
+      (d("has_more") === true && page.length !== limit)
+    )
+      return false;
+    if (id === "searchMutualFunds") {
+      if (d("next_cursor") !== null) return false;
+    } else {
+      if (
+        page.some((row) => field(row, "fund_id") !== params.id) ||
+        ids.some(
+          (value, i) =>
+            BigInt(String(value)) <=
+            BigInt(
+              i ? String(ids[i - 1]) : String(params.starting_after ?? "0"),
+            ),
+        ) ||
+        d("next_cursor") !== (d("has_more") ? ids.at(-1) : null)
+      )
+        return false;
+    }
+  }
+  if (id === "retrieveMutualFundScheme" && d("id") !== params.id) return false;
   if (id === "searchMarketSchemes") {
     const page = rows(d("data"));
     if (

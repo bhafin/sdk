@@ -238,19 +238,48 @@ export type FundPortfolioResource =
       >
     >;
   };
-export interface FundPortfolioAccessor extends PortfolioMethods {
-  (
+export interface PublicMutualFundObject extends PortfolioMethods {
+  readonly mutual_fund_id?: string;
+  portfolio(
     selection?: Partial<import("./monthly-types.cjs").MonthSelection>,
     options?: RequestOptions,
   ): Promise<FundPortfolioResource | null>;
+  schemes(
+    query?: SchemeListQuery,
+    options?: RequestOptions,
+  ): Promise<import("./market-types.cjs").MarketList<MutualFundSchemeObject>>;
 }
-export interface PublicMutualFundObject extends MutualFundObject {
-  readonly portfolio: FundPortfolioAccessor;
+export interface SchemeListQuery extends SchemePage {
+  query?: string;
+  plan?: number;
+  option?: number;
+}
+interface SchemePage {
+  limit?: number;
+  startingAfter?: string;
+}
+export interface MutualFundSchemeObject {
+  id: string;
+  mutual_fund_id: string | null;
+  fund_name: string | null;
+  plan: string | null;
+  option: string | null;
+  amfi_code: string | null;
+  isin: string | null;
+  fund(
+    options?: RequestOptions,
+  ): Promise<
+    (import("./market-types.cjs").FundOwner & PublicMutualFundObject) | null
+  >;
+  nav(
+    selection?: { asOf?: string },
+    options?: RequestOptions,
+  ): ReturnType<MonthlyMarketClient["schemes"]["nav"]>;
 }
 export interface MutualFundObject extends PortfolioMethods {
   readonly portfolio: PortfolioMethods;
-  readonly mutual_fund_id?: string;
   readonly instrument?: string;
+  readonly mutual_fund_id?: string;
 }
 export type FundObjectsList = Omit<Fields<FundsList>, "data"> & {
   data: Array<
@@ -276,6 +305,19 @@ export interface ClientSurface {
     >;
   };
   readonly mutualFundSchemes: {
+    search(
+      params: { query: string; limit?: number },
+      options?: RequestOptions,
+    ): Promise<
+      Omit<Fields<FundsList>, "data"> & {
+        data: (Fields<FundsList["data"][number]> & MutualFundSchemeObject)[];
+      }
+    >;
+    retrieve(
+      id: string,
+      options?: RequestOptions,
+    ): Promise<MutualFundSchemeObject>;
+
     readonly performance: A.AnalyticsResource<
       A.PerformanceSelection,
       A.SchemePerformance
@@ -372,7 +414,11 @@ export interface ClientSurface {
     readonly search: (
       params: { query: string; limit?: number },
       options?: RequestOptions,
-    ) => Promise<FundObjectsList>;
+    ) => Promise<
+      import("./market-types.cjs").MarketList<
+        import("./market-types.cjs").FundOwner & PublicMutualFundObject
+      >
+    >;
     readonly references: (
       params: { instruments: string[] },
       options?: RequestOptions,

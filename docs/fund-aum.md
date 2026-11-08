@@ -40,7 +40,7 @@ if (portfolio) {
 
 `portfolio.holdings()` includes the selected portfolio ID on every page. If a later lookup selects a different portfolio or the record disappears, the API returns `409 fund_portfolio_changed`; restart from `fund.portfolio()`. The SDK also rejects a different returned ID/date. This pins identity, not an immutable snapshot of all holding rows: source corrections to the same stored record are not versioned by this interface.
 
-Existing `fund.portfolio.assetMix()` and the flat `mutualFunds.portfolios.retrieve` / `holdings.list` methods remain supported. `fromId(fundId).portfolio()` skips the fund identity request. Instrument-only wrappers keep their existing mix methods; they are not silently treated as parent fund IDs. These public fund portfolios are distinct from private account portfolios and require only baseline market access.
+Existing `fund.assetMix()` and the flat `mutualFunds.portfolios.retrieve` / `holdings.list` methods remain supported. `fromId(fundId).portfolio()` skips the fund identity request. Instrument-only wrappers keep their existing mix methods; they are not silently treated as parent fund IDs. These public fund portfolios are distinct from private account portfolios and require only baseline market access.
 
 The nested `portfolio.aum` uses the same stored value and observation date as the standalone fund AUM result. It is optional in SDK types for compatibility with older servers. Missing or invalid AUM does not hide an otherwise valid portfolio and its holdings. A conflicting latest portfolio selection fails explicitly. Separate calls use current retained records, so compare returned IDs/dates if ingestion changes between requests.
 
@@ -57,3 +57,41 @@ The measure follows the existing app's fund AUM method: the stored value of the 
 Existing market authentication, account boundaries and shared quotas apply. Category AUM aggregation remains disabled. This change needs no data migration and changes neither ingestion nor TER. Actual hosted permissions and data coverage require release validation; the local tests use synthetic data.
 
 Authorization: every method described here is public baseline market data. A valid active API key is required; accounts:read, portfolios:read and investor consent are not required. Fund/scheme benchmark proxies use the same rule. Revocation, shared market quotas and applicable month-start date restrictions still apply. Private user accounts and portfolios keep their existing authorization requirements.
+
+## v0.10 migration (local, unreleased)
+
+`mutualFunds.search({query, limit?})` now returns parent mutual funds. Move scheme autocomplete to `mutualFundSchemes.search({query, limit?})`. Both searches are bounded (query 2–100 characters; limit 1–20, default10). Refine the query when `has_more` is true; searches have no cursor. Parent search matches literal fund-name substrings, not scheme identifiers. Scheme search retains ranked token/identifier/plan/option matching.
+
+```ts
+const funds = await bharosa.mutualFunds.search({ query: "HDFC Flexi Cap" });
+const selectedFund = funds.data[0];
+if (selectedFund) {
+  const fund = await bharosa.mutualFunds.retrieve(selectedFund.id);
+  const page = await fund.schemes({ limit: 20 });
+  const next = page.has_more && page.next_cursor
+    ? await fund.schemes({ limit: 20, startingAfter: page.next_cursor })
+    : null;
+  const selectedScheme = page.data[0];
+  if (selectedScheme) {
+    const scheme = await bharosa.mutualFundSchemes.retrieve(selectedScheme.id);
+    const parent = await scheme.fund();
+    const nav = await scheme.nav({ asOf: "2026-10-01" });
+  }
+  const portfolio = await fund.portfolio({ asOf: "2026-10-01" });
+  const holdings = portfolio ? await portfolio.holdings({ limit: 20 }) : null;
+}
+```
+
+Handle empty search/list results before selecting an element. `fund.schemes()` is paginated in numeric ID order (limit1–100, default20). Optional `plan` and `option` filters use source codes, not labels: plan0 Institutional,1 Regular,2 Super institutional,3 Institutional plus,4 Direct,5 Regular (standard); option0 Growth,1 Dividend / IDCW,2 Bonus. `query` is an optional literal fund-name substring. A nonexistent parent returns404; an existing parent without schemes returns an empty list. Parent scope cannot be overridden.
+
+Scheme resources expose `id`, `mutual_fund_id`, `fund_name`, `plan`, `option`, `amfi_code` and `isin`. Unknown/null source codes produce null labels. A null parent yields null from `scheme.fund()`; a missing referenced parent returns404. Historical NAV retains its existing snapshot envelope. Resource methods bind their original IDs, even if callers edit displayed result fields.
+
+`portfolio()`, `schemes()`, `fund()` and `nav()` are ordinary async methods. Resources have no custom thenable behavior. Replace `fund.portfolio.assetMix()` with `fund.assetMix()` (similarly sector/issuer). Flat analytics methods and instrument/reference calculation handles remain available. Historical portfolio cutoff, actual observation date, null result and pinned holdings behavior are unchanged. All public catalog routes use baseline market access; private portfolio operations still require their own permissions.
+
+### Concurrent source changes
+
+A holdings page validates the selected public portfolio ID, fund owner, observation date and cutoff selection in the same read-only repeatable-read database snapshot used to read its rows. A changed/deleted/reassigned selection visible at that boundary returns `409/fund_portfolio_changed`, including when the result would otherwise be empty. A genuinely empty portfolio or final page remains a successful empty result.
+
+A source update committed after that database read snapshot begins may return the coherent pre-change page; a later pinned request detects a changed selection. Portfolio/date binding does not provide immutable historical versions of individual holdings rows across requests. Unrelated database/unavailable and malformed-value errors retain their existing error codes.
+
+`portfolio.holdings()` automatically sends its captured `portfolio_id` and `portfolio_date` on every page, including after caller edits to displayed fields. Raw API callers should send both to detect same-ID date changes as `409/fund_portfolio_changed`. `portfolio_date` requires `portfolio_id`, accepts a calendar observation date on/before the cutoff, and only checks equality after normal eligible snapshot selection. It cannot select older/daily history or bypass month-start `as_of` restrictions. Legacy ID-only requests retain ID-only pinning.

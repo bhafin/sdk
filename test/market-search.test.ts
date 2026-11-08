@@ -34,11 +34,11 @@ test('market search rejects malformed schemas, wrong routes and impossible bound
 test('market search preserves 401, 403 and quota 429 errors',async()=>{
  for(const status of [401,403,429]){const client=new Bharosa({apiKey:'synthetic',fetch:async()=>Response.json({error:{type:'permission_error',code:'synthetic_denial',message:'denied',param:null,request_id:'req_test'}},{status})});await assert.rejects(client.markets.schemes.search({query:'equity'}),{status});}
 });
-test('market search allowlist never enables private methods and old search keeps its private route',async()=>{
+test('market search allowlist denies private methods; explicit scheme search uses baseline authentication',async()=>{
  let sent=0;const call=createTransport({apiKey:'synthetic',fetch:async()=>{sent++;return Response.json(example());}},true);
  await assert.rejects(call('retrieve_account'),{code:'market_only_operation'});await assert.rejects(call('search_funds',{query:'equity'}),{code:'market_only_operation'});assert.equal(sent,0);
- const client=new Bharosa({account,auth:{type:'delegated_application',apiKey:'synthetic',userAccessToken:'synthetic-user'},fetch:async(input,init)=>{assert.equal(new URL(String(input)).pathname,`/v1/accounts/${account}/mutual_funds`);assert.equal(new Headers(init?.headers).get('Bharosa-User-Authorization'),'Bearer synthetic-user');return Response.json({...example(),url:`/v1/accounts/${account}/mutual_funds`});}});
- assert.equal((await client.mutualFunds.search({query:'equity'})).data[0]?.scheme_id,'101');
+ const client=new Bharosa({account,auth:{type:'delegated_application',apiKey:'synthetic',userAccessToken:'synthetic-user'},fetch:async(input,init)=>{assert.equal(new URL(String(input)).pathname,'/v1/market-data/schemes/search');assert.equal(new Headers(init?.headers).get('Bharosa-User-Authorization'),null);return Response.json({...example(),url:'/v1/market-data/schemes/search'});}});
+ assert.equal((await client.mutualFundSchemes.search({query:'equity'})).data[0]?.scheme_id,'101');
 });
 test('market search respects cancellation before sending',async()=>{
  let sent=0;const client=new Bharosa({apiKey:'synthetic',fetch:async()=>{sent++;return Response.json(example());}});const controller=new AbortController();controller.abort();await assert.rejects(client.markets.schemes.search({query:'equity'},{signal:controller.signal}));assert.equal(sent,0);
