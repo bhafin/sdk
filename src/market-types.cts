@@ -59,6 +59,8 @@ export interface ExpenseObservation {
   value: string | null;
 }
 export interface FundPortfolio {
+  /** Local additive field; absent on older servers. */
+  aum?: import("./analytics-types.cjs").FundPortfolioAum;
   id: string;
   fund_id: string;
   date: string;

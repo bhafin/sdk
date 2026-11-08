@@ -1,3 +1,4 @@
+import { benchmarkMatches } from "./benchmark-checks.cjs";
 import { record, type Operation } from "./schema.cjs";
 import { valid, consistent } from "./validate.cjs";
 export function field(value: unknown, ...path: string[]): unknown {
@@ -27,6 +28,7 @@ export function responseMatches(
   account: string,
 ): boolean {
   if (!valid(op.response, data) || !consistent(data, account)) return false;
+  if (id.startsWith("benchmark_")) return benchmarkMatches(id, data, params);
   if (
     id === "update_portfolio" &&
     (field(data, "id") !== params.portfolio ||
@@ -70,7 +72,12 @@ export function responseMatches(
   }
   if (id === "searchMarketSchemes") {
     const page = rows(d("data"));
-    if (d("url") !== op.path || page.length > (typeof params.limit === "number" ? params.limit : 10) || (d("has_more") === true && page.length === 0)) return false;
+    if (
+      d("url") !== op.path ||
+      page.length > (typeof params.limit === "number" ? params.limit : 10) ||
+      (d("has_more") === true && page.length === 0)
+    )
+      return false;
   }
   if (op.marketData) {
     if (id.endsWith("_get") && d("id") !== params.id) return false;
@@ -164,6 +171,7 @@ export function responseMatches(
   if (id.startsWith("analytics_")) {
     if (id === "analytics_aum") {
       if (
+        d("fund_id") !== params.id ||
         d("requested_date") !== params.as_of ||
         (d("observation_date") !== null &&
           String(d("observation_date")) > String(params.as_of))
@@ -171,7 +179,7 @@ export function responseMatches(
         return false;
       if (
         d("status") === "available" &&
-        field(d("data"), "basis") === "reported_fund_total" &&
+        field(d("data"), "basis") === "stored_fund_portfolio_value" &&
         field(field(d("data"), "source"), "date") !== d("observation_date")
       )
         return false;
@@ -197,9 +205,7 @@ export function responseMatches(
           d("cohort", "option") !== (params.option ?? "growth")
         )
           return false;
-        const requested = String(
-          params.metrics ?? "return",
-        ).split(",");
+        const requested = String(params.metrics ?? "return").split(",");
         const expected = requested.flatMap((m) =>
           m === "return"
             ? String(params.periods ?? "1y,3y,5y")
@@ -254,7 +260,14 @@ export function responseMatches(
     const observation = d("observation_date"),
       requested = d("requested_date"),
       data = d("data");
-    if (!(id === "monthly_nav" && params.as_of === undefined) && requested !== params.as_of) return false;
+    if (
+      !(
+        ["monthly_nav", "monthly_portfolio", "monthly_holdings"].includes(id) &&
+        params.as_of === undefined
+      ) &&
+      requested !== params.as_of
+    )
+      return false;
     if (d("status") === "available") {
       if (
         typeof observation !== "string" ||
@@ -275,6 +288,23 @@ export function responseMatches(
           field(data, "date") !== observation)
       )
         return false;
+      if (id === "monthly_portfolio" || id === "monthly_holdings") {
+        const portfolio =
+          id === "monthly_portfolio" ? data : field(data, "portfolio");
+        const aum = field(portfolio, "aum");
+        if (
+          aum !== undefined &&
+          (field(aum, "requested_date") !== requested ||
+            field(aum, "observation_date") !== observation ||
+            (field(aum, "status") === "available" &&
+              (field(aum, "data", "fund_id") !== params.id ||
+                field(aum, "data", "date") !== observation ||
+                field(aum, "data", "source", "portfolio_id") !==
+                  field(portfolio, "id") ||
+                field(aum, "data", "source", "date") !== observation)))
+        )
+          return false;
+      }
       if (
         id === "monthly_holdings" &&
         (field(data, "portfolio", "fund_id") !== params.id ||

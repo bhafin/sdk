@@ -1,6 +1,6 @@
 {
   "name": "bharosa",
-  "version": "0.7.0",
+  "version": "0.9.0",
   "private": false,
   "description": "Typed Bharosa resource SDK with server credentials or caller-owned transport.",
   "license": "MIT",
@@ -46,7 +46,8 @@
     "FIRST-PARTY-CONTRACT-SHA256",
     "MONTHLY-MARKET-CONTRACT-SHA256",
     "ANALYTICS-CONTRACT-SHA256",
-    "MARKET-SEARCH-CONTRACT-SHA256"
+    "MARKET-SEARCH-CONTRACT-SHA256",
+    "BENCHMARK-CONTRACT-SHA256"
   ],
   "scripts": {
     "build": "node scripts/build.mjs",
@@ -64,7 +65,9 @@
     "generate:analytics": "node scripts/generate-analytics.mjs",
     "check:analytics": "node scripts/generate-analytics.mjs --check",
     "generate:market-search": "node scripts/generate-market-search.mjs",
-    "check:market-search": "node scripts/generate-market-search.mjs --check"
+    "check:market-search": "node scripts/generate-market-search.mjs --check",
+    "generate:benchmarks": "node scripts/generate-benchmarks.mjs",
+    "check:benchmarks": "node scripts/generate-benchmarks.mjs --check"
   },
   "publishConfig": {
     "access": "public",

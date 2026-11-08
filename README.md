@@ -1,3 +1,5 @@
+> SDK 0.8.0 adds stored indexes, fund benchmarks and [fund portfolio AUM](docs/fund-aum.md), including AUM in public fund portfolio and holdings responses. These methods require the matching server API. TER is unchanged.
+
 # Bharosa SDK
 
 A TypeScript client for Bharosa accounts, investors, portfolios, and mutual funds. Use one resource interface from TypeScript, ESM, or CommonJS, with no runtime dependencies.
@@ -92,7 +94,7 @@ Saved portfolios also expose scoped `holdings` and declared `history`. Use `hold
 
 ## Reliability and security
 
-Keep credentials in a backend or a server that handles browser sessions. Account-key and delegated authentication are server-only. Browser applications can use a caller-owned transport; the host application owns session handling, same-origin enforcement and CSRF. Bun and Deno are unsupported. Clients are immutable and account-scoped. The SDK does not provision access, start consent, or refresh tokens.
+Keep credentials in a backend or a server that handles browser sessions. Account-key and delegated authentication are server-only. Browser applications can use a caller-owned transport; the host application owns session handling, same-origin enforcement and CSRF. Bun and Deno are unsupported. Clients are immutable; private resources use the configured account context, while public market resources use baseline access. The SDK does not provision access, start consent, or refresh tokens.
 
 Requests have a total 30-second timeout by default and zero retries unless requested. Creates require an idempotency key. A failed mutation can have an `unknown` outcome even if the server committed it. Use the [reliability guide](docs/reliability.md) to handle retries, cancellation, and reconciliation correctly.
 
@@ -110,7 +112,7 @@ The license covers this SDK. The Bharosa API service, analytics implementation, 
 
 ### Monthly market history and synthetic samples
 
-`client.marketSnapshots` exposes month-start historical market observations and latest NAV valuation without a separate market-data approval step, using authenticated credentials with the required account-read scope. All external credentials, including direct account keys, use monthly historical market dates; investor transaction and position history retains its full dates. See [monthly snapshots](docs/monthly-market-data.md) for actual observation dates, missing data and availability. Installing the SDK does not grant account access.
+`client.marketSnapshots` exposes month-start historical market observations and latest NAV valuation without a separate market-data approval step, using any active, unexpired API key without accounts:read or portfolios:read. All external credentials, including direct account keys, use monthly historical market dates; investor transaction and position history retains its full dates. See [monthly snapshots](docs/monthly-market-data.md) for actual observation dates, missing data and availability. Installing the SDK does not grant account access.
 
 The optional `bharosa/testing` entrypoint supplies fresh, deterministic synthetic portfolios and fictional fund compositions without credentials or network requests. Its seed helper writes only when explicitly called with an authenticated client, confirmed test account, stable run ID and resolved instrument mapping. See [testing samples](docs/testing.md).
 
@@ -132,7 +134,7 @@ Provides `mutualFundSchemes.performance.retrieve` and `fundCategories.statistics
 
 ## Unified API keys
 
-SDK 0.5.0 introduced `new Bharosa({ apiKey })` and `client.markets`, using the existing account-independent market routes. Omit the NAV selection for latest NAV, or pass `{ asOf: "2026-10-01" }` for a monthly snapshot. Missing observations return `status: "missing"` and `data: null`. Explicit dates must be month starts. The account-scoped NAV method also accepts omission, while keeping account authorization.
+SDK 0.5.0 introduced `new Bharosa({ apiKey })` and `client.markets`, using the existing account-independent market routes. Omit the NAV selection for latest NAV, or pass `{ asOf: "2026-10-01" }` for a monthly snapshot. Missing observations return `status: "missing"` and `data: null`. Explicit dates must be month starts. The legacy NAV alias also accepts omission and uses baseline key authentication; its account segment does not select private account data.
 
 Existing `auth` configurations and `BharosaMarket` remain supported. Baseline calls use only the API key; delegated private calls still require user consent and a valid user token. The production origin remains `https://api.bharosa.finance`. Unified-key support is deployed. Private permissions remain optional and are enforced by the server; installing the SDK grants no additional access.
 
@@ -147,7 +149,7 @@ if (selected) {
 }
 ```
 
-Choose the intended scheme and plan from the results. `query` must have 2–100 characters, with at least two after trimming; `limit` is 1–20 and defaults to 10. If `has_more` is true, refine the query; search has no cursor or historical date parameter. An empty `data` array is a valid result. Search returns scheme identities and latest NAV references, including freshness and data-mode information. It does not grant private account access. Existing `mutualFunds.search` remains account-scoped. `BharosaMarket` users can call `schemes.search` directly.
+Choose the intended scheme and plan from the results. `query` must have 2–100 characters, with at least two after trimming; `limit` is 1–20 and defaults to 10. If `has_more` is true, refine the query; search has no cursor or historical date parameter. An empty `data` array is a valid result. Search returns scheme identities and latest NAV references, including freshness and data-mode information. It does not grant private account access. Existing `mutualFunds.search` remains compatible and also uses baseline market authentication. `BharosaMarket` users can call `schemes.search` directly.
 
 Available in SDK 0.6.0 and later, using the account-independent `/v1/market-data/schemes/search` route.
 
@@ -156,3 +158,5 @@ Available in SDK 0.6.0 and later, using the account-independent `/v1/market-data
 SDK 0.7.0 adds `markets.schemes.performance.retrieve`, `markets.categories.statistics.retrieve`, `markets.schemes.references` and `markets.schemes.valuation`. `BharosaMarket` exposes the same methods without the `markets` prefix. These aliases and the legacy market-route authorization correction are deployed in API revision 10. The new SDK aliases are not present in SDK 0.6.0.
 
 Caller-supplied valuation uses provided units and market NAV, never saved positions. Private account/portfolio holdings, history and mixes retain their authorization and consent requirements. Existing monthly date limits, production API origin and error handling remain unchanged. See [analytics](docs/analytics.md) and [market snapshots](docs/monthly-market-data.md) for these interfaces.
+
+All new index, index-performance, fund/scheme benchmark, public mutual-fund portfolio, holdings and AUM methods are baseline market data. They require a valid active API key, not accounts:read or portfolios:read. Revocation, shared quotas and applicable monthly date restrictions remain enforced. Private user portfolios and accounts retain their existing permission/consent requirements.

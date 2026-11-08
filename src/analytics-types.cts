@@ -98,3 +98,55 @@ export interface CategoryStatistics extends AnalyticsEnvelope {
 export interface AnalyticsResource<P, R> {
   retrieve(id: string, params: P, options?: RequestOptions): Promise<R>;
 }
+
+/** Current-vintage stored fund portfolio value, shared by plan/option variants. */
+export interface AumSelection {
+  asOf: string;
+}
+export interface FundAumData {
+  fund_id: string;
+  date: string;
+  amount: string;
+  currency: "INR";
+  unit: "rupee";
+  scope: "fund";
+  basis: "stored_fund_portfolio_value";
+  source: {
+    table: "portfolios";
+    field: "value_cents";
+    portfolio_id: string;
+    date: string;
+    source_unit: "paise";
+  };
+}
+export interface AumQuality {
+  status: "fresh" | "stale";
+  age_days: number;
+  limit_days: number;
+}
+export type FundPortfolioAum = {
+  object: "market_snapshot";
+  requested_date: string;
+} & (
+  | {
+      status: "available";
+      observation_date: string;
+      data: FundAumData;
+      quality: AumQuality;
+    }
+  | { status: "missing"; observation_date: null; data: null }
+  | {
+      status: "unavailable";
+      reason: string;
+      observation_date: string | null;
+      data: null;
+      quality: AumQuality | null;
+    }
+);
+
+export type FundAum = FundPortfolioAum & {
+  fund_id: string;
+  source_cutoff: string;
+  source_version: string;
+  history_basis: "current_source_vintage";
+};

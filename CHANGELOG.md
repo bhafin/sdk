@@ -1,3 +1,11 @@
+# 0.9.0
+
+Adds the public mutual fund → portfolio() → holdings() resource chain, selecting the latest stored portfolio by default and retaining historical month-start selection. Holdings pagination binds to the selected portfolio; AUM stays on that record. Existing mix methods remain compatible. Strengthens calendar and union validation, pagination guards, and constructor transport snapshots.
+
+# 0.8.0
+
+Adds fund-owned stored AUM, including AUM inside public fund portfolio and holdings responses. TER is unchanged. Also adds account-independent stored index discovery/performance and fund-owned benchmark composition/performance, with scheme delegation. Uses existing stored quotes and weights; supports 1y/3y/5y with explicit missing-data results. These additive methods require the matching server API and baseline API-key access without account or portfolio permissions. See [benchmark guide](docs/benchmarks.md).
+
 # 0.7.0 — 31 October 2026
 
 Added baseline scheme performance, category statistics, instrument references and caller-supplied scheme valuation. Existing pure-market methods remain compatible. Private portfolio authorization is unchanged. Matching API permission correction deployed in revision 10.

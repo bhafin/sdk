@@ -287,12 +287,13 @@ module.exports = {
         {
           "name": "as_of",
           "in": "query",
-          "required": true,
+          "required": false,
           "schema": {
             "type": "string",
             "format": "date",
             "pattern": "^[0-9]{4}-[0-9]{2}-01$"
-          }
+          },
+          "description": "Omit for latest stored fund portfolio on or before today in Asia/Kolkata. Explicit historical selections remain month-start only."
         }
       ],
       "response": {
@@ -340,6 +341,242 @@ module.exports = {
                   "date": {
                     "type": "string",
                     "format": "date"
+                  },
+                  "aum": {
+                    "oneOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "object": {
+                            "const": "market_snapshot"
+                          },
+                          "requested_date": {
+                            "type": "string",
+                            "format": "date",
+                            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                          },
+                          "status": {
+                            "const": "available"
+                          },
+                          "observation_date": {
+                            "type": "string",
+                            "format": "date",
+                            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                          },
+                          "data": {
+                            "type": "object",
+                            "properties": {
+                              "fund_id": {
+                                "type": "string",
+                                "pattern": "^[1-9][0-9]{0,18}$"
+                              },
+                              "date": {
+                                "type": "string",
+                                "format": "date",
+                                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                              },
+                              "amount": {
+                                "type": "string",
+                                "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$"
+                              },
+                              "currency": {
+                                "const": "INR"
+                              },
+                              "unit": {
+                                "const": "rupee"
+                              },
+                              "scope": {
+                                "const": "fund"
+                              },
+                              "basis": {
+                                "const": "stored_fund_portfolio_value"
+                              },
+                              "source": {
+                                "type": "object",
+                                "properties": {
+                                  "table": {
+                                    "const": "portfolios"
+                                  },
+                                  "field": {
+                                    "const": "value_cents"
+                                  },
+                                  "portfolio_id": {
+                                    "type": "string",
+                                    "pattern": "^[1-9][0-9]{0,18}$"
+                                  },
+                                  "date": {
+                                    "type": "string",
+                                    "format": "date"
+                                  },
+                                  "source_unit": {
+                                    "const": "paise"
+                                  }
+                                },
+                                "required": [
+                                  "table",
+                                  "field",
+                                  "portfolio_id",
+                                  "date",
+                                  "source_unit"
+                                ],
+                                "additionalProperties": false
+                              }
+                            },
+                            "required": [
+                              "fund_id",
+                              "date",
+                              "amount",
+                              "currency",
+                              "unit",
+                              "scope",
+                              "basis",
+                              "source"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "quality": {
+                            "type": "object",
+                            "properties": {
+                              "status": {
+                                "enum": [
+                                  "fresh",
+                                  "stale"
+                                ]
+                              },
+                              "age_days": {
+                                "type": "number",
+                                "minimum": 0
+                              },
+                              "limit_days": {
+                                "type": "number",
+                                "minimum": 0
+                              }
+                            },
+                            "required": [
+                              "status",
+                              "age_days",
+                              "limit_days"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "required": [
+                          "object",
+                          "requested_date",
+                          "status",
+                          "observation_date",
+                          "data",
+                          "quality"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "object": {
+                            "const": "market_snapshot"
+                          },
+                          "requested_date": {
+                            "type": "string",
+                            "format": "date",
+                            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                          },
+                          "status": {
+                            "const": "missing"
+                          },
+                          "observation_date": {
+                            "type": "null"
+                          },
+                          "data": {
+                            "type": "null"
+                          }
+                        },
+                        "required": [
+                          "object",
+                          "requested_date",
+                          "status",
+                          "observation_date",
+                          "data"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "object": {
+                            "const": "market_snapshot"
+                          },
+                          "requested_date": {
+                            "type": "string",
+                            "format": "date",
+                            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                          },
+                          "status": {
+                            "const": "unavailable"
+                          },
+                          "reason": {
+                            "type": "string"
+                          },
+                          "observation_date": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "format": "date",
+                                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "data": {
+                            "type": "null"
+                          },
+                          "quality": {
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "status": {
+                                    "enum": [
+                                      "fresh",
+                                      "stale"
+                                    ]
+                                  },
+                                  "age_days": {
+                                    "type": "number",
+                                    "minimum": 0
+                                  },
+                                  "limit_days": {
+                                    "type": "number",
+                                    "minimum": 0
+                                  }
+                                },
+                                "required": [
+                                  "status",
+                                  "age_days",
+                                  "limit_days"
+                                ],
+                                "additionalProperties": false
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "required": [
+                          "object",
+                          "requested_date",
+                          "status",
+                          "reason",
+                          "observation_date",
+                          "data",
+                          "quality"
+                        ],
+                        "additionalProperties": false
+                      }
+                    ]
                   }
                 },
                 "additionalProperties": true
@@ -426,12 +663,23 @@ module.exports = {
         {
           "name": "as_of",
           "in": "query",
-          "required": true,
+          "required": false,
           "schema": {
             "type": "string",
             "format": "date",
             "pattern": "^[0-9]{4}-[0-9]{2}-01$"
-          }
+          },
+          "description": "Omit for latest stored fund portfolio on or before today in Asia/Kolkata. Explicit historical selections remain month-start only."
+        },
+        {
+          "name": "portfolio_id",
+          "in": "query",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]{0,18}$"
+          },
+          "description": "Expected public portfolio ID. Reject changed/missing selection with 409 fund_portfolio_changed before reading holdings."
         }
       ],
       "response": {
@@ -487,6 +735,242 @@ module.exports = {
                       "date": {
                         "type": "string",
                         "format": "date"
+                      },
+                      "aum": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "object": {
+                                "const": "market_snapshot"
+                              },
+                              "requested_date": {
+                                "type": "string",
+                                "format": "date",
+                                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                              },
+                              "status": {
+                                "const": "available"
+                              },
+                              "observation_date": {
+                                "type": "string",
+                                "format": "date",
+                                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                              },
+                              "data": {
+                                "type": "object",
+                                "properties": {
+                                  "fund_id": {
+                                    "type": "string",
+                                    "pattern": "^[1-9][0-9]{0,18}$"
+                                  },
+                                  "date": {
+                                    "type": "string",
+                                    "format": "date",
+                                    "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                                  },
+                                  "amount": {
+                                    "type": "string",
+                                    "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$"
+                                  },
+                                  "currency": {
+                                    "const": "INR"
+                                  },
+                                  "unit": {
+                                    "const": "rupee"
+                                  },
+                                  "scope": {
+                                    "const": "fund"
+                                  },
+                                  "basis": {
+                                    "const": "stored_fund_portfolio_value"
+                                  },
+                                  "source": {
+                                    "type": "object",
+                                    "properties": {
+                                      "table": {
+                                        "const": "portfolios"
+                                      },
+                                      "field": {
+                                        "const": "value_cents"
+                                      },
+                                      "portfolio_id": {
+                                        "type": "string",
+                                        "pattern": "^[1-9][0-9]{0,18}$"
+                                      },
+                                      "date": {
+                                        "type": "string",
+                                        "format": "date"
+                                      },
+                                      "source_unit": {
+                                        "const": "paise"
+                                      }
+                                    },
+                                    "required": [
+                                      "table",
+                                      "field",
+                                      "portfolio_id",
+                                      "date",
+                                      "source_unit"
+                                    ],
+                                    "additionalProperties": false
+                                  }
+                                },
+                                "required": [
+                                  "fund_id",
+                                  "date",
+                                  "amount",
+                                  "currency",
+                                  "unit",
+                                  "scope",
+                                  "basis",
+                                  "source"
+                                ],
+                                "additionalProperties": false
+                              },
+                              "quality": {
+                                "type": "object",
+                                "properties": {
+                                  "status": {
+                                    "enum": [
+                                      "fresh",
+                                      "stale"
+                                    ]
+                                  },
+                                  "age_days": {
+                                    "type": "number",
+                                    "minimum": 0
+                                  },
+                                  "limit_days": {
+                                    "type": "number",
+                                    "minimum": 0
+                                  }
+                                },
+                                "required": [
+                                  "status",
+                                  "age_days",
+                                  "limit_days"
+                                ],
+                                "additionalProperties": false
+                              }
+                            },
+                            "required": [
+                              "object",
+                              "requested_date",
+                              "status",
+                              "observation_date",
+                              "data",
+                              "quality"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "object": {
+                                "const": "market_snapshot"
+                              },
+                              "requested_date": {
+                                "type": "string",
+                                "format": "date",
+                                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                              },
+                              "status": {
+                                "const": "missing"
+                              },
+                              "observation_date": {
+                                "type": "null"
+                              },
+                              "data": {
+                                "type": "null"
+                              }
+                            },
+                            "required": [
+                              "object",
+                              "requested_date",
+                              "status",
+                              "observation_date",
+                              "data"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "object": {
+                                "const": "market_snapshot"
+                              },
+                              "requested_date": {
+                                "type": "string",
+                                "format": "date",
+                                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                              },
+                              "status": {
+                                "const": "unavailable"
+                              },
+                              "reason": {
+                                "type": "string"
+                              },
+                              "observation_date": {
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "format": "date",
+                                    "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "data": {
+                                "type": "null"
+                              },
+                              "quality": {
+                                "anyOf": [
+                                  {
+                                    "type": "object",
+                                    "properties": {
+                                      "status": {
+                                        "enum": [
+                                          "fresh",
+                                          "stale"
+                                        ]
+                                      },
+                                      "age_days": {
+                                        "type": "number",
+                                        "minimum": 0
+                                      },
+                                      "limit_days": {
+                                        "type": "number",
+                                        "minimum": 0
+                                      }
+                                    },
+                                    "required": [
+                                      "status",
+                                      "age_days",
+                                      "limit_days"
+                                    ],
+                                    "additionalProperties": false
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            "required": [
+                              "object",
+                              "requested_date",
+                              "status",
+                              "reason",
+                              "observation_date",
+                              "data",
+                              "quality"
+                            ],
+                            "additionalProperties": false
+                          }
+                        ]
                       }
                     },
                     "additionalProperties": true
@@ -962,6 +1446,89 @@ module.exports = {
             "description": "Unavailable valuation retains a nullable observed INR amount and does not contain a computed value."
           }
         ]
+      }
+    },
+    "baseline_fund": {
+      "path": "/v1/market-data/funds/{id}",
+      "method": "GET",
+      "status": 200,
+      "marketData": true,
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]{0,18}$"
+          }
+        }
+      ],
+      "response": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "amc_id",
+          "category",
+          "active",
+          "manager_ids"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]{0,18}$"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "amc_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[1-9][0-9]{0,18}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "active": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "manager_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]{0,18}$"
+            }
+          }
+        },
+        "additionalProperties": true
       }
     }
   }

@@ -255,12 +255,14 @@ async function lifecycleConsumer(client: import("bharosa").Bharosa) {
 }
 void lifecycleConsumer;
 
-// Growth-only additive surface; deferred APIs must not appear in the package.
+// Additive return and fund-AUM candidate surface; unrelated deferred APIs stay absent.
 declare const growthClient: import("bharosa").Bharosa;
 void growthClient.mutualFundSchemes.performance.retrieve("11",{asOf:"2026-10-01",periods:["1y"]});
 void growthClient.fundCategories.statistics.retrieve("equity",{asOf:"2026-10-01",metrics:["return"]});
-// @ts-expect-error AUM is not part of the Growth-return slice.
-void growthClient.mutualFunds.aum;
+const fundAumResult: Promise<FundAum> = growthClient.mutualFunds.aum.retrieve("11417", {asOf:"2026-10-01"});
+void fundAumResult;
+// @ts-expect-error AUM belongs to the fund, never a scheme.
+void growthClient.mutualFundSchemes.aum;
 // @ts-expect-error Investor monetary returns require the separate ledger release.
 void growthClient.portfolios.performance;
 // @ts-expect-error Category TER is not a supported metric in this slice.
@@ -269,7 +271,6 @@ void growthClient.fundCategories.statistics.retrieve("equity",{asOf:"2026-10-01"
 // Deferred capability types must not imply a shipped API.
 // @ts-expect-error Investor monetary performance is deferred.
 import type { PortfolioPerformance } from "bharosa";
-// @ts-expect-error Fund AUM is deferred.
 import type { FundAum } from "bharosa";
 
 import { BharosaMarket } from "bharosa";

@@ -21,7 +21,7 @@ assert.ok(dry.files.some((x) => x.path === "LICENSE"));
 for (const f of dry.files)
   assert.match(
     f.path,
-    /^(dist\/[^/]+\.(?:cjs|mjs|d\.ts|d\.cts|d\.mts)|README\.md|CONTRIBUTING\.md|SECURITY\.md|CHANGELOG\.md|docs\/(?:index|getting-started|portfolios|reliability|releasing|provenance|testing|analytics|monthly-market-data)\.md|examples\/(?:README\.md|(?:read-account|portfolio-mixes|create-investor)\.ts|offline-smoke\.mjs)|LICENSE|CONTRACT-SHA256|FIRST-PARTY-CONTRACT-SHA256|ANALYTICS-CONTRACT-SHA256|MARKET-SEARCH-CONTRACT-SHA256|MONTHLY-MARKET-CONTRACT-SHA256|package\.json)$/,
+    /^(dist\/[^/]+\.(?:cjs|mjs|d\.ts|d\.cts|d\.mts)|README\.md|CONTRIBUTING\.md|SECURITY\.md|CHANGELOG\.md|docs\/(?:index|getting-started|portfolios|reliability|releasing|provenance|testing|analytics|fund-aum|benchmarks|monthly-market-data)\.md|examples\/(?:README\.md|(?:read-account|portfolio-mixes|create-investor|benchmark-performance)\.ts|offline-smoke\.mjs)|LICENSE|CONTRACT-SHA256|FIRST-PARTY-CONTRACT-SHA256|ANALYTICS-CONTRACT-SHA256|MARKET-SEARCH-CONTRACT-SHA256|BENCHMARK-CONTRACT-SHA256|MONTHLY-MARKET-CONTRACT-SHA256|package\.json)$/,
   );
 assert.ok(
   !dry.files.some(
@@ -113,7 +113,7 @@ for (const [module, resolution, files] of [
 const packageJson = JSON.parse(
   fs.readFileSync(path.join(temp, "node_modules/bharosa/package.json")),
 );
-assert.equal(packageJson.private, false);
+assert.equal(packageJson.private, false); // Reviewed, explicitly authorized release candidate.
 assert.equal(
   packageJson.version,
   JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8")).version,
@@ -145,7 +145,7 @@ console.log(
         "browser ESM and CJS exports",
         "deep-import rejection",
         "allowlist",
-        "release license/publication checks",
+        "release license/publication metadata checks",
       ],
     },
     null,

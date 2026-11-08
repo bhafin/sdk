@@ -1,8 +1,12 @@
+import { benchmarkMethods, indexMethods } from "./benchmark-methods.cjs";
+import type * as B from "./benchmark-types.cjs";
+export type * from "./benchmark-types.cjs";
 import type * as A from "./analytics-types.cjs";
 export type * from "./analytics-types.cjs";
 import type { MonthlyMarketClient, MonthSelection } from "./monthly-types.cjs";
 export type * from "./monthly-types.cjs";
 import { createTransport, check, keys } from "./transport.cjs";
+import { InvalidResponseError } from "./errors.cjs";
 import { schemas } from "./contract.cjs";
 import { valid } from "./validate.cjs";
 import type * as T from "./client-types.cjs";
@@ -106,7 +110,8 @@ export class Bharosa implements T.ClientSurface {
   readonly marketSnapshots: MonthlyMarketClient;
   readonly marketData: D.MarketDataClient;
   constructor(config: T.BharosaConfig) {
-    this.markets = baselineMarkets(createTransport(config, true));
+    const marketCall = createTransport(config, true);
+    this.markets = baselineMarkets(marketCall);
     const call = createTransport(config);
     this.fundCategories = categoryMethods(call);
 
@@ -340,7 +345,67 @@ export class Bharosa implements T.ClientSurface {
     ): A & T.MutualFundObject => {
       const common = mixMethods(target),
         portfolio = methods(
-          {},
+          target.type === "mutual_fund"
+            ? async (
+                selection: Partial<MonthSelection> = {},
+                options?: T.RequestOptions,
+              ): Promise<T.FundPortfolioResource | null> => {
+                keys(selection, ["asOf"]);
+                const asOf = selection.asOf;
+                if (asOf !== undefined) {
+                  checkedDate(asOf);
+                  check(asOf.endsWith("-01"));
+                }
+                const id = target.mutual_fund_id;
+                const selected = await marketCall(
+                  "monthly_portfolio",
+                  { id, ...(asOf === undefined ? {} : { as_of: asOf }) },
+                  undefined,
+                  options,
+                );
+                if (selected.status === "missing") return null;
+                const selectedId = selected.data.id,
+                  selectedDate = selected.observation_date;
+                return methods(
+                  {
+                    ...selected.data,
+                    requested_date: selected.requested_date,
+                    observation_date: selectedDate,
+                  },
+                  {
+                    holdings: async (
+                      query: D.MarketPage = {},
+                      requestOptions?: T.RequestOptions,
+                    ) => {
+                      keys(query, ["limit", "startingAfter"]);
+                      const response = await marketCall(
+                        "monthly_holdings",
+                        {
+                          id,
+                          ...(asOf === undefined ? {} : { as_of: asOf }),
+                          portfolio_id: selectedId,
+                          ...(query.limit === undefined
+                            ? {}
+                            : { limit: query.limit }),
+                          ...(query.startingAfter === undefined
+                            ? {}
+                            : { starting_after: query.startingAfter }),
+                        },
+                        undefined,
+                        requestOptions,
+                      );
+                      if (
+                        response.status !== "available" ||
+                        response.data.portfolio.id !== selectedId ||
+                        response.observation_date !== selectedDate
+                      )
+                        throw new InvalidResponseError();
+                      return response.data.holdings;
+                    },
+                  },
+                );
+              }
+            : {},
           {
             assetMix: common.assetMix,
             sectorMix: common.sectorMix,
@@ -358,6 +423,30 @@ export class Bharosa implements T.ClientSurface {
       });
     };
     this.mutualFunds = Object.freeze({
+      retrieve: async (id: string, options?: T.RequestOptions) => {
+        const data = await marketCall(
+          "baseline_fund",
+          { id },
+          undefined,
+          options,
+        );
+        if (data.id !== id) throw new InvalidResponseError();
+        return fund(
+          { type: "mutual_fund", mutual_fund_id: id },
+          data,
+        ) as D.FundOwner & T.PublicMutualFundObject;
+      },
+      aum: Object.freeze({
+        retrieve: (id: string, q: A.AumSelection, o?: T.RequestOptions) => {
+          keys(q, ["asOf"]);
+          return call(
+            "analytics_aum",
+            { id, ...analyticsQuery(q) },
+            undefined,
+            o,
+          );
+        },
+      }),
       portfolios: Object.freeze({
         retrieve: (id: string, q: MonthSelection, o?: T.RequestOptions) =>
           this.marketSnapshots.funds.portfolio(id, q, o),
@@ -378,7 +467,7 @@ export class Bharosa implements T.ClientSurface {
         return fund(
           { type: "mutual_fund", mutual_fund_id: id },
           { mutual_fund_id: id },
-        );
+        ) as T.PublicMutualFundObject;
       },
       fromInstrument: (instrument: string) => {
         check(
@@ -598,7 +687,8 @@ export interface BharosaMarketConfig {
 export class BharosaMarket {
   readonly schemes: BaselineMarketClient["schemes"];
   readonly categories: BaselineMarketClient["categories"];
-  readonly funds: MonthlyMarketClient["funds"];
+  readonly funds: BaselineMarketClient["funds"];
+  readonly indexes: B.IndexClient;
   constructor(config: BharosaMarketConfig) {
     keys(config, [
       "baseUrl",
@@ -616,11 +706,14 @@ export class BharosaMarket {
     this.schemes = resources.schemes;
     this.categories = resources.categories;
     this.funds = resources.funds;
+    this.indexes = resources.indexes;
   }
 }
 export interface BaselineMarketClient {
+  readonly indexes: B.IndexClient;
   readonly categories: T.ClientSurface["fundCategories"];
   readonly schemes: {
+    benchmark: B.BenchmarkClient;
     references(
       query: { instruments: string[] },
       options?: T.RequestOptions,
@@ -638,7 +731,10 @@ export interface BaselineMarketClient {
     ): ReturnType<MonthlyMarketClient["schemes"]["nav"]>;
     expenseRatio: MonthlyMarketClient["schemes"]["expenseRatio"];
   };
-  readonly funds: MonthlyMarketClient["funds"];
+  readonly funds: MonthlyMarketClient["funds"] & {
+    readonly aum: T.ClientSurface["mutualFunds"]["aum"];
+    readonly benchmark: B.BenchmarkClient;
+  };
 }
 function baselineMarkets(
   call: ReturnType<typeof createTransport>,
@@ -654,6 +750,7 @@ function baselineMarkets(
     };
   };
   const schemes: BaselineMarketClient["schemes"] = {
+    benchmark: benchmarkMethods(call, "scheme"),
     references: (p, o) => {
       keys(p, ["instruments"]);
       check(
@@ -718,6 +815,18 @@ function baselineMarkets(
       call("monthly_expense", { id, ...query(q) }, undefined, o),
   };
   const funds: BaselineMarketClient["funds"] = {
+    aum: Object.freeze({
+      retrieve: (id: string, q: A.AumSelection, o?: T.RequestOptions) => {
+        keys(q, ["asOf"]);
+        return call(
+          "analytics_aum",
+          { id, ...analyticsQuery(q) },
+          undefined,
+          o,
+        );
+      },
+    }),
+    benchmark: benchmarkMethods(call, "fund"),
     portfolio: (id, q, o) =>
       call("monthly_portfolio", { id, ...query(q) }, undefined, o),
     holdings: (id, q, o) =>
@@ -727,5 +836,6 @@ function baselineMarkets(
     schemes: Object.freeze(schemes),
     funds: Object.freeze(funds),
     categories: categoryMethods(call),
+    indexes: indexMethods(call),
   });
 }

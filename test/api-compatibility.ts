@@ -16,8 +16,10 @@ const currentSurface: Omit<
   | "portfolios"
 > = previous;
 const previousFunds: Previous["mutualFunds"] = current.mutualFunds;
-const currentFunds: Omit<Current["mutualFunds"], "portfolios"> =
-  previous.mutualFunds;
+const currentFunds: Omit<
+  Current["mutualFunds"],
+  "portfolios" | "aum" | "retrieve" | "fromId"
+> = previous.mutualFunds;
 void previousSurface;
 void currentSurface;
 void previousFunds;

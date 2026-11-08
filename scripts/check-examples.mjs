@@ -10,6 +10,11 @@ if (!consumer)
   throw Error(
     "Set BHAROSA_CONSUMER_ROOT to an isolated installed tarball consumer.",
   );
+// Regenerate only files owned by this checker; stale guide files must not
+// participate when switching reviewed documentation snapshots.
+for (const name of fs.readdirSync(consumer)) {
+  if (/^website-.*\.(ts|mjs)$/.test(name)) fs.rmSync(path.join(consumer,name));
+}
 const { endpoints } = await import(
   pathToFileURL(path.join(marketing, "src/content/product.ts"))
 );
@@ -117,30 +122,20 @@ if (process.env.BHAROSA_TSC) {
   const productUrl = pathToFileURL(
     path.join(marketing, "src/content/product.ts"),
   ).href;
+  // A data URL has no relative base; resolve all guide imports explicitly.
   const guideSource = fs
     .readFileSync(path.join(marketing, "src/content/guides.ts"), "utf8")
-    .replace('"./product"', JSON.stringify(productUrl))
-    .replace(
-      '"./reference-design.ts"',
-      JSON.stringify(
-        pathToFileURL(path.join(marketing, "src/content/reference-design.ts"))
-          .href,
-      ),
-    )
-    .replace(
-      '"./saved-portfolio-example"',
-      JSON.stringify(
-        pathToFileURL(
-          path.join(marketing, "src/content/saved-portfolio-example.ts"),
-        ).href,
-      ),
-    )
-    .replace(
-      '"./examples"',
-      JSON.stringify(
-        pathToFileURL(path.join(marketing, "src/content/examples.ts")).href,
-      ),
-    );
+    .replace(/from\s+["'](\.\/[^"']+)["']/g, (_match, specifier) => {
+      const filename = /\.[a-z]+$/i.test(specifier)
+        ? specifier
+        : specifier + ".ts";
+      return (
+        "from " +
+        JSON.stringify(
+          pathToFileURL(path.resolve(marketing, "src/content", filename)).href,
+        )
+      );
+    });
   const guideJs = ts.transpileModule(guideSource, {
     compilerOptions: {
       module: ts.ModuleKind.ESNext,
@@ -163,12 +158,26 @@ if (process.env.BHAROSA_TSC) {
         continue;
       // Installation commands and MCP host JSON are not SDK TypeScript examples.
       // Shell examples remain owned by the website tooling.
-      if (/^(?:\s*#[^\n]*(?:\n|$))*\s*(?:curl|npm|npx|node|claude|codex)\b/.test(section.code)) continue;
-      const source =
-        (section.code.includes("import { Bharosa }")
-          ? ""
-          : sdkInitialization + "\n") + section.code;
+      if (
+        /^(?:\s*#[^\n]*(?:\n|$))*\s*(?:curl|npm|npx|node|claude|codex)\b/.test(
+          section.code,
+        )
+      )
+        continue;
+      const javascript = section.codeLanguage === "javascript";
+      const source = javascript
+        ? section.code
+        : (/import\s*\{[^}]*\bBharosa\b|\bnew\s+Bharosa\s*\(/.test(section.code)
+            ? ""
+            : sdkInitialization + "\n") + section.code;
+      // This contextual consent snippet explicitly consumes a previously validated
+      // delivery. Supply synthetic setup; do not skip or modify the snippet.
+      const context =
+        guide.slug === "connect-an-account" && section.id === "step-3"
+          ? `const delivery = {account_id: "${env.BHAROSA_ACCOUNT_ID}", access_token: "${env.BHAROSA_USER_ACCESS_TOKEN}"}; const applicationKey = "${env.BHAROSA_APPLICATION_KEY}";\n`
+          : "";
       const executable =
+        context +
         source +
         (guide.slug === "oauth"
           ? "\nawait retrieveGrantedAccount({accountId:process.env.BHAROSA_ACCOUNT_ID!,accessToken:process.env.BHAROSA_USER_ACCESS_TOKEN!});"
@@ -198,20 +207,30 @@ if (process.env.BHAROSA_TSC) {
           });
         }
       }
-      const js = ts.transpileModule(
-        executable
-          .replace('import { Bharosa } from "bharosa";', "")
-          .replace(
-            /import\s*\{([^}]+)\}\s*from\s*["']bharosa\/testing["'];?/g,
-            "const {$1} = testing;",
-          ),
-        {
-          compilerOptions: {
-            module: ts.ModuleKind.ESNext,
-            target: ts.ScriptTarget.ES2022,
+      const js = ts
+        .transpileModule(
+          executable
+            .replace(
+              /import\s*\{([^}]+)\}\s*from\s*["']node:crypto["'];?/g,
+              'const {$1} = await import("node:crypto");',
+            )
+            .replace('import { Bharosa } from "bharosa";', "")
+            .replace(
+              /import\s*\{([^}]+)\}\s*from\s*["']bharosa\/testing["'];?/g,
+              "const {$1} = testing;",
+            ),
+          {
+            compilerOptions: {
+              module: ts.ModuleKind.ESNext,
+              target: ts.ScriptTarget.ES2022,
+            },
           },
-        },
-      ).outputText;
+        )
+        .outputText.replace(
+          /^export\s+(?=(?:async\s+)?(?:function|class|const|let|var)\b)/gm,
+          "",
+        )
+        .replace(/^export\s*\{\s*\};?$/gm, "");
       await new AsyncFunction(
         "Bharosa",
         "process",
@@ -226,10 +245,20 @@ if (process.env.BHAROSA_TSC) {
         { log() {} },
         testing,
       );
+      const stem = `website-guide-${guide.slug}-${section.id}`;
+      fs.rmSync(path.join(consumer, stem + (javascript ? ".ts" : ".mjs")), {
+        force: true,
+      });
       fs.writeFileSync(
-        path.join(consumer, `website-guide-${guide.slug}-${section.id}.ts`),
-        `declare const process: {env: Record<string,string|undefined>};\n` +
-          source,
+        path.join(consumer, stem + (javascript ? ".mjs" : ".ts")),
+        javascript
+          ? source
+          : `declare const process: {env: Record<string,string|undefined>};\n` +
+              (source.includes("import { Bharosa }")
+                ? ""
+                : 'import { Bharosa } from "bharosa";\n') +
+              context +
+              source,
       );
       guideCount++;
     }
@@ -239,13 +268,17 @@ if (process.env.BHAROSA_TSC) {
 
   const files = fs
     .readdirSync(consumer)
-    .filter((x) => x.startsWith("website-") && x.endsWith(".ts"));
+    .filter((x) => x.startsWith("website-") && /\.(ts|mjs)$/.test(x));
   const r = spawnSync(
     process.execPath,
     [
       process.env.BHAROSA_TSC,
       "--noEmit",
+      "--typeRoots",
+      path.resolve(path.dirname(process.env.BHAROSA_TSC), "../../@types"),
       "--strict",
+      "--allowJs",
+      "--checkJs",
       "--target",
       "ES2022",
       "--module",

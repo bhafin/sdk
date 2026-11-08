@@ -12,3 +12,9 @@ Build a Node.js integration with the Bharosa resource API. Install the published
 For development, start with [CONTRIBUTING.md](../CONTRIBUTING.md). See the [source and package release checklist](releasing.md) before any distribution.
 
 The SDK contains client transport, public contract types, and validation. The service that computes analytics is separate and remains closed source. Public contracts describe observable behavior; they do not grant access to service source or provider datasets.
+
+## SDK 0.8.0
+
+[Stored indexes and fund benchmarks](benchmarks.md) describes the stored-index and benchmark methods introduced in SDK 0.8.0.
+
+- [Fund portfolio AUM](fund-aum.md) — inspect public fund holdings and stored AUM together.

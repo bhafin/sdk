@@ -25,3 +25,5 @@ node node_modules/bharosa/examples/offline-smoke.mjs
 ```
 
 The script uses an in-process synthetic transport and the optional testing entrypoint. It needs no API origin, credentials, repository checkout or contributor tooling, and makes no network requests or persisted writes. Real access must be checked separately using operator-supplied configuration.
+
+`benchmark-performance.ts` uses SDK 0.8.0 stored fund benchmarks and requires the matching server API. It is not a 0.7.0 capability.
