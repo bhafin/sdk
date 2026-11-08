@@ -1,4 +1,4 @@
-# 0.10.0 — local unreleased
+# 0.10.0
 
 Separate parent-fund and scheme discovery/retrieval. Add paginated fund.schemes() and scheme.fund()/nav(). Parent fund.portfolio() is an ordinary async method; use direct fund mix methods instead of portfolio function properties. See docs/fund-aum.md for migration and preserved historical semantics.
 

@@ -58,7 +58,7 @@ Existing market authentication, account boundaries and shared quotas apply. Cate
 
 Authorization: every method described here is public baseline market data. A valid active API key is required; accounts:read, portfolios:read and investor consent are not required. Fund/scheme benchmark proxies use the same rule. Revocation, shared market quotas and applicable month-start date restrictions still apply. Private user accounts and portfolios keep their existing authorization requirements.
 
-## v0.10 migration (local, unreleased)
+## v0.10 migration
 
 `mutualFunds.search({query, limit?})` now returns parent mutual funds. Move scheme autocomplete to `mutualFundSchemes.search({query, limit?})`. Both searches are bounded (query 2–100 characters; limit 1–20, default10). Refine the query when `has_more` is true; searches have no cursor. Parent search matches literal fund-name substrings, not scheme identifiers. Scheme search retains ranked token/identifier/plan/option matching.
 
